@@ -540,7 +540,14 @@
         document.body.setAttribute('data-theme', theme);
         const selectedTheme = document.getElementById('theme').value;
         editor.updateOptions({
-          theme: selectedTheme, // Monaco theme change
+          theme: selectedTheme,
+          autoClosingBrackets: document.getElementById('autoClosingBrackets').checked,
+          wordWrap: document.getElementById('wordWrap').checked ? 'on' : 'off',
+          fontSize: parseInt(document.getElementById('fontSize').value, 10),
+          lineNumbers: document.getElementById('lineNumbers').checked ? 'on' : 'off',
+          renderWhitespace: document.getElementById('renderWhitespace').checked ? 'all' : 'none',
+          minimap: { enabled: document.getElementById('minimap').checked },
+          
         });
 
         // Apply body class for theme change
