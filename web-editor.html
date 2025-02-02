@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+    <!-- Primary Meta Tags -->
+    <title>Script Api Editor</title>
+    <meta name="description" content="A simple web-based code editor for Minecraft Bedrock Edition scripting with real-time autocomplete, module version management.">
+    <meta name="keywords" content="Minecraft Script API editor, Minecraft Bedrock scripting, code editor, TypeScript autocomplete, Minecraft module versions, @minecraft/server, @minecraft/server-ui, monaco editor, JavaScript, Minecraft coding tool">
+    <meta name="author" content="minato4743">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Script Api Editor">
+    <meta property="og:description" content="A simple web-based code editor for Minecraft Bedrock Edition scripting with real-time autocomplete, module version management.">
+    <meta property="og:url" content="...">
+    <meta property="og:image" content="./content/pictures/screenshot.png">
+    <meta property="og:site_name" content="Script Api Editor">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Script Api Editor">
+    <meta name="twitter:description" content="A simple web-based code editor for Minecraft Bedrock Edition scripting with real-time autocomplete, module version management.">
+    <meta name="twitter:image" content="./content/pictures/screenshot.png">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1e1e1e" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f3f3f3" media="(prefers-color-scheme: light)">
+
+    <!-- iOS Specific -->
+    <meta name="apple-mobile-web-app-title" content="Script Api Editor">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <!-- Windows Specific -->
+    <meta name="msapplication-TileColor" content="#1e1e1e">
+
+    <link rel="icon" type="image/x-icon" href="./content/pictures/web-editor.png">
+    <style>
+      :root {
+        /* dark theme (default) */
+        --bg-color: #1e1e1e;
+        --text-color: #d4d4d4;
+        --button-bg: #3c3c3c;
+        --button-border: #454545;
+        --modal-bg: #2d2d2d;
+        --input-bg: #3c3c3c;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #3c3c3c;
+        --scrollbar-thumb: #606060;
+      }
+    
+      [data-theme="hc-black"] {
+        /* high contrast theme */
+        --bg-color: #000000;
+        --text-color: #ffffff;
+        --button-bg: #000000;
+        --button-border: #ffffff;
+        --modal-bg: #000000;
+        --input-bg: #000000;
+        --hover-brightness: 1.25;
+        --scrollbar-color: #000000;
+        --scrollbar-thumb: #ffffff;
+      }
+    
+      [data-theme="vs"] {
+        /* light theme */
+        --bg-color: #f3f3f3;
+        --text-color: #333333;
+        --button-bg: #e0e0e0;
+        --button-border: #cccccc;
+        --modal-bg: #ffffff;
+        --input-bg: #ffffff;
+        --hover-brightness: 0.95;
+        --scrollbar-color: #e0e0e0;
+        --scrollbar-thumb: #b0b0b0;
+      }
+    
+      body {
+        margin: 0;
+        padding: 10px;
+        font-family: Arial, sans-serif;
+        background: var(--bg-color);
+        color: var(--text-color);
+        -webkit-font-smoothing: antialiased;
+      }
+    
+      .loading-bar {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background-color: var(--button-border);
+        z-index: 1001;
+      }
+    
+      .loading-progress {
+        height: 100%;
+        width: 0;
+        background-color: limegreen;
+        transition: width 0.3s ease;
+      }
+    
+      #toolbar-container {
+        position: relative;
+        margin-bottom: 10px;
+      }
+    
+      #toolbar-toggle {
+        top: -10px;
+        padding: 4px 8px;
+        background: var(--button-bg);
+        border: 1px solid var(--button-border);
+        color: var(--text-color);
+        cursor: pointer;
+        border-radius: 4px 4px 0 0;
+        font-size: 12px;
+        z-index: 2;
+        white-space: nowrap;
+        text-align: center;
+      }
+    
+      #toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        height: 0;
+        opacity: 0;
+      }
+    
+      #toolbar.visible {
+        height: auto;
+        opacity: 1;
+        padding: 8px 0;
+      }
+    
+      .toolbar-btn {
+        padding: 12px 16px;
+        background: var(--button-bg);
+        border: 1px solid var(--button-border);
+        color: var(--text-color);
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+        white-space: nowrap;
+        font-size: 14px;
+        flex: 1 1 auto;
+      }
+    
+      .toolbar-btn:hover {
+        filter: brightness(var(--hover-brightness));
+      }
+    
+      .toolbar-input {
+        padding: 12px;
+        background: var(--input-bg);
+        border: 1px solid var(--button-border);
+        color: var(--text-color);
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        flex: 2 1 200px;
+        min-width: 120px;
+        font-size: 14px;
+      }
+    
+      #editor {
+        width: 100%;
+        height: calc(100vh - 70px);
+        border: 1px solid var(--button-border);
+        border-radius: 4px;
+        touch-action: manipulation;
+      }
+    
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+      }
+    
+      .modal-content {
+        position: relative;
+        background: var(--modal-bg);
+        margin: auto;
+        padding: 20px;
+        width: 90%;
+        max-width: 500px;
+        border-radius: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 1px solid var(--button-border);
+      }
+    
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+    
+      .modal-close {
+        cursor: pointer;
+        font-size: 24px;
+        padding: 0 8px;
+        color: var(--text-color);
+      }
+    
+      .modal-close:hover {
+        opacity: 0.8;
+      }
+    
+      .settings-group {
+        margin-bottom: 15px;
+      }
+    
+      .settings-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-color);
+      }
+    
+      .version-select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        background: var(--input-bg);
+        border: 1px solid var(--button-border);
+        color: var(--text-color);
+        border-radius: 4px;
+      }
+    
+      .module-label {
+        margin: 8px 0 4px;
+        font-size: 0.9em;
+        color: var(--text-color);
+        opacity: 0.8;
+      }
+    
+      @media (max-width: 480px) {
+        .toolbar-btn {
+          padding: 14px 12px;
+          font-size: 13px;
+        }
+        .toolbar-input {
+          flex-basis: 100%;
+        }
+        #editor {
+          height: calc(100vh - 90px);
+        }
+      }
+    
+      /* monaco editor overrides */
+      .monaco-editor .line-numbers {
+        font-size: 12px !important;
+        padding-left: 5px !important;
+        color: var(--text-color) !important;
+      }
+    
+      .monaco-editor .margin-view-overlays {
+        width: 40px !important;
+        background: var(--bg-color) !important;
+      }
+    
+      /* scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+        background-color: var(--scrollbar-color);
+      }
+    
+      ::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb);
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- loading bar -->
+    <div id="loadingBar" class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+    <div id="toolbar-container">
+      <div id="toolbar-toggle" onclick="toggleToolbar()">▽ Show Toolbar</div>
+      <div id="toolbar">
+        <input
+          type="text"
+          class="toolbar-input"
+          id="filename"
+          value="main.js"
+        />
+        <button class="toolbar-btn" onclick="saveCode()">💾 Save</button>
+        <button class="toolbar-btn" onclick="formatCode()">✨ Format</button>
+        <button class="toolbar-btn" onclick="showSettings()">
+          ⚙️ Settings
+        </button>
+        <button class="toolbar-btn" onclick="showVersions()">📦 Modules</button>
+      </div>
+    </div>
+    <div id="editor"></div>
+
+    <!-- settings menu -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editor Settings</h3>
+                <span class="modal-close" onclick="closeModal('settingsModal')">&times;</span>
+            </div>
+            <div class="settings-group">
+                <label><input type="checkbox" id="minimap"> Show Minimap</label>
+                <label><input type="checkbox" id="wordWrap" checked>Wrap Lines</label>
+                <label>Font Size <input type="number" id="fontSize" value="13" min="8" max="24" class="toolbar-input"></label>
+                <label><input type="checkbox" id="lineNumbers" checked> Show Line Numbers</label>
+                <label><input type="checkbox" id="renderWhitespace"> Render Whitespace</label>
+                <label>Theme <select id="theme" class="toolbar-input">
+                    <option value="vs-dark" selected>Dark</option>
+                    <option value="vs">Light</option>
+                    <option value="hc-black">High Contrast</option>
+                </select></label>
+                <label><input type="checkbox" id="autoClosingBrackets" checked> Auto Closing Brackets</label>
+            </div>
+            <button class="toolbar-btn" onclick="applySettings()">Apply</button>
+        </div>
+    </div>
+
+    <!-- version selection menu -->
+    <div id="versionModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Module Versions</h3>
+          <span class="modal-close" onclick="closeModal('versionModal')">&times;</span>
+        </div>
+        <div class="settings-group" id="versionSelectors">
+          <!-- modules versions will be added here dynamically -->
+        </div>
+        <button class="toolbar-btn" onclick="loadSelectedVersions()">
+          Load Versions
+        </button>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.js"></script>
+    <script>
+      // ========== modules ========== //
+      // add new modules here following the same format
+      const MODULES = [
+        {
+          name: "@minecraft/server",
+          currentVersion: "1.17.0-beta.1.21.51-stable",
+          typesUrl: (version) =>
+            `https://cdn.jsdelivr.net/npm/@minecraft/server@${version}/index.d.ts`,
+        },
+        {
+          name: "@minecraft/server-ui",
+          currentVersion: "1.3.0",
+          typesUrl: (version) =>
+            `https://cdn.jsdelivr.net/npm/@minecraft/server-ui@${version}/index.d.ts`,
+        },
+        {
+          name: "@minecraft/server-net",
+          currentVersion: "1.0.0-beta.1.21.51-stable",
+          typesUrl: (version) =>
+            `https://cdn.jsdelivr.net/npm/@minecraft/server-net@${version}/index.d.ts`,
+        },
+        {
+          name: "@minecraft/server-admin",
+          currentVersion: "1.0.0-beta.1.21.51-stable",
+          typesUrl: (version) =>
+            `https://cdn.jsdelivr.net/npm/@minecraft/server-admin@${version}/index.d.ts`,
+        },
+        {
+          name: "@minecraft/math",
+          currentVersion: "2.0.1",
+          typesUrl: (version) =>
+            `https://cdn.jsdelivr.net/npm/@minecraft/math@${version}/dist/minecraft-math.d.ts`,
+        },
+        {
+          name: "@minecraft/vanilla-data",
+          currentVersion: "1.21.50",
+          typesUrl: (version) =>
+            `https://cdn.jsdelivr.net/npm/@minecraft/vanilla-data@${version}/lib/index.js`,
+        },
+      ];
+
+      let editor;
+      let typeLibs = new Map();
+      let isToolbarVisible = false;
+
+      /*------loading bar related functions------ */
+      function showLoadingBar() {
+        document.getElementById("loadingBar").style.display = "block";
+        document.querySelector(".loading-progress").style.width = "0";
+        
+      }
+      function updateLoadingProgress(current, total) {document.querySelector(".loading-progress").style.width = `${(current / total) * 100}%`;}
+      function hideLoadingBar() {setTimeout(() => {document.getElementById("loadingBar").style.display = "none";}, 300)}
+      function toggleToolbar() {
+        isToolbarVisible = !isToolbarVisible;
+        const toolbar = document.getElementById("toolbar");
+        const toggleBtn = document.getElementById("toolbar-toggle");
+
+        toolbar.classList.toggle("visible", isToolbarVisible);
+        toggleBtn.textContent = `${
+          isToolbarVisible ? "△ Hide" : "▽ Show"
+        } Toolbar`;
+      }
+
+      /*------type definition related functions------ */
+      async function loadTypeDefinitions() {
+        showLoadingBar();
+
+        monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+          allowNonTsExtensions: true,
+          moduleResolution:
+            monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+          target: monaco.languages.typescript.ScriptTarget.ES2020,
+        });
+
+        typeLibs.forEach((lib) => lib.dispose());
+        typeLibs.clear();
+
+        const totalModules = MODULES.length;
+        let loadedModules = 0;
+
+        for (const module of MODULES) {
+          const types = await fetch(
+            module.typesUrl(module.currentVersion)
+          ).then((res) => res.text());
+
+          const lib =
+            monaco.languages.typescript.javascriptDefaults.addExtraLib(
+              `declare module "${module.name}" { ${types} }`,
+              `file:///node_modules/${module.name}/index.d.ts`
+            );
+
+          typeLibs.set(module.name, lib);
+
+          loadedModules++;
+          updateLoadingProgress(loadedModules, totalModules);
+        }
+
+        hideLoadingBar();
+      }
+
+      async function loadSelectedVersions() {
+        showLoadingBar();
+
+        for (const module of MODULES) {
+          module.currentVersion = document.getElementById(
+            module.selectorId
+          ).value;
+        }
+
+        await loadTypeDefinitions();
+        closeModal("versionModal");
+        editor.setValue(editor.getValue());
+
+        hideLoadingBar();
+      }
+
+      let isClicked = false;
+      async function showVersions() {
+        if (isClicked) return;
+        isClicked = true;
+        const versionSelectors = document.getElementById("versionSelectors");
+        versionSelectors.innerHTML = "";
+
+        const totalModules = MODULES.length;
+        let loadedModules = 0;
+
+        showLoadingBar();
+
+        for (const module of MODULES) {
+          const versions = await fetchVersions(module.name);
+          const select = createVersionSelector(module, versions);
+          versionSelectors.appendChild(select);
+          loadedModules++;
+          updateLoadingProgress(loadedModules, totalModules);
+        }
+
+        hideLoadingBar();
+
+        isClicked = false;
+        document.getElementById("versionModal").style.display = "block";
+      }
+
+
+      async function fetchVersions(packageName) {
+        const response = await fetch(
+          `https://data.jsdelivr.com/v1/package/npm/${packageName}`
+        );
+        const data = await response.json();
+        return data.versions.reverse(); // newest first
+      }
+
+      function createVersionSelector(module, versions) {
+        const container = document.createElement("div");
+        const label = document.createElement("div");
+        label.className = "module-label";
+        label.textContent = module.name;
+
+        const select = document.createElement("select");
+        select.className = "version-select";
+        select.id = module.selectorId;
+        select.innerHTML = versions
+          .map(
+            (v) =>
+              `<option value="${v}" ${
+                v === module.currentVersion ? "selected" : ""
+              }>${v}</option>`
+          )
+          .join("");
+
+        container.appendChild(label);
+        container.appendChild(select);
+        return container;
+      }
+
+      /*------settings related functions------ */
+      function getSettingElements(){
+        return {
+          miniMap: document.getElementById('minimap'),
+          wordWrap: document.getElementById('wordWrap'),
+          fontSize: document.getElementById('fontSize'),
+          lineNumbers: document.getElementById('lineNumbers'),
+          renderWhitespace: document.getElementById('renderWhitespace'),
+          theme: document.getElementById('theme'),
+          autoClosingBrackets: document.getElementById('autoClosingBrackets'),
+        }
+      }
+      function showSettings() {
+        const {miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets} = getSettingElements();
+
+          if (minimap && wordWrap && fontSize && lineNumbers && renderWhitespace && theme && autoClosingBrackets) {
+              document.getElementById('settingsModal').style.display = 'block';
+          } else {
+              console.error('One or more settings elements are missing in the DOM.');
+          }
+      }
+      function applySettings() {
+        const theme = document.getElementById('theme').value;
+        document.body.setAttribute('data-theme', theme);
+        const selectedTheme = document.getElementById('theme').value;
+        editor.updateOptions({
+          theme: selectedTheme, // Monaco theme change
+        });
+
+        // Apply body class for theme change
+        document.body.classList.remove('high-contrast-theme', 'light-theme');
+        if (selectedTheme === 'vs') {
+          document.body.classList.add('light-theme');
+        } else if (selectedTheme === 'hc-black') {
+          document.body.classList.add('high-contrast-theme');
+        } else {
+          document.body.classList.remove('light-theme', 'high-contrast-theme');
+        }
+
+        closeModal('settingsModal');
+        saveSetting();
+      }
+
+
+    function saveSetting(){
+      const {miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets} = getSettingElements();
+
+      localStorage.setItem('minimap', miniMap.checked);
+      localStorage.setItem('wordWrap', wordWrap.checked);
+      localStorage.setItem('fontSize', fontSize.value);
+      localStorage.setItem('lineNumbers', lineNumbers.checked);
+      localStorage.setItem('renderWhitespace', renderWhitespace.checked);
+      localStorage.setItem('theme', theme.value);
+      localStorage.setItem('autoClosingBrackets', autoClosingBrackets.checked);
+    }
+
+    function loadSetting() {
+        const {miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets} = getSettingElements();
+
+        miniMap.checked = localStorage.getItem('minimap') === 'true';
+        wordWrap.checked = localStorage.getItem('wordWrap') === 'true';
+        fontSize.value = localStorage.getItem('fontSize') || 13;
+        lineNumbers.checked = localStorage.getItem('lineNumbers') === 'true';
+        renderWhitespace.checked = localStorage.getItem('renderWhitespace') === 'true';
+        theme.value = localStorage.getItem('theme');
+        autoClosingBrackets.checked = localStorage.getItem('autoClosingBrackets') === 'true';
+        autoClosingBrackets.checked = localStorage.getItem('autoClosingBrackets') === 'true';
+    }
+
+    async function initializeEditor() {
+      loadSetting();
+      // Add theme initialization
+      const savedTheme = localStorage.getItem('theme') || 'vs-dark';
+      document.body.setAttribute('data-theme', savedTheme);
+        require.config({
+            paths: {
+                vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs",
+            },
+        });
+        require(["vs/editor/editor.main"], async () => {
+            await loadTypeDefinitions();
+
+            editor = monaco.editor.create(document.getElementById("editor"), {
+                value: `// Minecraft scripting with full autocomplete capabilities (almost)\nimport { world, ItemStack } from '@minecraft/server';\nimport { ActionFormData } from '@minecraft/server-ui';\n\nworld.beforeEvents.itemUse.subscribe((event) => {\n    const { source, itemStack } = event;\n    if (itemStack.typeId !== "minecraft:stick") return;\n    new ActionFormData()\n        .title("Special Offer!")\n        .body("Do you want a free diamond?")\n        .button("Yes!")\n        .button("No")\n        .show(source)\n        .then(({ selection }) => {\n            if (selection !== 0) return;\n            source.getComponent("minecraft:inventory")?.container?.addItem(new ItemStack("minecraft:diamond", 1));\n            source.sendMessage("You received a free diamond!");\n        })\n});`,
+                language: "javascript",
+                theme: localStorage.getItem('theme') || 'vs-dark',
+                automaticLayout: true,
+                minimap: { enabled: localStorage.getItem('minimap') === 'true' },
+                wordWrap: localStorage.getItem('wordWrap') === 'true' ? 'on' : 'off',
+                fontSize: parseInt(localStorage.getItem('fontSize') || 13),
+                lineNumbers: localStorage.getItem('lineNumbers') === 'true' ? 'on' : 'off',
+                autoClosingBrackets: localStorage.getItem('autoClosingBrackets') === 'true' ? 'always' : 'never',
+                renderWhitespace: localStorage.getItem('renderWhitespace') === 'true' ? 'all' : 'none',
+                highlightActiveLine: true,
+                lineNumbersMinChars: 2,
+            });
+        });
+    }
+
+      function closeModal(modalId) {
+        document.getElementById(modalId).style.display = "none";
+      }
+
+      async function formatCode() {
+        await editor.getAction("editor.action.formatDocument").run();
+      }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.ctrlKey && event.key === "s") {
+          event.preventDefault();
+          saveCode();
+        }
+      });
+
+      function saveCode() {
+        const code = editor.getValue();
+        const fileName =
+          document.getElementById("filename").value || "minecraft_script.js";
+        const blob = new Blob([code], { type: "text/javascript" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+
+      // Initialize editor on load
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("filename").value = "index.js";
+      });
+      initializeEditor();
+    </script>
+  </body>
+</html>
