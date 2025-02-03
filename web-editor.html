@@ -430,6 +430,14 @@
                   <option value="gruvbox">Gruvbox</option>
                 </select></label>
                 <label><input type="checkbox" id="autoClosingBrackets" checked> Auto Closing Brackets</label>
+                <label>Auto-Save Interval (seconds) 
+                  <input type="number" id="autoSaveInterval" min="5" value="30" class="toolbar-input" checked>
+                </label>
+                <label><input type="checkbox" id="autoSaveEnabled" onchange="toggleInput()"> Enable Auto-Save</label>
+                <label>Language <select id="language" class="toolbar-input">
+                  <option value="javascript">JavaScript</option>
+                  <option value="typescript">TypeScript</option>
+                </select></label>
             </div>
             <button class="toolbar-btn" onclick="applySettings()">Apply</button>
         </div>
@@ -453,6 +461,10 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.js"></script>
     <script>
+
+      function toggleInput(){
+        document.getElementById('autoSaveInterval').disabled = !document.getElementById('autoSaveEnabled').checked
+      }
 
       let count = 0
       function showError(message) {
@@ -517,6 +529,7 @@
         },
       ];
 
+      const defaultCode = `// Minecraft scripting with full autocomplete capabilities\nimport { world, ItemStack } from '@minecraft/server';\nimport { ActionFormData } from '@minecraft/server-ui';\n\nworld.beforeEvents.itemUse.subscribe((event) => {\n    const { source, itemStack } = event;\n    if (itemStack.typeId !== "minecraft:stick") return;\n    new ActionFormData()\n        .title("Special Offer!")\n        .body("Do you want a free diamond?")\n        .button("Yes!")\n        .button("No")\n        .show(source)\n        .then(({ selection }) => {\n            if (selection !== 0) return;\n            source.getComponent("minecraft:inventory")?.container?.addItem(new ItemStack("minecraft:diamond", 1));\n            source.sendMessage("You received a free diamond!");\n        })\n});`
       let editor;
       let typeLibs = new Map();
       let isToolbarVisible = false;
@@ -548,6 +561,14 @@
           allowNonTsExtensions: true,
           moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
           target: monaco.languages.typescript.ScriptTarget.ES2020,
+          checkJs: true,
+        });
+
+        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+          allowNonTsExtensions: true,
+          moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+          target: monaco.languages.typescript.ScriptTarget.ES2020,
+          strict: true,
         });
 
         typeLibs.forEach((lib) => lib.dispose());
@@ -565,11 +586,15 @@
             }
             const types = await response.text();
             
-            const lib = monaco.languages.typescript.javascriptDefaults.addExtraLib(
+            const libJS = monaco.languages.typescript.javascriptDefaults.addExtraLib(
               `declare module "${module.name}" { ${types} }`,
               `file:///node_modules/${module.name}/index.d.ts`
             );
-            typeLibs.set(module.name, lib);
+            const libTS = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+              `declare module "${module.name}" { ${types} }`,
+              `file:///node_modules/${module.name}/index.d.ts`
+            );
+            typeLibs.set(module.name, { jsLib: libJS, tsLib: libTS });
           } catch (error) {
             console.error(`Failed to load ${module.name}@${module.currentVersion}:`, error);
             showError(`Failed to load ${module.name}@${module.currentVersion}`);
@@ -680,12 +705,15 @@
           renderWhitespace: document.getElementById('renderWhitespace'),
           theme: document.getElementById('theme'),
           autoClosingBrackets: document.getElementById('autoClosingBrackets'),
+          autoSaveInterval: document.getElementById('autoSaveInterval'),
+          autoSaveEnabled: document.getElementById('autoSaveEnabled'),
+          language: document.getElementById('language'),
         }
       }
       function showSettings() {
-        const {miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets} = getSettingElements();
+        const {miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language} = getSettingElements();
 
-          if (minimap && wordWrap && fontSize && lineNumbers && renderWhitespace && theme && autoClosingBrackets) {
+          if (minimap && wordWrap && fontSize && lineNumbers && renderWhitespace && theme && autoClosingBrackets && language) {
               document.getElementById('settingsModal').style.display = 'block';
           } else {
               showError('One or more settings elements are missing in the DOM.');
@@ -693,7 +721,9 @@
           }
       }
       function applySettings() {
+        startAutoSave();
         const theme = document.getElementById('theme').value;
+        const selectedLanguage = document.getElementById('language').value;
         document.body.setAttribute('data-theme', theme);
         const selectedTheme = document.getElementById('theme').value;
         editor.updateOptions({
@@ -706,6 +736,8 @@
           minimap: { enabled: document.getElementById('minimap').checked },
           
         });
+        const model = editor.getModel();
+        monaco.editor.setModelLanguage(model, selectedLanguage);
 
         // Apply body class for theme change
         document.body.classList.remove('high-contrast-theme', 'light-theme');
@@ -732,10 +764,13 @@
       localStorage.setItem('renderWhitespace', renderWhitespace.checked);
       localStorage.setItem('theme', theme.value);
       localStorage.setItem('autoClosingBrackets', autoClosingBrackets.checked);
+      localStorage.setItem('autoSaveInterval', autoSaveInterval.value);
+      localStorage.setItem('autoSaveEnabled', autoSaveEnabled.checked);
+      localStorage.setItem('language', language.value);
     }
 
     function loadSetting() {
-        const {miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets} = getSettingElements();
+        const {miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language} = getSettingElements();
 
         miniMap.checked = localStorage.getItem('minimap') === 'true';
         wordWrap.checked = localStorage.getItem('wordWrap') === 'true';
@@ -744,7 +779,9 @@
         renderWhitespace.checked = localStorage.getItem('renderWhitespace') === 'true';
         theme.value = localStorage.getItem('theme');
         autoClosingBrackets.checked = localStorage.getItem('autoClosingBrackets') === 'true';
-        autoClosingBrackets.checked = localStorage.getItem('autoClosingBrackets') === 'true';
+        autoSaveInterval.value = localStorage.getItem('autoSaveInterval') || 30;
+        autoSaveEnabled.checked = localStorage.getItem('autoSaveEnabled') === 'true';
+        language.value = localStorage.getItem('language') || 'javascript';
     }
 
     async function initializeEditor() {
@@ -877,8 +914,8 @@
           });
 
             editor = monaco.editor.create(document.getElementById("editor"), {
-                value: `// Minecraft scripting with full autocomplete capabilities (almost)\nimport { world, ItemStack } from '@minecraft/server';\nimport { ActionFormData } from '@minecraft/server-ui';\n\nworld.beforeEvents.itemUse.subscribe((event) => {\n    const { source, itemStack } = event;\n    if (itemStack.typeId !== "minecraft:stick") return;\n    new ActionFormData()\n        .title("Special Offer!")\n        .body("Do you want a free diamond?")\n        .button("Yes!")\n        .button("No")\n        .show(source)\n        .then(({ selection }) => {\n            if (selection !== 0) return;\n            source.getComponent("minecraft:inventory")?.container?.addItem(new ItemStack("minecraft:diamond", 1));\n            source.sendMessage("You received a free diamond!");\n        })\n});`,
-                language: "javascript",
+                value:  document.getElementById('autoSaveEnabled').checked ? (localStorage.getItem('editorContent') || defaultCode) : defaultCode,
+                language: localStorage.getItem('language') || 'javascript',
                 theme: localStorage.getItem('theme') || 'vs-dark',
                 automaticLayout: true,
                 minimap: { enabled: localStorage.getItem('minimap') === 'true' },
@@ -891,7 +928,25 @@
                 lineNumbersMinChars: 2,
             });
         });
+
+        startAutoSave()
     }
+
+      let autoSaveTimer;
+      function startAutoSave() {
+        console.log('Auto-save started');
+        
+        const interval = parseInt(document.getElementById('autoSaveInterval').value) * 1000;
+        const enabled = document.getElementById('autoSaveEnabled').checked;
+        
+        if (autoSaveTimer) clearInterval(autoSaveTimer);        
+        if (!enabled) return;
+        
+        autoSaveTimer = setInterval(() => {
+          const content = editor.getValue();
+          localStorage.setItem('editorContent', content);
+        }, interval);
+      }
 
       function closeModal(modalId) {
         document.getElementById(modalId).style.display = "none";
@@ -926,6 +981,12 @@
       document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("filename").value = "index.js";
       });
+
+      // Save content when closing the tab
+      window.addEventListener('beforeunload', () => {
+        localStorage.setItem('editorContent', editor.getValue());
+      });
+
       initializeEditor();
     </script>
   </body>
