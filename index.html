@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Apps</title>
+    <style>
+        :root {
+            /* Dark theme */
+            --bg-color: #1e1e1e;
+            --text-color: #d4d4d4;
+            --button-bg: #3c3c3c;
+            --button-border: #454545;
+            --modal-bg: #2d2d2d;
+            --accent-color: #569cd6;
+            --border-color: #454545;
+        }
+
+        [data-theme="light"] {
+            /* Light theme */
+            --bg-color: #f3f3f3;
+            --text-color: #333333;
+            --button-bg: #e0e0e0;
+            --button-border: #cccccc;
+            --modal-bg: #ffffff;
+            --accent-color: #007acc;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--button-bg);
+            color: var(--text-color);
+            border: 1px solid var(--button-border);
+            padding: 0.5rem 1rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Segoe UI';
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            filter: brightness(1.2);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .project-card {
+            background: var(--modal-bg);
+            padding: 1.5rem;
+            border-radius: 3px;
+            margin: 1rem 0;
+            transition: transform 0.2s;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .project-content {
+            flex: 1;
+        }
+
+        .project-thumbnail {
+            width: 120px;
+            height: 80px;
+            border-radius: 5px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background-color: var(--button-bg);
+            flex-shrink: 0;
+        }
+
+        .project-thumbnail:hover {
+            transform: scale(1.03);
+        }
+
+        .project-card:hover {
+            transform: translateX(3px);
+        }
+
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .description {
+            color: color-mix(in srgb, var(--text-color) 70%, transparent);
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 600px) {
+            .project-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .project-thumbnail {
+                width: 100%;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-text">Light Theme</span>
+    </button>
+
+    <div id="imageModal" class="image-modal">
+        <img class="modal-content" id="expandedImage" alt="Expanded view">
+    </div>
+
+    <div class="container">
+        <h1>Web Apps</h1>
+        
+        <div class="project-card">
+            <div class="project-content">
+                <h2><a href="web-editor.html">Web Editor</a></h2>
+                <p class="description">
+                    A simple web-based code editor for Minecraft Bedrock Edition scripting with autocomplete.
+                </p>
+            </div>
+            <img class="project-thumbnail" 
+                 src="./content/pictures/web-editor/screenshot.png" 
+                 alt="Web Editor preview">
+        </div>
+
+        <!-- Add more project cards using this template -->
+        <!--
+        <div class="project-card">
+            <div class="project-content">
+                <h2><a href="#">Another Project</a></h2>
+                <p class="description">
+                    Project description goes here.
+                </p>
+            </div>
+            <img class="project-thumbnail" 
+                 src="./content/pictures/another-project/screenshot.png" 
+                 alt="Project preview">
+        </div>
+        -->
+    </div>
+
+    <script>
+        // Image expansion functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const thumbnails = document.querySelectorAll('.project-thumbnail');
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('expandedImage');
+
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', function() {
+                    modal.style.display = 'block';
+                    modalImg.src = this.src;
+                });
+            });
+
+            modal.addEventListener('click', () => modal.style.display = 'none');
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display === 'block') {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            const isLight = body.getAttribute('data-theme') === 'light';
+            
+            if (isLight) {
+                body.removeAttribute('data-theme');
+                themeToggle.querySelector('.theme-text').textContent = 'Light Theme';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeToggle.querySelector('.theme-text').textContent = 'Dark Theme';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.body.setAttribute('data-theme', 'light');
+            document.querySelector('.theme-text').textContent = 'Dark Theme';
+        }
+    </script>
+</body>
+</html>
