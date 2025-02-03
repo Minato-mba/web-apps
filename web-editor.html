@@ -19,7 +19,6 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:image" content="https://minato-mba.github.io/web-apps/content/pictures/web-editor/screenshot.png">
 
-
     <meta name="theme-color" content="#1e1e1e" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#f3f3f3" media="(prefers-color-scheme: light)">
     <meta name="apple-mobile-web-app-title" content="Script Api Editor">
@@ -66,7 +65,81 @@
         --scrollbar-color: #e0e0e0;
         --scrollbar-thumb: #b0b0b0;
       }
-    
+
+      [data-theme="dracula"] {
+        /* dark-blue theme */
+        --bg-color: #282a36;
+        --text-color: #f8f8f2;
+        --button-bg: #44475a;
+        --button-border: #6272a4;
+        --modal-bg: #44475a;
+        --input-bg: #44475a;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #44475a;
+        --scrollbar-thumb: #6272a4;
+      }
+
+      [data-theme="monokai"] {
+        /* monokai (dark-green) theme */
+        --bg-color: #272822;
+        --text-color: #f8f8f2;
+        --button-bg: #3e3d32;
+        --button-border: #75715e;
+        --modal-bg: #3e3d32;
+        --input-bg: #3e3d32;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #3e3d32;
+        --scrollbar-thumb: #75715e;
+      }
+
+      [data-theme="solarized-dark"] {
+        --bg-color: #002b36;
+        --text-color: #839496;
+        --button-bg: #073642;
+        --button-border: #586e75;
+        --modal-bg: #073642;
+        --input-bg: #073642;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #073642;
+        --scrollbar-thumb: #586e75;
+      }
+
+      [data-theme="solarized-light"] {
+        --bg-color: #fdf6e3;
+        --text-color: #657b83;
+        --button-bg: #eee8d5;
+        --button-border: #93a1a1;
+        --modal-bg: #eee8d5;
+        --input-bg: #eee8d5;
+        --hover-brightness: 0.95;
+        --scrollbar-color: #eee8d5;
+        --scrollbar-thumb: #93a1a1;
+      }
+
+      [data-theme="nord"] {
+        --bg-color: #2e3440;
+        --text-color: #d8dee9;
+        --button-bg: #3b4252;
+        --button-border: #4c566a;
+        --modal-bg: #3b4252;
+        --input-bg: #3b4252;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #3b4252;
+        --scrollbar-thumb: #4c566a;
+      }
+
+      [data-theme="gruvbox"] {
+        --bg-color: #282828;
+        --text-color: #ebdbb2;
+        --button-bg: #3c3836;
+        --button-border: #665c54;
+        --modal-bg: #3c3836;
+        --input-bg: #3c3836;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #3c3836;
+        --scrollbar-thumb: #665c54;
+      }
+  
       body {
         margin: 0;
         padding: 10px;
@@ -346,9 +419,15 @@
                 <label><input type="checkbox" id="lineNumbers" checked> Show Line Numbers</label>
                 <label><input type="checkbox" id="renderWhitespace"> Render Whitespace</label>
                 <label>Theme <select id="theme" class="toolbar-input">
-                    <option value="vs-dark" selected>Dark</option>
-                    <option value="vs">Light</option>
-                    <option value="hc-black">High Contrast</option>
+                  <option value="vs-dark">Dark</option>
+                  <option value="vs">Light</option>
+                  <option value="hc-black">High Contrast</option>
+                  <option value="dracula">Dracula</option>
+                  <option value="monokai">Monokai</option>
+                  <option value="solarized-dark">Solarized Dark</option>
+                  <option value="solarized-light">Solarized Light</option>
+                  <option value="nord">Nord</option>
+                  <option value="gruvbox">Gruvbox</option>
                 </select></label>
                 <label><input type="checkbox" id="autoClosingBrackets" checked> Auto Closing Brackets</label>
             </div>
@@ -680,6 +759,122 @@
         });
         require(["vs/editor/editor.main"], async () => {
             await loadTypeDefinitions();
+
+            // ========== THEMES ========== //
+            // add new themes here following the same format
+            monaco.editor.defineTheme('dracula', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+              { token: '', foreground: '#f8f8f2', background: '#282a36' },
+              { token: 'comment', foreground: '#6272a4' },
+              { token: 'keyword', foreground: '#ff79c6' },
+              { token: 'number', foreground: '#bd93f9' },
+              { token: 'string', foreground: '#f1fa8c' },
+              { token: 'identifier', foreground: '#50fa7b' },
+            ],
+            colors: {
+              'editor.background': '#282a36',
+              'editor.foreground': '#f8f8f2',
+              'editor.lineHighlightBackground': '#44475a',
+              'editorLineNumber.foreground': '#6272a4',
+            }
+          });
+
+          monaco.editor.defineTheme('monokai', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+              { token: '', foreground: '#f8f8f2', background: '#272822' },
+              { token: 'comment', foreground: '#75715e' },
+              { token: 'keyword', foreground: '#f92672' },
+              { token: 'number', foreground: '#ae81ff' },
+              { token: 'string', foreground: '#e6db74' },
+              { token: 'identifier', foreground: '#a6e22e' },
+            ],
+            colors: {
+              'editor.background': '#272822',
+              'editor.foreground': '#f8f8f2',
+              'editor.lineHighlightBackground': '#3e3d32',
+              'editorLineNumber.foreground': '#75715e',
+            }
+          });
+
+          monaco.editor.defineTheme('solarized-dark', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+              { token: '', foreground: '#839496', background: '#002b36' },
+              { token: 'comment', foreground: '#586e75' },
+              { token: 'keyword', foreground: '#859900' },
+              { token: 'number', foreground: '#d33682' },
+              { token: 'string', foreground: '#2aa198' },
+              { token: 'identifier', foreground: '#b58900' },
+            ],
+            colors: {
+              'editor.background': '#002b36',
+              'editor.foreground': '#839496',
+              'editor.lineHighlightBackground': '#073642',
+              'editorLineNumber.foreground': '#586e75',
+            }
+          });
+
+          monaco.editor.defineTheme('solarized-light', {
+            base: 'vs',
+            inherit: true,
+            rules: [
+              { token: '', foreground: '#657b83', background: '#fdf6e3' },
+              { token: 'comment', foreground: '#93a1a1' },
+              { token: 'keyword', foreground: '#859900' },
+              { token: 'number', foreground: '#d33682' },
+              { token: 'string', foreground: '#2aa198' },
+              { token: 'identifier', foreground: '#b58900' },
+            ],
+            colors: {
+              'editor.background': '#fdf6e3',
+              'editor.foreground': '#657b83',
+              'editor.lineHighlightBackground': '#eee8d5',
+              'editorLineNumber.foreground': '#93a1a1',
+            }
+          });
+
+          monaco.editor.defineTheme('nord', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+              { token: '', foreground: '#d8dee9', background: '#2e3440' },
+              { token: 'comment', foreground: '#4c566a' },
+              { token: 'keyword', foreground: '#81a1c1' },
+              { token: 'number', foreground: '#b48ead' },
+              { token: 'string', foreground: '#a3be8c' },
+              { token: 'identifier', foreground: '#ebcb8b' },
+            ],
+            colors: {
+              'editor.background': '#2e3440',
+              'editor.foreground': '#d8dee9',
+              'editor.lineHighlightBackground': '#3b4252',
+              'editorLineNumber.foreground': '#4c566a',
+            }
+          });
+
+          monaco.editor.defineTheme('gruvbox', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+              { token: '', foreground: '#ebdbb2', background: '#282828' },
+              { token: 'comment', foreground: '#665c54' },
+              { token: 'keyword', foreground: '#fb4934' },
+              { token: 'number', foreground: '#d3869b' },
+              { token: 'string', foreground: '#b8bb26' },
+              { token: 'identifier', foreground: '#fabd2f' },
+            ],
+            colors: {
+              'editor.background': '#282828',
+              'editor.foreground': '#ebdbb2',
+              'editor.lineHighlightBackground': '#3c3836',
+              'editorLineNumber.foreground': '#665c54',
+            }
+          });
 
             editor = monaco.editor.create(document.getElementById("editor"), {
                 value: `// Minecraft scripting with full autocomplete capabilities (almost)\nimport { world, ItemStack } from '@minecraft/server';\nimport { ActionFormData } from '@minecraft/server-ui';\n\nworld.beforeEvents.itemUse.subscribe((event) => {\n    const { source, itemStack } = event;\n    if (itemStack.typeId !== "minecraft:stick") return;\n    new ActionFormData()\n        .title("Special Offer!")\n        .body("Do you want a free diamond?")\n        .button("Yes!")\n        .button("No")\n        .show(source)\n        .then(({ selection }) => {\n            if (selection !== 0) return;\n            source.getComponent("minecraft:inventory")?.container?.addItem(new ItemStack("minecraft:diamond", 1));\n            source.sendMessage("You received a free diamond!");\n        })\n});`,
