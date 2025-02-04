@@ -419,7 +419,7 @@
                 <label><input type="checkbox" id="lineNumbers" checked> Show Line Numbers</label>
                 <label><input type="checkbox" id="renderWhitespace"> Render Whitespace</label>
                 <label>Theme <select id="theme" class="toolbar-input">
-                  <option value="vs-dark">Dark</option>
+                  <option value="vs-dark" selected>Dark</option>
                   <option value="vs">Light</option>
                   <option value="hc-black">High Contrast</option>
                   <option value="dracula">Dracula</option>
@@ -710,6 +710,21 @@
           language: document.getElementById('language'),
         }
       }
+
+      function getStoredSettings() {
+        return {
+          storedMinimap : localStorage.getItem('minimap'),
+          storedWordWrap : localStorage.getItem('wordWrap'),
+          storedFontSize : localStorage.getItem('fontSize'),
+          storedLineNumbers : localStorage.getItem('lineNumbers'),
+          storedRenderWhitespace : localStorage.getItem('renderWhitespace'),
+          storedTheme : localStorage.getItem('theme'),
+          storedAutoClosingBrackets : localStorage.getItem('autoClosingBrackets'),
+          storedAutoSaveInterval : localStorage.getItem('autoSaveInterval'),
+          storedAutoSaveEnabled : localStorage.getItem('autoSaveEnabled'),
+          storedLanguage : localStorage.getItem('language'),
+        }
+      }
       function showSettings() {
         const {miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language} = getSettingElements();
 
@@ -771,17 +786,18 @@
 
     function loadSetting() {
         const {miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language} = getSettingElements();
+        const {storedMinimap, storedWordWrap, storedFontSize, storedLineNumbers, storedRenderWhitespace, storedTheme, storedAutoClosingBrackets, storedAutoSaveInterval, storedAutoSaveEnabled, storedLanguage} = getStoredSettings();
 
-        miniMap.checked = localStorage.getItem('minimap') === 'true';
-        wordWrap.checked = localStorage.getItem('wordWrap') === 'true';
-        fontSize.value = localStorage.getItem('fontSize') || 13;
-        lineNumbers.checked = localStorage.getItem('lineNumbers') === 'true';
-        renderWhitespace.checked = localStorage.getItem('renderWhitespace') === 'true';
-        theme.value = localStorage.getItem('theme');
-        autoClosingBrackets.checked = localStorage.getItem('autoClosingBrackets') === 'true';
-        autoSaveInterval.value = localStorage.getItem('autoSaveInterval') || 30;
-        autoSaveEnabled.checked = localStorage.getItem('autoSaveEnabled') === 'true';
-        language.value = localStorage.getItem('language') || 'javascript';
+        miniMap.checked = storedMinimap ? storedMinimap === 'true' : false;
+        wordWrap.checked = storedWordWrap ? storedWordWrap === 'true' : false;
+        fontSize.value = storedFontSize || 13;
+        lineNumbers.checked = storedLineNumbers ? storedLineNumbers === 'true' : true;
+        renderWhitespace.checked = storedRenderWhitespace ? storedRenderWhitespace === 'true' : false;
+        theme.value = storedTheme || 'vs-dark';
+        autoClosingBrackets.checked = storedAutoClosingBrackets ? storedAutoClosingBrackets === 'true' : true;
+        autoSaveInterval.value = storedAutoSaveInterval || 30;
+        autoSaveEnabled.checked = storedAutoSaveEnabled ? storedAutoSaveEnabled === 'true' : true;
+        language.value = storedLanguage || 'javascript';
     }
 
     async function initializeEditor() {
@@ -912,18 +928,20 @@
               'editorLineNumber.foreground': '#665c54',
             }
           });
+          
+            const { storedMinimap, storedWordWrap, storedFontSize, storedLineNumbers, storedRenderWhitespace, storedTheme, storedAutoClosingBrackets, storedAutoSaveInterval, storedAutoSaveEnabled, storedLanguage} = getStoredSettings();
 
             editor = monaco.editor.create(document.getElementById("editor"), {
                 value:  document.getElementById('autoSaveEnabled').checked ? (localStorage.getItem('editorContent') || defaultCode) : defaultCode,
-                language: localStorage.getItem('language') || 'javascript',
-                theme: localStorage.getItem('theme') || 'vs-dark',
+                language: storedLanguage || 'javascript',
+                theme: storedTheme || 'vs-dark',
                 automaticLayout: true,
-                minimap: { enabled: localStorage.getItem('minimap') === 'true' },
-                wordWrap: localStorage.getItem('wordWrap') === 'true' ? 'on' : 'off',
-                fontSize: parseInt(localStorage.getItem('fontSize') || 13),
-                lineNumbers: localStorage.getItem('lineNumbers') === 'true' ? 'on' : 'off',
-                autoClosingBrackets: localStorage.getItem('autoClosingBrackets') === 'true' ? 'always' : 'never',
-                renderWhitespace: localStorage.getItem('renderWhitespace') === 'true' ? 'all' : 'none',
+                minimap: { enabled: storedMinimap === 'true' },
+                wordWrap: storedWordWrap === 'true' ? 'on' : 'off',
+                fontSize: parseInt(storedFontSize || 13),
+                lineNumbers: storedLineNumbers === 'true' ? 'on' : 'off',
+                autoClosingBrackets: storedAutoClosingBrackets === 'true' ? 'always' : 'never',
+                renderWhitespace: storedRenderWhitespace === 'true' ? 'all' : 'none',
                 highlightActiveLine: true,
                 lineNumbersMinChars: 2,
             });
@@ -933,9 +951,7 @@
     }
 
       let autoSaveTimer;
-      function startAutoSave() {
-        console.log('Auto-save started');
-        
+      function startAutoSave() {        
         const interval = parseInt(document.getElementById('autoSaveInterval').value) * 1000;
         const enabled = document.getElementById('autoSaveEnabled').checked;
         
