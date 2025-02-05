@@ -554,11 +554,6 @@
         } Toolbar`;
       }
 
-      function selectAllText() {
-    editor.setSelection(editor.getModel().getFullModelRange());
-    editor.focus();
-}
-
       /*------type definition related functions------ */
       
       async function loadTypeDefinitions() {
@@ -954,94 +949,8 @@
                 lineNumbersMinChars: 2,
             });
         });
-        initializeTouchSupport();
-
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_A, () => {
-            selectAllText();
-        });
 
         startAutoSave()
-    }
-
-    function updateEditorTouchOptions() {
-          editor.updateOptions({
-              scrollbar: {
-                  useShadows: true,
-                  verticalHasArrows: true,
-                  horizontalHasArrows: true,
-                  vertical: 'visible',
-                  horizontal: 'visible',
-                  verticalScrollbarSize: 17,
-                  horizontalScrollbarSize: 17,
-                  arrowSize: 30
-              },
-              multiCursorModifier: 'alt',
-              renderWhitespace: 'none',
-              fontSize: 16,
-              lineHeight: 24,
-              minimap: {
-                  enabled: false
-              },
-              mouseWheelZoom: true,
-              smoothScrolling: true,
-              touchScroll: true
-          });
-      }
-
-      function initializeTouchSupport() {
-          const isTouchDevice = ('ontouchstart' in window) || 
-              (navigator.maxTouchPoints > 0) || 
-              (navigator.msMaxTouchPoints > 0);
-
-          if (isTouchDevice) {
-              updateEditorTouchOptions();
-              editor.onDidChangeConfiguration(() => {
-                  updateEditorTouchOptions();
-              });
-              document.getElementById('editor').addEventListener('touchstart', handleTouchSelection, { passive: false });
-          }
-      }
-
-      function handleTouchSelection(e) {
-        const touchDuration = 500;
-        let timer;
-        let touchStartY;
-        let touchStartX;
-
-        const touch = e.touches[0];
-        touchStartY = touch.clientY;
-        touchStartX = touch.clientX;
-
-        timer = setTimeout(() => {
-            const position = editor.getTargetAtClientPoint(touchStartX, touchStartY);
-            if (position) {
-                editor.setPosition(position);
-                editor.trigger('touch', 'editor.action.selectAll', null);
-            }
-        }, touchDuration);
-
-        document.addEventListener('touchend', () => {
-            clearTimeout(timer);
-        }, { once: true });
-
-        e.preventDefault();
-    }
-
-    editor.onDidChangeModelContent(() => {
-        const position = editor.getPosition();
-        localStorage.setItem('editorPosition', JSON.stringify({
-            lineNumber: position.lineNumber,
-            column: position.column
-        }));
-    });
-
-    function restoreEditorPosition() {
-        const savedPosition = localStorage.getItem('editorPosition');
-        if (savedPosition) {
-            const position = JSON.parse(savedPosition);
-            editor.setPosition(position);
-            editor.revealPositionInCenter(position);
-        }
     }
 
       let autoSaveTimer;
