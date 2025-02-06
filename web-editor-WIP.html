@@ -708,6 +708,34 @@ if (message === '!hello') {
       let isSelecting = false;
       let currentScrollPosition = 0;
 
+      function getLineYCoordinate(position) {
+        const lineTop = editor.getTopForLineNumber(position.lineNumber);
+        const editorCoords = editorElement.getBoundingClientRect();
+        const lineY = window.scrollY + editorCoords.top + lineTop - tapsHeight;
+        return lineY;
+    }
+
+    function isPositionInSelection(position) {
+        const selection = editor.getSelection();
+        if (!selection || selection.isEmpty()) {
+            return false;
+        }
+
+        const startPosition = selection.getStartPosition();
+        const endPosition = selection.getEndPosition();
+
+        // Compare the position with the selection range
+        const isInRange = (
+            position.lineNumber > startPosition.lineNumber ||
+            (position.lineNumber === startPosition.lineNumber && position.column >= startPosition.column)
+        ) && (
+                position.lineNumber < endPosition.lineNumber ||
+                (position.lineNumber === endPosition.lineNumber && position.column <= endPosition.column)
+            );
+
+        return isInRange;
+    }
+
       function toggleInput() {
         document.getElementById("autoSaveInterval").disabled = !document.getElementById("autoSaveEnabled").checked;
       }
