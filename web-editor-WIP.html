@@ -504,6 +504,82 @@
           height: calc(100vh - 90px);
         }
       }
+
+      /* Mobile Selectors and Context Menu */
+      .selections.hidden {
+          display: none;
+      }
+
+      .selctos {
+          position: absolute;
+          width: 30px;
+          height: 30px;
+          background: limegreen;
+          border-radius: 50%;
+          opacity: 0.7;
+          touch-action: none;
+          z-index: 1000;
+      }
+
+      .menu-selector {
+          position: absolute;
+          left: 20px;
+          background: var(--modal-bg);
+          border: 1px solid var(--button-border);
+          border-radius: 8px;
+          padding: 8px;
+          z-index: 10000;
+          max-width: 90%;
+          overflow: hidden;
+      }
+
+      .menu-selector.hidden {
+          display: none;
+      }
+
+      .outset-shit-select {
+          display: flex;
+          overflow-x: auto;
+          scroll-behavior: smooth;
+          gap: 8px;
+      }
+
+      .inset-menu {
+          display: flex;
+          gap: 8px;
+          padding: 4px;
+      }
+
+      .mnc {
+          padding: 12px;
+          background: var(--button-bg);
+          border-radius: 6px;
+          white-space: nowrap;
+          cursor: pointer;
+      }
+
+      .mnc.hovered {
+          filter: brightness(var(--hover-brightness));
+      }
+
+      .right-arrow-mnc {
+          position: absolute;
+          right: -12px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 24px;
+          height: 24px;
+          background: var(--button-bg);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+
+      .right-arrow-mnc.left {
+          left: -12px;
+          right: auto;
+      }
     </style>
   </head>
   <body>
@@ -601,6 +677,136 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.js"></script>
     <script>
+      // ========== Mobile Touch Functions ========== //
+      let selectionsContainer;
+      let rightSelector;
+      let leftSelector;
+      let selectorMenu;
+      let touchTimeout;
+      let startPosition;
+      let isSelecting = false;
+      let disabledMove = false;
+
+      function initializeMobileSelectors() {
+          // Create selectors container
+          selectionsContainer = document.createElement('div');
+          selectionsContainer.className = 'selections hidden';
+
+          // Create left/right selectors
+          rightSelector = document.createElement('div');
+          rightSelector.className = 'selctos right-selector';
+          leftSelector = document.createElement('div');
+          leftSelector.className = 'selctos left-selector';
+          selectionsContainer.appendChild(leftSelector);
+          selectionsContainer.appendChild(rightSelector);
+
+          // Create context menu
+          selectorMenu = document.createElement('div');
+          selectorMenu.className = 'menu-selector hidden';
+          const outsetContainer = document.createElement('div');
+          outsetContainer.className = 'outset-shit-select';
+          const insetMenu = document.createElement('div');
+          insetMenu.className = 'inset-menu';
+
+          // Menu items
+          const menuItems = [
+              { text: 'Copy', action: () => copy() },
+              { text: 'Cut', action: () => cut() },
+              { text: 'Paste', action: () => paste() },
+              { text: 'Select All', action: () => selectAll() },
+              { text: 'Undo', action: () => undo() },
+              { text: 'Redo', action: () => redo() },
+              { text: 'Format', action: () => formatCode() }
+          ];
+
+          menuItems.forEach(item => {
+              const btn = document.createElement('div');
+              btn.className = 'mnc';
+              btn.textContent = item.text;
+              btn.ontouchstart = () => btn.classList.add('hovered');
+              btn.ontouchend = () => {
+                  btn.classList.remove('hovered');
+                  item.action();
+                  selectorMenu.classList.add('hidden');
+              };
+              insetMenu.appendChild(btn);
+          });
+
+          outsetContainer.appendChild(insetMenu);
+          selectorMenu.appendChild(outsetContainer);
+          
+          // Add elements to editor
+          const editorElement = document.getElementById('editor');
+          editorElement.appendChild(selectionsContainer);
+          editorElement.appendChild(selectorMenu);
+
+          // Touch handlers for selectors
+          [leftSelector, rightSelector].forEach(selector => {
+              selector.addEventListener('touchstart', (e) => {
+                  e.preventDefault();
+                  disabledMove = true;
+              });
+              selector.addEventListener('touchend', () => {
+                  disabledMove = false;
+              });
+          });
+      }
+
+      // Touch event handlers
+      function setupTouchListeners() {
+          const editorElement = document.getElementById('editor');
+
+          editorElement.addEventListener('touchstart', (e) => {
+              if (disabledMove) return;
+              touchTimeout = setTimeout(() => {
+                  const touch = e.touches[0];
+                  showContextMenu(touch.clientX, touch.clientY);
+              }, 500);
+          });
+
+          editorElement.addEventListener('touchend', () => {
+              clearTimeout(touchTimeout);
+          });
+
+          editorElement.addEventListener('touchmove', (e) => {
+              if (touchTimeout) clearTimeout(touchTimeout);
+              if (isSelecting) {
+                  e.preventDefault();
+                  const touch = e.touches[0];
+                  const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
+                  if (target?.position) {
+                      editor.setSelection(monaco.Selection.fromPositions([startPosition, target.position]));
+                  }
+              }
+          });
+      }
+
+      function showContextMenu(x, y) {
+          selectorMenu.style.left = `${x}px`;
+          selectorMenu.style.top = `${y}px`;
+          selectorMenu.classList.remove('hidden');
+      }
+
+      // Clipboard/Edit functions
+      function undo() { editor.trigger('keyboard', 'undo'); }
+      function redo() { editor.trigger('keyboard', 'redo'); }
+      function copy() {
+          const selection = editor.getSelection();
+          navigator.clipboard.writeText(editor.getModel().getValueInRange(selection));
+      }
+      function cut() {
+          copy();
+          editor.executeEdits('', [{ range: editor.getSelection(), text: '' }]);
+      }
+      async function paste() {
+          const text = await navigator.clipboard.readText();
+          editor.executeEdits('', [{ range: editor.getSelection(), text }]);
+      }
+      function selectAll() {
+          editor.setSelection(editor.getModel().getFullModelRange());
+      }
+
+
       // File management system
       let files = new Map();
       let currentFile = null;
@@ -1309,6 +1515,9 @@ if (message === '!hello') {
           updateFileExplorer();
           startAutoSave();
         });
+
+        initializeMobileSelectors();
+        setupTouchListeners();
 
         window.addEventListener("resize", () => {
           if (editor) {
