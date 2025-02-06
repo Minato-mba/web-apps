@@ -462,6 +462,160 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.js"></script>
     <script>
 
+require.config({
+            paths: {
+                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs'
+            }
+        });
+
+        // Custom Selection Class
+        class MonacoCustomSelect {
+            constructor(editor) {
+                this.editor = editor;
+                this.selectionState = {
+                    isSelecting: false,
+                    startPosition: null,
+                    lastPosition: null
+                };
+                this.initializeCustomSelection();
+            }
+
+            initializeCustomSelection() {
+                // Mouse events
+                this.editor.onMouseDown((e) => {
+                    if (e.event.leftButton && e.target.position) {
+                        this.startSelection(e.target.position);
+                    }
+                });
+
+                this.editor.onMouseMove((e) => {
+                    if (this.selectionState.isSelecting && e.target.position) {
+                        this.updateSelection(e.target.position);
+                    }
+                });
+
+                this.editor.onMouseUp(() => {
+                    this.endSelection();
+                });
+
+                // Touch events
+                const editorDomNode = this.editor.getDomNode();
+                if (editorDomNode) {
+                    editorDomNode.addEventListener('touchstart', (e) => {
+                        const touch = e.touches[0];
+                        const position = this.editor.getPositionFromMouseEvent({
+                            target: document.elementFromPoint(touch.clientX, touch.clientY),
+                            clientX: touch.clientX,
+                            clientY: touch.clientY
+                        });
+                        
+                        if (position) {
+                            this.startSelection(position);
+                        }
+                    });
+
+                    editorDomNode.addEventListener('touchmove', (e) => {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        const position = this.editor.getPositionFromMouseEvent({
+                            target: document.elementFromPoint(touch.clientX, touch.clientY),
+                            clientX: touch.clientX,
+                            clientY: touch.clientY
+                        });
+                        
+                        if (position) {
+                            this.updateSelection(position);
+                        }
+                    });
+
+                    editorDomNode.addEventListener('touchend', () => {
+                        this.endSelection();
+                    });
+                }
+
+                // Custom keyboard commands
+                this.addCustomCommands();
+            }
+
+            startSelection(position) {
+                this.selectionState = {
+                    isSelecting: true,
+                    startPosition: position,
+                    lastPosition: position
+                };
+
+                this.editor.setSelection(new monaco.Range(
+                    position.lineNumber,
+                    position.column,
+                    position.lineNumber,
+                    position.column
+                ));
+            }
+
+            updateSelection(currentPosition) {
+                if (!this.selectionState.startPosition) return;
+
+                const selection = new monaco.Selection(
+                    this.selectionState.startPosition.lineNumber,
+                    this.selectionState.startPosition.column,
+                    currentPosition.lineNumber,
+                    currentPosition.column
+                );
+
+                this.editor.setSelection(selection);
+                this.editor.revealPositionInCenterIfOutsideViewport(currentPosition);
+            }
+
+            endSelection() {
+                this.selectionState.isSelecting = false;
+            }
+
+            addCustomCommands() {
+                // Select all (Ctrl/Cmd + A)
+                this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyA, () => {
+                    const model = this.editor.getModel();
+                    if (model) {
+                        const lastLineNumber = model.getLineCount();
+                        const lastLineLength = model.getLineLength(lastLineNumber);
+                        this.editor.setSelection(new monaco.Range(1, 1, lastLineNumber, lastLineLength + 1));
+                    }
+                });
+
+                // Select current line (Ctrl/Cmd + L)
+                this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyL, () => {
+                    const position = this.editor.getPosition();
+                    if (position) {
+                        const model = this.editor.getModel();
+                        if (model) {
+                            const lineLength = model.getLineLength(position.lineNumber);
+                            this.editor.setSelection(new monaco.Range(
+                                position.lineNumber, 
+                                1, 
+                                position.lineNumber, 
+                                lineLength + 1
+                            ));
+                        }
+                    }
+                });
+            }
+
+            selectWord(position) {
+                const word = this.editor.getModel()?.getWordAtPosition(position);
+                if (word) {
+                    this.editor.setSelection(new monaco.Range(
+                        position.lineNumber,
+                        word.startColumn,
+                        position.lineNumber,
+                        word.endColumn
+                    ));
+                }
+            }
+
+            getSelectedText() {
+                return this.editor.getModel()?.getValueInRange(this.editor.getSelection()) || '';
+            }
+        }
+
       function toggleInput(){
         document.getElementById('autoSaveInterval').disabled = !document.getElementById('autoSaveEnabled').checked
       }
@@ -948,6 +1102,19 @@
                 highlightActiveLine: true,
                 lineNumbersMinChars: 2,
             });
+
+
+            // Add double-click word selection
+            document.addEventListener('dblclick', (e) => {
+                const position = editor.getPosition();
+                if (position) {
+                    customSelect.selectWord(position);
+                }
+            });
+
+            // Make editor instance available globally (for debugging)
+            window.monacoEditor = editor;
+            window.customSelect = customSelect;
         });
 
         startAutoSave()
