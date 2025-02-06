@@ -462,6 +462,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.js"></script>
     <script>
 
+    // Mobile detection utility
+    const MobileDetector = {
+        isAndroid: function() {
+            return navigator.userAgent.match(/Android/i);
+        },
+        isIOS: function() {
+            return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+        },
+        isMobileApp: function() {
+            // Check for common mobile app webview signatures
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            
+            // Check if running in a WebView
+            const isWebView = /(; wv\)|WebView)/.test(userAgent);
+            
+            // Check for specific app signatures
+            const isApp = /FB_IAB|FBAN|FBAV|Instagram|WhatsApp|Line/.test(userAgent);
+            
+            return isWebView || isApp;
+        },
+        isMobileDevice: function() {
+            return this.isAndroid() || this.isIOS() || /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(navigator.userAgent);
+        }
+    };
+
       function toggleInput(){
         document.getElementById('autoSaveInterval').disabled = !document.getElementById('autoSaveEnabled').checked
       }
@@ -553,11 +578,6 @@
           isToolbarVisible ? "△ Hide" : "▽ Show"
         } Toolbar`;
       }
-
-      function selectAllText() {
-    editor.setSelection(editor.getModel().getFullModelRange());
-    editor.focus();
-}
 
       /*------type definition related functions------ */
       
@@ -939,6 +959,7 @@
           
             const { storedMinimap, storedWordWrap, storedFontSize, storedLineNumbers, storedRenderWhitespace, storedTheme, storedAutoClosingBrackets, storedAutoSaveInterval, storedAutoSaveEnabled, storedLanguage} = getStoredSettings();
 
+            const isMobile = MobileDetector.isMobileDevice()
             editor = monaco.editor.create(document.getElementById("editor"), {
                 value:  document.getElementById('autoSaveEnabled').checked ? (localStorage.getItem('editorContent') || defaultCode) : defaultCode,
                 language: storedLanguage || 'javascript',
@@ -952,96 +973,66 @@
                 renderWhitespace: storedRenderWhitespace ? (storedRenderWhitespace === 'true' ? 'all' : 'none') : 'none',
                 highlightActiveLine: true,
                 lineNumbersMinChars: 2,
-            });
-        });
-        initializeTouchSupport();
 
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_A, () => {
-            selectAllText();
+                dragAndDrop: isMobile,
+                selectionClipboard: isMobile,
+                contextmenu: isMobile,
+                lineNumbers: isMobile ? 'off' : 'on',
+                folding: !isMobile,
+                scrollBeyondLastLine: !isMobile,                
+                smoothScrolling: isMobile,
+                mouseWheelZoom: isMobile,
+            });
+
+            editor.addAction({
+              id: 'select-line',
+              label: 'Select Line',
+              keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyL],
+              run: function(ed) {
+                  const position = ed.getPosition();
+                  const range = new monaco.Range(
+                      position.lineNumber,
+                      1,
+                      position.lineNumber,
+                      ed.getModel().getLineMaxColumn(position.lineNumber)
+                  );
+                  ed.setSelection(range);
+              }
+          });
+
+          if (isMobile) addMobileTextCommands(editor)
+
+          function addMobileTextCommands(editor) {
+              let touchStartPos = null;
+              let touchStartTime = null;
+
+              editor.getDomNode().addEventListener('touchstart', (e) => {
+                  touchStartPos = {
+                      x: e.touches[0].clientX,
+                      y: e.touches[0].clientY
+                  };
+                  touchStartTime = Date.now();
+              });
+
+              editor.getDomNode().addEventListener('touchend', (e) => {
+                  const touchEndTime = Date.now();
+                  const timeDiff = touchEndTime - touchStartTime;
+
+                  // Double tap detection for line selection
+                  if (timeDiff < 300) {
+                      const position = editor.getPosition();
+                      editor.setSelection(new monaco.Range(
+                          position.lineNumber,
+                          1,
+                          position.lineNumber,
+                          editor.getModel().getLineMaxColumn(position.lineNumber)
+                      ));
+                  }
+              });
+          }
         });
 
         startAutoSave()
-    }
-
-    function updateEditorTouchOptions() {
-          editor.updateOptions({
-              scrollbar: {
-                  useShadows: true,
-                  verticalHasArrows: true,
-                  horizontalHasArrows: true,
-                  vertical: 'visible',
-                  horizontal: 'visible',
-                  verticalScrollbarSize: 17,
-                  horizontalScrollbarSize: 17,
-                  arrowSize: 30
-              },
-              multiCursorModifier: 'alt',
-              renderWhitespace: 'none',
-              fontSize: 16,
-              lineHeight: 24,
-              minimap: {
-                  enabled: false
-              },
-              mouseWheelZoom: true,
-              smoothScrolling: true,
-              touchScroll: true
-          });
-      }
-
-      function initializeTouchSupport() {
-          const isTouchDevice = ('ontouchstart' in window) || 
-              (navigator.maxTouchPoints > 0) || 
-              (navigator.msMaxTouchPoints > 0);
-
-          if (isTouchDevice) {
-              updateEditorTouchOptions();
-              editor.onDidChangeConfiguration(() => {
-                  updateEditorTouchOptions();
-              });
-              document.getElementById('editor').addEventListener('touchstart', handleTouchSelection, { passive: false });
-          }
-      }
-
-      function handleTouchSelection(e) {
-        const touchDuration = 500;
-        let timer;
-        let touchStartY;
-        let touchStartX;
-
-        const touch = e.touches[0];
-        touchStartY = touch.clientY;
-        touchStartX = touch.clientX;
-
-        timer = setTimeout(() => {
-            const position = editor.getTargetAtClientPoint(touchStartX, touchStartY);
-            if (position) {
-                editor.setPosition(position);
-                editor.trigger('touch', 'editor.action.selectAll', null);
-            }
-        }, touchDuration);
-
-        document.addEventListener('touchend', () => {
-            clearTimeout(timer);
-        }, { once: true });
-
-        e.preventDefault();
-    }
-
-    editor.onDidChangeModelContent(() => {
-        const position = editor.getPosition();
-        localStorage.setItem('editorPosition', JSON.stringify({
-            lineNumber: position.lineNumber,
-            column: position.column
-        }));
-    });
-
-    function restoreEditorPosition() {
-        const savedPosition = localStorage.getItem('editorPosition');
-        if (savedPosition) {
-            const position = JSON.parse(savedPosition);
-            editor.setPosition(position);
-            editor.revealPositionInCenter(position);
-        }
     }
 
       let autoSaveTimer;
