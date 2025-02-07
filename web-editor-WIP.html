@@ -3,24 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
     <!-- Primary Meta Tags -->
     <title>Script Api Editor</title>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta property="og:title" content="Script Api Editor" />
     <meta property="og:description" content="A simple web-based code editor for Minecraft Bedrock Edition scripting with real-time autocomplete." />
+
     <meta property="og:image" content="https://minato-mba.github.io/web-apps/content/pictures/web-editor/screenshot.png" />
     <meta property="og:image:width" content="1350" />
     <meta property="og:image:height" content="643" />
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta property="twitter:image" content="https://minato-mba.github.io/web-apps/content/pictures/web-editor/screenshot.png" />
+
     <meta name="theme-color" content="#1e1e1e" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f3f3f3" media="(prefers-color-scheme: light)" />
     <meta name="apple-mobile-web-app-title" content="Script Api Editor" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="msapplication-TileColor" content="#1e1e1e" />
+
     <link rel="icon" type="image/x-icon" href="content/pictures/web-editor/web-editor.png" />
     <style>
       :root {
-        /* Dark Theme (Default) */
+        /* dark theme (default) */
         --bg-color: #1e1e1e;
         --text-color: #d4d4d4;
         --button-bg: #3c3c3c;
@@ -32,8 +40,8 @@
         --scrollbar-thumb: #606060;
       }
 
-      /* Theme Variations */
       [data-theme="hc-black"] {
+        /* high contrast theme */
         --bg-color: #000000;
         --text-color: #ffffff;
         --button-bg: #000000;
@@ -46,6 +54,7 @@
       }
 
       [data-theme="vs"] {
+        /* light theme */
         --bg-color: #f3f3f3;
         --text-color: #333333;
         --button-bg: #e0e0e0;
@@ -58,6 +67,7 @@
       }
 
       [data-theme="dracula"] {
+        /* dark-blue theme */
         --bg-color: #282a36;
         --text-color: #f8f8f2;
         --button-bg: #44475a;
@@ -70,6 +80,7 @@
       }
 
       [data-theme="monokai"] {
+        /* monokai (dark-green) theme */
         --bg-color: #272822;
         --text-color: #f8f8f2;
         --button-bg: #3e3d32;
@@ -136,8 +147,6 @@
         background: var(--bg-color);
         color: var(--text-color);
         -webkit-font-smoothing: antialiased;
-        overflow: hidden;
-        height: 100vh;
       }
 
       .loading-bar {
@@ -188,6 +197,17 @@
         opacity: 0;
       }
 
+      .menu-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        padding: 10px 0 0 0;
+
+      }
+
       #toolbar.visible {
         height: auto;
         opacity: 1;
@@ -223,160 +243,12 @@
         font-size: 14px;
       }
 
-      .workspace-container {
-        display: flex;
-        height: calc(100vh - 70px);
-        margin-top: 10px;
-        overflow: hidden;
-        width: 100%;
-      }
-
-      .editor-container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        overflow: hidden;
-        min-width: 0;
-      }
-
       #editor {
         width: 100%;
-        height: calc(100vh - 120px);
+        height: calc(100vh - 70px);
         border: 1px solid var(--button-border);
         border-radius: 4px;
-        overflow: hidden;
-      }
-
-      .file-explorer {
-        width: 200px;
-        background: var(--bg-color);
-        border-right: 1px solid var(--button-border);
-        display: none;
-        flex-direction: column;
-        padding: 8px;
-      }
-
-      .file-explorer.visible {
-        display: flex !important;
-      }
-
-      .file-explorer-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--button-border);
-        margin-bottom: 8px;
-      }
-
-      .file-explorer-title {
-        font-size: 14px;
-        font-weight: bold;
-      }
-
-      .file-list {
-        flex: 1;
-        overflow-y: auto;
-      }
-
-      .file-item {
-        padding: 4px 8px;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 4px;
-      }
-
-      .file-item:hover {
-        background: var(--button-bg);
-      }
-
-      .file-item.active {
-        background: var(--button-border);
-      }
-
-      .tabs-container {
-        display: flex;
-        background: var(--bg-color);
-        border-bottom: 1px solid var(--button-border);
-        overflow-x: auto;
-        white-space: nowrap;
-        min-height: 32px;
-        max-height: 32px;
-        scrollbar-width: thin;
-        scrollbar-height: thin;
-      }
-
-      .tabs-container::-webkit-scrollbar {
-        height: 4px;
-      }
-
-      .tabs-container::-webkit-scrollbar-thumb {
-        background-color: var(--scrollbar-thumb);
-        border-radius: 2px;
-      }
-
-      .tabs-container::-webkit-scrollbar-track {
-        background-color: var(--scrollbar-color);
-      }
-
-      .tab {
-        display: flex;
-        align-items: center;
-        padding: 4px 12px;
-        background: var(--button-bg);
-        border: 1px solid var(--button-border);
-        border-bottom: none;
-        margin-right: 2px;
-        cursor: pointer;
-        border-radius: 4px 4px 0 0;
-        font-size: 12px;
-        height: 24px;
-        min-width: 50px;
-        max-width: 200px;
-      }
-
-      .tab span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 150px;
-      }
-
-      .tab.active {
-        background: var(--bg-color);
-        border-bottom: 1px solid var(--bg-color);
-        margin-bottom: -1px;
-      }
-
-      .tab-close {
-        width: 16px;
-        height: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        margin-left: 8px;
-      }
-
-      .tab-close:hover {
-        background: var(--button-border);
-      }
-
-      .file-explorer-header .toolbar-btn {
-        padding: 0;
-        font-size: 12px;
-        height: 24px;
-        width: 24px;
-        min-height: 24px;
-        min-width: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        aspect-ratio: 1;
-        flex: 0 0 24px;
+        touch-action: manipulation;
       }
 
       .modal {
@@ -448,6 +320,42 @@
         opacity: 0.8;
       }
 
+      @media (max-width: 480px) {
+        .toolbar-btn {
+          padding: 14px 12px;
+          font-size: 13px;
+        }
+        .toolbar-input {
+          flex-basis: 100%;
+        }
+        #editor {
+          height: calc(100vh - 90px);
+        }
+      }
+
+      /* monaco editor overrides */
+      .monaco-editor .line-numbers {
+        font-size: 12px !important;
+        padding-left: 5px !important;
+        color: var(--text-color) !important;
+      }
+
+      .monaco-editor .margin-view-overlays {
+        width: 40px !important;
+        background: var(--bg-color) !important;
+      }
+
+      /* scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+        background-color: var(--scrollbar-color);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb);
+        border-radius: 4px;
+      }
+
       #error-container {
         position: fixed;
         top: 10%;
@@ -491,42 +399,59 @@
           transform: translateY(-20px);
         }
       }
-
-      .monaco-editor .line-numbers {
-        font-size: 12px !important;
-        padding-left: 5px !important;
-        color: var(--text-color) !important;
+      .selections {
+        position: absolute;
+        z-index: 10;
+      }
+      .hidden {
+        display: none;
+      }
+      .selectors {
+        width: 25px;
+        height: 25px;
+        background: #7a77ff;
+        position: absolute;
+        border-radius: 50%;
+        margin-top: 25px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        transition: transform 0.1s ease;
+        z-index: 2000;
       }
 
-      .monaco-editor .margin-view-overlays {
-        width: 40px !important;
-        background: var(--bg-color) !important;
+      .right-selector {
+        border-top-left-radius: 0;
+        margin-left: -8px;
       }
 
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-        background-color: var(--scrollbar-color);
+      .left-selector {
+        border-top-right-radius: 0;
+        margin-left: -35px;
       }
 
-      ::-webkit-scrollbar-thumb {
-        background-color: var(--scrollbar-thumb);
-        border-radius: 4px;
+      .mnc {
+        padding: 10px;
+        cursor: pointer;
+        user-select: none;
       }
-
-      @media (max-width: 480px) {
-        .toolbar-btn {
-          padding: 14px 12px;
-          font-size: 13px;
-        }
-
-        .toolbar-input {
-          flex-basis: 100%;
-        }
-
-        .workspace-container {
-          height: calc(100vh - 90px);
-        }
+      .hovered {
+        background-color: #ccc;
+      }
+      .right-arrow-mnc,
+      .left-arrow-mnc {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        background-color: blue;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      .right-arrow-mnc {
+        right: 10px;
+      }
+      .left-arrow-mnc {
+        left: 10px;
       }
     </style>
   </head>
@@ -541,28 +466,23 @@
       <div id="toolbar-toggle" onclick="toggleToolbar()">▽ Show Toolbar</div>
       <div id="toolbar">
         <input type="text" class="toolbar-input" id="filename" value="main.js" />
-        <button class="toolbar-btn" onclick="toggleFileExplorer()">📁 Explorer</button>
-        <button class="toolbar-btn" onclick="createNewFile()">📄 New File</button>
-        <button class="toolbar-btn" onclick="importFile()">📥 Import</button>
         <button class="toolbar-btn" onclick="saveCode()">💾 Save</button>
         <button class="toolbar-btn" onclick="formatCode()">✨ Format</button>
         <button class="toolbar-btn" onclick="showSettings()">⚙️ Settings</button>
         <button class="toolbar-btn" onclick="showVersions()">📦 Modules</button>
       </div>
+      <!-- selection menu -->
+       <div class="menu-selector  hidden">
+          <div class="toolbar-btn copy" onclick="copySelection()">Copy</div>
+          <div class="toolbar-btn cut" onclick="cutSelection()">Cut</div>
+          <div class="toolbar-btn paste" onclick="pasteSelection()">Paste</div>
+          <div class="toolbar-btn select-all" onclick="selectAll()">Select all</div>
+          <div class="toolbar-btn format-document" onclick="formatDocument()">Format</div>
+       </div>
+      <div></div>
     </div>
-    <div class="workspace-container">
-      <div id="fileExplorer" class="file-explorer">
-        <div class="file-explorer-header">
-          <span class="file-explorer-title">EXPLORER</span>
-          <button class="toolbar-btn" onclick="createNewFile()">+</button>
-        </div>
-        <div id="fileList" class="file-list"></div>
-      </div>
-      <div class="editor-container">
-        <div id="tabsContainer" class="tabs-container"></div>
-        <div id="editor"></div>
-      </div>
-    </div>
+    <div id="editor"></div>
+
     <!-- settings menu -->
     <div id="settingsModal" class="modal">
       <div class="modal-content">
@@ -572,7 +492,7 @@
         </div>
         <div class="settings-group">
           <label><input type="checkbox" id="minimap" /> Show Minimap</label>
-          <label><input type="checkbox" id="wordWrap" checked /> Wrap Lines</label>
+          <label><input type="checkbox" id="wordWrap" checked />Wrap Lines</label>
           <label>Font Size <input type="number" id="fontSize" value="13" min="8" max="24" class="toolbar-input" /></label>
           <label><input type="checkbox" id="lineNumbers" checked /> Show Line Numbers</label>
           <label><input type="checkbox" id="renderWhitespace" /> Render Whitespace</label>
@@ -593,7 +513,7 @@
           <label><input type="checkbox" id="autoClosingBrackets" checked /> Auto Closing Brackets</label>
           <label
             >Auto-Save Interval (seconds)
-            <input type="number" id="autoSaveInterval" min="5" value="30" class="toolbar-input" />
+            <input type="number" id="autoSaveInterval" min="5" value="30" class="toolbar-input" checked />
           </label>
           <label><input type="checkbox" id="autoSaveEnabled" onchange="toggleInput()" /> Enable Auto-Save</label>
           <label
@@ -607,6 +527,7 @@
         <button class="toolbar-btn" onclick="applySettings()">Apply</button>
       </div>
     </div>
+
     <!-- version selection menu -->
     <div id="versionModal" class="modal">
       <div class="modal-content">
@@ -620,37 +541,13 @@
         <button class="toolbar-btn" onclick="loadSelectedVersions()">Load Versions</button>
       </div>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.js"></script>
     <script>
-      window.addEventListener("beforeunload", function (event) {
-        saveFilesToStorage();
-        event.preventDefault();
-        event.returnValue = "Are you sure you want to leave?";
-      });
-
-      // File management system
-      let files = new Map();
-      let currentFile = null;
-      let editor;
-      let typeLibs = new Map();
-      let isToolbarVisible = false;
-      const defaultCode = `// Minecraft scripting with full autocomplete capabilities
-import { world, ItemStack } from '@minecraft/server';
-import { ActionFormData } from '@minecraft/server-ui';
-
-world.beforeEvents.chatSend.subscribe((eventData) => {
-const message = eventData.message.toLowerCase();
-const player = eventData.sender;
-
-if (message === '!hello') {
-  player.sendMessage('Hello, ' + player.name + '!');
-}
-});`;
       function toggleInput() {
         document.getElementById("autoSaveInterval").disabled = !document.getElementById("autoSaveEnabled").checked;
       }
 
-      // Error handling
       let count = 0;
       function showError(message) {
         count += 1;
@@ -658,6 +555,7 @@ if (message === '!hello') {
         const toast = document.createElement("div");
         toast.className = "error-toast";
         toast.textContent = message;
+
         setTimeout(() => {
           errorContainer.appendChild(toast);
           setTimeout(() => {
@@ -666,181 +564,8 @@ if (message === '!hello') {
           }, 4000);
         }, count * 500);
       }
-      function getFileLanguage(fileName) {
-        const ext = fileName.split(".").pop().toLowerCase();
-        switch (ext) {
-          case "ts":
-            return "typescript";
-          case "js":
-            return "javascript";
-          default:
-            return "javascript";
-        }
-      }
-      function openFile(fileName) {
-        if (!files.has(fileName)) return;
-        if (currentFile) {
-          const currentContent = editor.getValue();
-          files.get(currentFile).content = currentContent;
-          updateFileModel(currentFile, currentContent);
-        }
-        currentFile = fileName;
-        const file = files.get(fileName);
-        const uri = monaco.Uri.file(`/${fileName}`);
-        let model = monaco.editor.getModel(uri);
-        if (!model) {
-          model = monaco.editor.createModel(file.content, file.language, uri);
-        }
-        editor.setModel(model);
-        updateTabs();
-        updateFileExplorer();
-      }
-      function updateFileExplorer() {
-        const fileList = document.getElementById("fileList");
-        if (!fileList) return;
-        fileList.innerHTML = "";
-        files.forEach((file, fileName) => {
-          const item = document.createElement("div");
-          item.className = `file-item ${currentFile === fileName ? "active" : ""}`;
-          const nameSpan = document.createElement("span");
-          nameSpan.textContent = fileName;
-          nameSpan.onclick = () => openFile(fileName);
-          const closeBtn = document.createElement("span");
-          closeBtn.innerHTML = "&times;";
-          closeBtn.className = "tab-close";
-          closeBtn.onclick = (e) => {
-            e.stopPropagation();
-            closeFile(fileName);
-          };
-          item.appendChild(nameSpan);
-          item.appendChild(closeBtn);
-          fileList.appendChild(item);
-        });
-      }
-
-      // Add function to update file models
-      function updateFileModel(fileName, content) {
-        const uri = monaco.Uri.file(`/${fileName}`);
-        const model = monaco.editor.getModel(uri);
-        if (model) {
-          model.setValue(content);
-        }
-      }
-      function updateTabs() {
-        const container = document.getElementById("tabsContainer");
-        if (!container) {
-          console.error("Tabs container not found");
-          return;
-        }
-        container.innerHTML = "";
-        files.forEach((file, fileName) => {
-          const tab = document.createElement("div");
-          tab.className = `tab ${currentFile === fileName ? "active" : ""}`;
-          const tabContent = document.createElement("div");
-          tabContent.style.display = "flex";
-          tabContent.style.alignItems = "center";
-          tabContent.style.gap = "8px";
-          const nameSpan = document.createElement("span");
-          nameSpan.textContent = fileName;
-          nameSpan.style.cursor = "pointer";
-          nameSpan.onclick = () => openFile(fileName);
-          const closeBtn = document.createElement("span");
-          closeBtn.innerHTML = "&times;";
-          closeBtn.className = "tab-close";
-          closeBtn.onclick = (e) => {
-            e.stopPropagation();
-            closeFile(fileName);
-          };
-          tabContent.appendChild(nameSpan);
-          tabContent.appendChild(closeBtn);
-          tab.appendChild(tabContent);
-          container.appendChild(tab);
-        });
-      }
-
-      function closeFile(fileName) {
-        if (!files.has(fileName)) return;
-        if (files.size === 1) {
-          window.alert("You can't close the last file!");
-          return;
-        }
-        if (!confirm(`Are you sure you want to close ${fileName}?`)) return;
-        const uri = monaco.Uri.file(`/${fileName}`);
-        const model = monaco.editor.getModel(uri);
-        if (model) {
-          model.dispose();
-        }
-        files.delete(fileName);
-        saveFilesToStorage();
-        if (currentFile === fileName) {
-          currentFile = null;
-          const nextFile = Array.from(files.keys())[0];
-          if (nextFile) {
-            openFile(nextFile);
-          } else {
-            editor.setValue("");
-          }
-        }
-        updateTabs();
-        updateFileExplorer();
-      }
-
-      function createNewFile() {
-        let name = "untitled";
-        let i = 1;
-        while (files.has(`${name}.js`)) {
-          name = `untitled${i}`;
-          i++;
-        }
-
-        const fileName = prompt("Enter file name:", `${name}.js`);
-        if (!fileName) return;
-        if (files.has(fileName)) {
-          showError("File already exists!");
-          return;
-        }
-
-        const currentTime = formatUTCDate(new Date());
-        const content = "";
-
-        files.set(fileName, {
-          content,
-          language: getFileLanguage(fileName),
-          lastModified: currentTime,
-          createdAt: currentTime,
-          author: "MinecraftBedrockArabic",
-        });
-
-        const uri = monaco.Uri.file(`/${fileName}`);
-        monaco.editor.createModel(content, getFileLanguage(fileName), uri);
-        document.getElementById("filename").value = fileName;
-        openFile(fileName);
-        updateFileExplorer();
-        saveFilesToStorage();
-      }
-
-      async function importFile() {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".js,.ts";
-        input.multiple = true;
-        input.onchange = async function () {
-          for (const file of this.files) {
-            const content = await file.text();
-            files.set(file.name, {
-              content,
-              language: getFileLanguage(file.name),
-            });
-            // Create model for imported file
-            const uri = monaco.Uri.file(`/${file.name}`);
-            monaco.editor.createModel(content, getFileLanguage(file.name), uri);
-          }
-          if (this.files.length > 0) {
-            openFile(this.files[0].name);
-          }
-        };
-        input.click();
-      }
+      // ========== modules ========== //
+      // add new modules here following the same format
       const MODULES = [
         {
           name: "@minecraft/server",
@@ -879,6 +604,13 @@ if (message === '!hello') {
           typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/vanilla-data@${version}/lib/index.d.ts`,
         },
       ];
+
+      const defaultCode = `// Minecraft scripting with full autocomplete capabilities\nimport { world, ItemStack } from '@minecraft/server';\nimport { ActionFormData } from '@minecraft/server-ui';\n\nworld.beforeEvents.itemUse.subscribe((event) => {\n    const { source, itemStack } = event;\n    if (itemStack.typeId !== "minecraft:stick") return;\n    new ActionFormData()\n        .title("Special Offer!")\n        .body("Do you want a free diamond?")\n        .button("Yes!")\n        .button("No")\n        .show(source)\n        .then(({ selection }) => {\n            if (selection !== 0) return;\n            source.getComponent("minecraft:inventory")?.container?.addItem(new ItemStack("minecraft:diamond", 1));\n            source.sendMessage("You received a free diamond!");\n        })\n});`;
+      let editor;
+      let typeLibs = new Map();
+      let isToolbarVisible = false;
+
+      /*------loading bar related functions------ */
       function showLoadingBar() {
         document.getElementById("loadingBar").style.display = "block";
         document.querySelector(".loading-progress").style.width = "0";
@@ -895,38 +627,35 @@ if (message === '!hello') {
         isToolbarVisible = !isToolbarVisible;
         const toolbar = document.getElementById("toolbar");
         const toggleBtn = document.getElementById("toolbar-toggle");
+
         toolbar.classList.toggle("visible", isToolbarVisible);
         toggleBtn.textContent = `${isToolbarVisible ? "△ Hide" : "▽ Show"} Toolbar`;
       }
+
+      /*------type definition related functions------ */
+
       async function loadTypeDefinitions() {
         showLoadingBar();
-        // Clear existing type definitions safely
-        if (typeLibs.size > 0) {
-          typeLibs.forEach((lib) => {
-            if (lib.jsLib && typeof lib.jsLib.dispose === "function") {
-              lib.jsLib.dispose();
-            }
-            if (lib.tsLib && typeof lib.tsLib.dispose === "function") {
-              lib.tsLib.dispose();
-            }
-          });
-        }
-        typeLibs.clear();
-        // Set compiler options
         monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
           allowNonTsExtensions: true,
           moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
           target: monaco.languages.typescript.ScriptTarget.ES2020,
           checkJs: true,
         });
+
         monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
           allowNonTsExtensions: true,
           moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
           target: monaco.languages.typescript.ScriptTarget.ES2020,
           strict: true,
         });
+
+        typeLibs.forEach((lib) => lib.dispose());
+        typeLibs.clear();
+
         const totalModules = MODULES.length;
         let loadedModules = 0;
+
         for (const module of MODULES) {
           try {
             const response = await fetch(module.typesUrl(module.currentVersion));
@@ -935,7 +664,10 @@ if (message === '!hello') {
               throw new Error(`HTTP ${response.status}`);
             }
             const types = await response.text();
+
             const libJS = monaco.languages.typescript.javascriptDefaults.addExtraLib(`declare module "${module.name}" { ${types} }`, `file:///node_modules/${module.name}/index.d.ts`);
+            console.log(`file:///node_modules/${module.name}/index.d.ts`);
+
             const libTS = monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare module "${module.name}" { ${types} }`, `file:///node_modules/${module.name}/index.d.ts`);
             typeLibs.set(module.name, { jsLib: libJS, tsLib: libTS });
           } catch (error) {
@@ -947,15 +679,35 @@ if (message === '!hello') {
         }
         hideLoadingBar();
       }
+
+      async function loadSelectedVersions() {
+        showLoadingBar();
+
+        for (const module of MODULES) {
+          const selectedVersion = document.getElementById(module.selectorId).value;
+          console.log(`Updating ${module.name} to version ${selectedVersion}`);
+          module.currentVersion = selectedVersion;
+        }
+
+        await loadTypeDefinitions();
+        closeModal("versionModal");
+        editor.setValue(editor.getValue());
+
+        hideLoadingBar();
+      }
+
       let isClicked = false;
       async function showVersions() {
         if (isClicked) return;
         isClicked = true;
         const versionSelectors = document.getElementById("versionSelectors");
         versionSelectors.innerHTML = "";
+
         const totalModules = MODULES.length;
         let loadedModules = 0;
+
         showLoadingBar();
+
         for (const module of MODULES) {
           const versions = await fetchVersions(module.name);
           const select = createVersionSelector(module, versions);
@@ -963,22 +715,13 @@ if (message === '!hello') {
           loadedModules++;
           updateLoadingProgress(loadedModules, totalModules);
         }
+
         hideLoadingBar();
+
         isClicked = false;
         document.getElementById("versionModal").style.display = "block";
       }
-      async function loadSelectedVersions() {
-        showLoadingBar();
-        for (const module of MODULES) {
-          const selectedVersion = document.getElementById(module.selectorId).value;
-          console.log(`Updating ${module.name} to version ${selectedVersion}`);
-          module.currentVersion = selectedVersion;
-        }
-        await loadTypeDefinitions();
-        closeModal("versionModal");
-        editor.setValue(editor.getValue());
-        hideLoadingBar();
-      }
+
       async function fetchVersions(packageName) {
         try {
           const response = await fetch(`https://data.jsdelivr.com/v1/package/npm/${packageName}`);
@@ -994,23 +737,29 @@ if (message === '!hello') {
           return [];
         }
       }
+
       function createVersionSelector(module, versions) {
         const container = document.createElement("div");
         const label = document.createElement("div");
         label.className = "module-label";
         label.textContent = module.name;
+
         const select = document.createElement("select");
         select.className = "version-select";
         select.id = module.selectorId;
         select.innerHTML = versions.map((v) => `<option value="${v}" ${v === module.currentVersion ? "selected" : ""}>${v}</option>`).join("");
+
         container.appendChild(label);
         container.appendChild(select);
+
         if (versions.length === 0) {
           select.disabled = true;
           select.innerHTML = `<option>No versions available</option>`;
         }
         return container;
       }
+
+      /*------settings related functions------ */
       function getSettingElements() {
         return {
           miniMap: document.getElementById("minimap"),
@@ -1025,6 +774,7 @@ if (message === '!hello') {
           language: document.getElementById("language"),
         };
       }
+
       function getStoredSettings() {
         return {
           storedMinimap: localStorage.getItem("minimap"),
@@ -1040,8 +790,9 @@ if (message === '!hello') {
         };
       }
       function showSettings() {
-        const elements = getSettingElements();
-        if (Object.values(elements).every((el) => el)) {
+        const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language } = getSettingElements();
+
+        if (minimap && wordWrap && fontSize && lineNumbers && renderWhitespace && theme && autoClosingBrackets && language) {
           document.getElementById("settingsModal").style.display = "block";
         } else {
           showError("One or more settings elements are missing in the DOM.");
@@ -1053,8 +804,9 @@ if (message === '!hello') {
         const theme = document.getElementById("theme").value;
         const selectedLanguage = document.getElementById("language").value;
         document.body.setAttribute("data-theme", theme);
+        const selectedTheme = document.getElementById("theme").value;
         editor.updateOptions({
-          theme: theme,
+          theme: selectedTheme,
           autoClosingBrackets: document.getElementById("autoClosingBrackets").checked,
           wordWrap: document.getElementById("wordWrap").checked ? "on" : "off",
           fontSize: parseInt(document.getElementById("fontSize").value, 10),
@@ -1064,46 +816,66 @@ if (message === '!hello') {
         });
         const model = editor.getModel();
         monaco.editor.setModelLanguage(model, selectedLanguage);
+
         // Apply body class for theme change
         document.body.classList.remove("high-contrast-theme", "light-theme");
-        if (theme === "vs") {
+        if (selectedTheme === "vs") {
           document.body.classList.add("light-theme");
-        } else if (theme === "hc-black") {
+        } else if (selectedTheme === "hc-black") {
           document.body.classList.add("high-contrast-theme");
+        } else {
+          document.body.classList.remove("light-theme", "high-contrast-theme");
         }
+
         closeModal("settingsModal");
-        saveSettings();
+        saveSetting();
       }
-      function saveSettings() {
-        const elements = getSettingElements();
-        localStorage.setItem("minimap", elements.miniMap.checked);
-        localStorage.setItem("wordWrap", elements.wordWrap.checked);
-        localStorage.setItem("fontSize", elements.fontSize.value);
-        localStorage.setItem("lineNumbers", elements.lineNumbers.checked);
-        localStorage.setItem("renderWhitespace", elements.renderWhitespace.checked);
-        localStorage.setItem("theme", elements.theme.value);
-        localStorage.setItem("autoClosingBrackets", elements.autoClosingBrackets.checked);
-        localStorage.setItem("autoSaveInterval", elements.autoSaveInterval.value);
-        localStorage.setItem("autoSaveEnabled", elements.autoSaveEnabled.checked);
-        localStorage.setItem("language", elements.language.value);
+
+      function saveSetting() {
+        const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets } = getSettingElements();
+
+        localStorage.setItem("minimap", miniMap.checked);
+        localStorage.setItem("wordWrap", wordWrap.checked);
+        localStorage.setItem("fontSize", fontSize.value);
+        localStorage.setItem("lineNumbers", lineNumbers.checked);
+        localStorage.setItem("renderWhitespace", renderWhitespace.checked);
+        localStorage.setItem("theme", theme.value);
+        localStorage.setItem("autoClosingBrackets", autoClosingBrackets.checked);
+        localStorage.setItem("autoSaveInterval", autoSaveInterval.value);
+        localStorage.setItem("autoSaveEnabled", autoSaveEnabled.checked);
+        localStorage.setItem("language", language.value);
       }
-      function loadSettings() {
-        const elements = getSettingElements();
-        const stored = getStoredSettings();
-        elements.miniMap.checked = stored.storedMinimap === "true";
-        elements.wordWrap.checked = stored.storedWordWrap === "true";
-        elements.fontSize.value = stored.storedFontSize || "13";
-        elements.lineNumbers.checked = stored.storedLineNumbers !== "false";
-        elements.renderWhitespace.checked = stored.storedRenderWhitespace === "true";
-        elements.theme.value = stored.storedTheme || "vs-dark";
-        elements.autoClosingBrackets.checked = stored.storedAutoClosingBrackets !== "false";
-        elements.autoSaveInterval.value = stored.storedAutoSaveInterval || "30";
-        elements.autoSaveEnabled.checked = stored.storedAutoSaveEnabled === "true";
-        elements.language.value = stored.storedLanguage || "javascript";
+
+      function loadSetting() {
+        const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language } = getSettingElements();
+        const {
+          storedMinimap,
+          storedWordWrap,
+          storedFontSize,
+          storedLineNumbers,
+          storedRenderWhitespace,
+          storedTheme,
+          storedAutoClosingBrackets,
+          storedAutoSaveInterval,
+          storedAutoSaveEnabled,
+          storedLanguage,
+        } = getStoredSettings();
+
+        miniMap.checked = storedMinimap ? storedMinimap === "true" : false;
+        wordWrap.checked = storedWordWrap ? storedWordWrap === "true" : false;
+        fontSize.value = storedFontSize || 13;
+        lineNumbers.checked = storedLineNumbers ? storedLineNumbers === "true" : true;
+        renderWhitespace.checked = storedRenderWhitespace ? storedRenderWhitespace === "true" : false;
+        theme.value = storedTheme || "vs-dark";
+        autoClosingBrackets.checked = storedAutoClosingBrackets ? storedAutoClosingBrackets === "true" : true;
+        autoSaveInterval.value = storedAutoSaveInterval || 30;
+        autoSaveEnabled.checked = storedAutoSaveEnabled ? storedAutoSaveEnabled === "true" : true;
+        language.value = storedLanguage || "javascript";
       }
 
       async function initializeEditor() {
-        loadSettings();
+        loadSetting();
+        // Add theme initialization
         const savedTheme = localStorage.getItem("theme") || "vs-dark";
         document.body.setAttribute("data-theme", savedTheme);
         require.config({
@@ -1112,140 +884,7 @@ if (message === '!hello') {
           },
         });
         require(["vs/editor/editor.main"], async () => {
-          // Initialize type definitions first
           await loadTypeDefinitions();
-          const stored = getStoredSettings();
-
-          // Load saved files first
-          const savedFiles = localStorage.getItem("editor_files");
-          const defaultFileName = "main.js";
-
-          // Format current UTC date in YYYY-MM-DD HH:MM:SS format
-          const formatUTCDate = (date) => {
-            return date
-              .toISOString()
-              .replace("T", " ")
-              .replace(/\.\d+Z$/, "");
-          };
-
-          const defaultCode = `// Minecraft scripting with full autocomplete capabilities
-import { world, ItemStack } from '@minecraft/server';
-import { ActionFormData } from '@minecraft/server-ui';
-
-world.beforeEvents.itemUse.subscribe((event) => {
-    const { source, itemStack } = event;
-    if (itemStack.typeId !== "minecraft:stick") return;
-    new ActionFormData()
-        .title("Special Offer!")
-        .body("Do you want a free diamond?")
-        .button("Yes!")
-        .button("No")
-        .show(source)
-        .then(({ selection }) => {
-            if (selection !== 0) return;
-            source.getComponent("minecraft:inventory")?.container?.addItem(new ItemStack("minecraft:diamond", 1));
-            source.sendMessage("You received a free diamond!");
-        })
-});`;
-
-          let initialContent = defaultCode;
-          let initialFileName = defaultFileName;
-          let initialLanguage = stored.storedLanguage || "javascript";
-
-          if (savedFiles) {
-            const filesData = JSON.parse(savedFiles);
-            // Load all saved files into the files Map
-            Object.entries(filesData).forEach(([fileName, file]) => {
-              files.set(fileName, {
-                content: file.content,
-                language: file.language,
-                lastModified: file.lastModified || formatUTCDate(new Date()),
-              });
-            });
-
-            // Get the last modified file to use as initial content
-            const sortedFiles = Object.entries(filesData).sort((a, b) => new Date(b[1].lastModified || 0) - new Date(a[1].lastModified || 0));
-
-            if (sortedFiles.length > 0) {
-              const [firstFileName, firstFile] = sortedFiles[0];
-              initialContent = firstFile.content;
-              initialFileName = firstFileName;
-              initialLanguage = firstFile.language;
-            }
-          }
-
-          // Create editor with initial content
-          editor = monaco.editor.create(document.getElementById("editor"), {
-            value: initialContent,
-            language: initialLanguage,
-            theme: stored.storedTheme || "vs-dark",
-            automaticLayout: true,
-            minimap: { enabled: stored.storedMinimap === "true" },
-            wordWrap: stored.storedWordWrap === "true" ? "on" : "off",
-            fontSize: parseInt(stored.storedFontSize || "13"),
-            lineNumbers: stored.storedLineNumbers !== "false" ? "on" : "off",
-            autoClosingBrackets: stored.storedAutoClosingBrackets !== "false" ? "always" : "never",
-            renderWhitespace: stored.storedRenderWhitespace === "true" ? "all" : "none",
-            highlightActiveLine: true,
-            lineNumbersMinChars: 2,
-            suggest: {
-              snippetsPreventQuickSuggestions: false,
-              localityBonus: true,
-              shareSuggestSelections: true,
-              showIcons: true,
-              maxVisibleSuggestions: 12,
-              selectionMode: "always",
-            },
-            scrollBeyondLastLine: false,
-            scrollbar: {
-              horizontal: "auto",
-              vertical: "auto",
-              horizontalScrollbarSize: 12,
-              verticalScrollbarSize: 12,
-              alwaysConsumeMouseWheel: false,
-            },
-          });
-
-          // If no saved files exist, create the default file
-          if (files.size === 0) {
-            files.set(initialFileName, {
-              content: initialContent,
-              language: initialLanguage,
-              lastModified: formatUTCDate(new Date()),
-            });
-          }
-
-          // Set up models for all files
-          files.forEach((file, fileName) => {
-            const uri = monaco.Uri.file(`/${fileName}`);
-            if (!monaco.editor.getModel(uri)) {
-              monaco.editor.createModel(file.content, file.language, uri);
-            }
-          });
-
-          // Set current file and open it
-          currentFile = initialFileName;
-          if (currentFile) {
-            openFile(currentFile);
-            document.getElementById("filename").value = currentFile;
-          }
-
-          // Set up module resolution after editor is created
-          setupModuleResolution();
-
-          // Update UI
-          updateTabs();
-          updateFileExplorer();
-          startAutoSave();
-
-          // Set up file change tracking
-          editor.onDidChangeModelContent(() => {
-            if (currentFile) {
-              files.get(currentFile).lastModified = formatUTCDate(new Date());
-              // Update storage on each change
-              saveFilesToStorage();
-            }
-          });
 
           // ========== THEMES ========== //
           // add new themes here following the same format
@@ -1267,6 +906,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
               "editorLineNumber.foreground": "#6272a4",
             },
           });
+
           monaco.editor.defineTheme("monokai", {
             base: "vs-dark",
             inherit: true,
@@ -1285,6 +925,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
               "editorLineNumber.foreground": "#75715e",
             },
           });
+
           monaco.editor.defineTheme("solarized-dark", {
             base: "vs-dark",
             inherit: true,
@@ -1303,6 +944,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
               "editorLineNumber.foreground": "#586e75",
             },
           });
+
           monaco.editor.defineTheme("solarized-light", {
             base: "vs",
             inherit: true,
@@ -1321,6 +963,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
               "editorLineNumber.foreground": "#93a1a1",
             },
           });
+
           monaco.editor.defineTheme("nord", {
             base: "vs-dark",
             inherit: true,
@@ -1339,6 +982,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
               "editorLineNumber.foreground": "#4c566a",
             },
           });
+
           monaco.editor.defineTheme("gruvbox", {
             base: "vs-dark",
             inherit: true,
@@ -1357,44 +1001,410 @@ world.beforeEvents.itemUse.subscribe((event) => {
               "editorLineNumber.foreground": "#665c54",
             },
           });
-        });
 
-        window.addEventListener("resize", () => {
-          if (editor) {
-            editor.layout();
+          const {
+            storedMinimap,
+            storedWordWrap,
+            storedFontSize,
+            storedLineNumbers,
+            storedRenderWhitespace,
+            storedTheme,
+            storedAutoClosingBrackets,
+            storedAutoSaveInterval,
+            storedAutoSaveEnabled,
+            storedLanguage,
+          } = getStoredSettings();
+
+          editor = monaco.editor.create(document.getElementById("editor"), {
+            value: document.getElementById("autoSaveEnabled").checked ? localStorage.getItem("editorContent") || defaultCode : defaultCode,
+            language: storedLanguage || "javascript",
+            theme: storedTheme || "vs-dark",
+            automaticLayout: true,
+            minimap: { enabled: storedMinimap ? storedMinimap === "true" : false },
+            wordWrap: storedWordWrap === "true" ? "on" : "off",
+            fontSize: parseInt(storedFontSize ? Number(storedFontSize) : 13),
+            lineNumbers: storedLineNumbers ? (storedLineNumbers === "true" ? "on" : "off") : "on",
+            autoClosingBrackets: storedAutoClosingBrackets ? (storedAutoClosingBrackets === "true" ? "always" : "never") : "always",
+            renderWhitespace: storedRenderWhitespace ? (storedRenderWhitespace === "true" ? "all" : "none") : "none",
+            highlightActiveLine: true,
+            lineNumbersMinChars: 2,
+            contextmenu: false,
+          });
+
+          let selectionsContainer;
+          let rightSelector;
+          let leftSelector;
+          let globalPoseMenu = 0;
+          let touchTimeout;
+          let touchCount = 0;
+          let startPosition;
+          let isSelecting = false;
+          let disabledMove = false;
+
+          function initializeSelector() {
+            selectionsContainer = document.createElement("div");
+            selectionsContainer.className = "selections hidden";
+
+            rightSelector = document.createElement("div");
+            rightSelector.className = "selectors right-selector";
+            leftSelector = document.createElement("div");
+            leftSelector.className = "selectors left-selector";
+
+            selectionsContainer.appendChild(rightSelector);
+            selectionsContainer.appendChild(leftSelector);
+
+            const editorScrollableNode = document.querySelector(".lines-content.monaco-editor-background");
+            editorScrollableNode.insertAdjacentElement("afterbegin", selectionsContainer);
+
+            const outsetContainer = document.createElement("div");
+            outsetContainer.className = "outset-shit-select";
+
+            const leftArrow = document.createElement("div");
+            leftArrow.className = "right-arrow-mnc left";
+            leftArrow.ontouchstart = function () {
+              this.classList.add("hovered");
+            };
+            leftArrow.ontouchmove = function () {
+              this.classList.remove("hovered");
+            };
+
+            let currentScrollPosition = 0;
+            leftArrow.ontouchend = function () {
+              this.classList.remove("hovered");
+              const containerWidth = outsetContainer.offsetWidth;
+              let newScrollPosition = currentScrollPosition - containerWidth;
+              if (newScrollPosition < 0) {
+                newScrollPosition = 0;
+              }
+              outsetContainer.scrollTo({
+                left: newScrollPosition,
+                behavior: "smooth",
+              });
+              currentScrollPosition = newScrollPosition;
+              if (newScrollPosition < 5) {
+              }
+            };
+
+            const rightArrow = document.createElement("div");
+            rightArrow.className = "right-arrow-mnc";
+            rightArrow.ontouchstart = function () {
+              this.classList.add("hovered");
+            };
+            rightArrow.ontouchmove = function () {
+              this.classList.remove("hovered");
+            };
+
+            rightArrow.ontouchend = function () {
+              this.classList.remove("hovered");
+              const containerWidth = outsetContainer.offsetWidth;
+              const scrollWidth = outsetContainer.scrollWidth;
+              let newScrollPosition = currentScrollPosition + containerWidth;
+              if (newScrollPosition > scrollWidth) {
+                newScrollPosition = scrollWidth;
+              }
+              outsetContainer.scrollTo({
+                left: newScrollPosition,
+                behavior: "smooth",
+              });
+              currentScrollPosition = newScrollPosition;
+            };
+
+            function isMobile() {
+              const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+              if (
+                /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(
+                  userAgent
+                ) ||
+                /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(
+                  userAgent.substr(0, 4)
+                )
+              )
+                return true;
+              return false;
+            }
+
+            let lastTapTime = 0;
+            const doubleTapDelay = 400; // milliseconds
+
+            document.addEventListener("touchend", (event) => {
+              const currentTime = new Date().getTime();
+              const tapLength = currentTime - lastTapTime;
+
+              if (tapLength < doubleTapDelay && tapLength > 0) {
+                // Double tap detected
+                const touch = event.changedTouches[0];
+                const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
+
+                if (target && target.position) {
+                  const model = editor.getModel();
+                  const word = model.getWordAtPosition(target.position);
+
+                  if (word) {
+                    const selection = new monaco.Selection(target.position.lineNumber, word.startColumn, target.position.lineNumber, word.endColumn);
+                    editor.setSelection(selection);
+                    event.preventDefault();
+                  }
+                }
+              }
+
+              lastTapTime = currentTime;
+            });
+
+            function handleSelectorTouch(selector, isLeft) {
+              let touchStartPos;
+              let initialSelection;
+              let touchMoved = false;
+
+              selector.addEventListener("touchstart", (event) => {
+                const touch = event.touches[0];
+                touchStartPos = { x: touch.clientX, y: touch.clientY };
+                initialSelection = editor.getSelection();
+                touchMoved = false;
+                event.preventDefault();
+                disabledMove = true;
+                
+                editor.focus();
+                if (initialSelection.isEmpty()) {
+                  editor.setSelection(initialSelection);
+                }
+              });
+
+              selector.addEventListener("touchmove", (event) => {
+                const touch = event.touches[0];
+                const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
+                event.preventDefault();
+
+                if (target?.position) {
+                  const newSelection = isLeft
+                    ? new monaco.Selection(
+                        target.position.lineNumber,
+                        target.position.column,
+                        initialSelection.endLineNumber,
+                        initialSelection.endColumn
+                      )
+                    : new monaco.Selection(
+                        initialSelection.startLineNumber,
+                        initialSelection.startColumn,
+                        target.position.lineNumber,
+                        target.position.column
+                      );
+                  
+                  editor.setSelection(newSelection);
+                  touchMoved = true;
+                }
+              });
+
+              selector.addEventListener("touchend", (event) => {
+                event.preventDefault();
+                const touch = event.changedTouches[0];
+                const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
+
+                if (target?.position) {
+                  const newSelection = isLeft
+                    ? new monaco.Selection(
+                        target.position.lineNumber,
+                        target.position.column,
+                        initialSelection.endLineNumber,
+                        initialSelection.endColumn
+                      )
+                    : new monaco.Selection(
+                        initialSelection.startLineNumber,
+                        initialSelection.startColumn,
+                        target.position.lineNumber,
+                        target.position.column
+                      );
+                  
+                  editor.setSelection(newSelection);
+                  editor.focus();
+                }
+
+                // Delay state reset to maintain selection
+                setTimeout(() => {
+                  touchStartPos = null;
+                  initialSelection = null;
+                  touchMoved = false;
+                  disabledMove = false;
+                }, 100);
+              });
+            }
+
+            handleSelectorTouch(leftSelector, true);
+            handleSelectorTouch(rightSelector, false);
           }
+
+          function selectAll() {
+            editor.focus();
+            const fullRange = editor.getModel().getFullModelRange();
+            editor.setSelection(fullRange);
+          }
+
+          function copy() {
+            const selection = editor.getSelection();
+            const selectedText = editor.getModel().getValueInRange(selection);
+            navigator.clipboard
+              .writeText(selectedText)
+              .then(() => {
+                console.log("Copied to clipboard");
+              })
+              .catch((err) => {
+                console.error("Error in copying", err);
+              });
+          }
+
+          function cut() {
+            const selection = editor.getSelection();
+            const selectedText = editor.getModel().getValueInRange(selection);
+            navigator.clipboard
+              .writeText(selectedText)
+              .then(() => {
+                editor.executeEdits("", [{ range: selection, text: "" }]);
+              })
+              .catch((err) => {
+                editor.executeEdits("", [{ range: selection, text: "" }]);
+              });
+          }
+
+          function paste() {
+            navigator.clipboard
+              .readText()
+              .then((text) => {
+                const selection = editor.getSelection();
+                editor.executeEdits("", [{ range: selection, text }]);
+                console.log("Pasted from clipboard");
+              })
+              .catch((err) => {
+                console.error("Failed to paste: ", err);
+              });
+          }
+
+          function formatDocument() {
+            editor.focus();
+            editor.getAction("editor.action.formatDocument").run();
+          }
+
+          function getLineYCoordinate(position) {
+            const lineTop = editor.getTopForLineNumber(position.lineNumber);
+            const editorCoords = editorElement.getBoundingClientRect();
+            return window.scrollY + editorCoords.top + lineTop - tapsHeight;
+          }
+
+          function isPositionInSelection(position) {
+            const selection = editor.getSelection();
+            if (!selection || selection.isEmpty()) {
+              return false;
+            }
+
+            const startPosition = selection.getStartPosition();
+            const endPosition = selection.getEndPosition();
+
+            return (
+              (position.lineNumber > startPosition.lineNumber || (position.lineNumber === startPosition.lineNumber && position.column >= startPosition.column)) &&
+              (position.lineNumber < endPosition.lineNumber || (position.lineNumber === endPosition.lineNumber && position.column <= endPosition.column))
+            );
+          }
+
+          const editorElement = document.getElementById("editor");
+          const tapsHeight = 40; // assuming you have some element on top that takes some height
+          const leftLength = document.querySelector(".monaco-editor .margin").offsetWidth;
+
+          editorElement.addEventListener("touchstart", (event) => {
+            touchCount++;
+            if (touchTimeout) {
+              clearTimeout(touchTimeout);
+            }
+
+            setTimeout(() => {
+              const selection = editor.getSelection();
+              if (!selection.isEmpty()) showContextMenu();
+            }, 400);
+
+            const touch = event.touches[0];
+            const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
+            if (target && target.position) {
+              startPosition = target.position;
+            }
+          });
+
+          editorElement.addEventListener("touchend", () => {
+            if (touchTimeout) {
+              clearTimeout(touchTimeout);
+            }
+            if (isSelecting) {
+              isSelecting = false;
+            }
+            if (disabledMove) {
+              disabledMove = false;
+            }
+          });
+
+          editorElement.addEventListener("touchmove", (event) => {
+            if (touchTimeout) {
+              clearTimeout(touchTimeout);
+            }
+
+            if (disabledMove) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+
+            if (startPosition && isSelecting) {
+              event.preventDefault();
+              event.stopPropagation();
+              const touch = event.touches[0];
+              const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
+              if (target && target.position) {
+                editor.setSelection(new monaco.Selection(startPosition.lineNumber, startPosition.column, target.position.lineNumber, target.position.column));
+                isSelecting = true;
+              }
+            }
+          });
+
+          editor.onDidChangeCursorSelection((e) => {
+            const selection = e.selection;
+            const startPosition = selection.getStartPosition();
+            const endPosition = selection.getEndPosition();
+
+            if (selection.isEmpty()) {
+              const selectorMenu = document.querySelector(".menu-selector");
+              selectorMenu.classList.add("hidden");
+              selectionsContainer.classList.add("hidden");
+              return;
+            }
+
+            const startLineTop = editor.getTopForLineNumber(startPosition.lineNumber);
+            const endLineTop = editor.getTopForLineNumber(endPosition.lineNumber);
+
+            const startCoords = editor.getScrolledVisiblePosition(startPosition);
+            const endCoords = editor.getScrolledVisiblePosition(endPosition);
+
+            if (startCoords && endCoords) {
+              const editorCoords = editorElement.getBoundingClientRect();
+
+              const leftSelectorX = editorCoords.left + startCoords.left - leftLength;
+              const leftSelectorY = editorCoords.top + startLineTop - tapsHeight;
+              const rightSelectorX = editorCoords.left + endCoords.left - leftLength;
+              const rightSelectorY = editorCoords.top + endLineTop - tapsHeight;
+
+              leftSelector.style.transform = `translateX(${leftSelectorX - 30}px) translateY(${leftSelectorY - 8}px)`;
+              rightSelector.style.transform = `translateX(${rightSelectorX - 30}px) translateY(${rightSelectorY - 8}px)`;
+              globalPoseMenu = leftSelectorY - 50;
+            }
+            selectionsContainer.classList.remove("hidden");
+          });
+
+          initializeSelector();
+
+          function showContextMenu() {
+            const selectorMenu = document.querySelector(".menu-selector");            
+            selectorMenu.classList.remove("hidden");
+          }
+
+          editorElement.addEventListener("click", (event) => {
+            event.stopPropagation();
+          });
         });
-      }
 
-      // Helper function to ensure consistent date formatting across the application
-      function formatUTCDate(date) {
-        return date
-          .toISOString()
-          .replace("T", " ")
-          .replace(/\.\d+Z$/, "");
-      }
-
-      function saveFilesToStorage() {
-        const filesData = {};
-        const currentTime = formatUTCDate(new Date());
-
-        files.forEach((file, fileName) => {
-          // If file was modified, use its lastModified time, otherwise use current time
-          filesData[fileName] = {
-            content: file.content,
-            language: file.language,
-            lastModified: file.lastModified || currentTime,
-            createdAt: file.createdAt || currentTime, // Preserve creation time if it exists
-            author: file.author || "MinecraftBedrockArabic", // Preserve or set author
-          };
-        });
-
-        try {
-          localStorage.setItem("editor_files", JSON.stringify(filesData));
-        } catch (error) {
-          showError("Failed to save files to storage: " + error.message);
-          console.error("Failed to save files to storage:", error);
-        }
+        startAutoSave();
       }
 
       let autoSaveTimer;
@@ -1406,87 +1416,49 @@ world.beforeEvents.itemUse.subscribe((event) => {
         if (!enabled) return;
 
         autoSaveTimer = setInterval(() => {
-          // Save current file's content first
-          if (currentFile) {
-            const currentContent = editor.getValue();
-            files.get(currentFile).content = currentContent;
-            updateFileModel(currentFile, currentContent);
-          }
-
-          // Save all other files' contents from their models
-          files.forEach((file, fileName) => {
-            if (fileName !== currentFile) {
-              const uri = monaco.Uri.file(`/${fileName}`);
-              const model = monaco.editor.getModel(uri);
-              if (model) {
-                const content = model.getValue();
-                files.get(fileName).content = content;
-              }
-            }
-          });
+          const content = editor.getValue();
+          localStorage.setItem("editorContent", content);
         }, interval);
       }
+
       function closeModal(modalId) {
         document.getElementById(modalId).style.display = "none";
       }
+
       async function formatCode() {
         await editor.getAction("editor.action.formatDocument").run();
       }
-      function saveCode() {
-        if (!currentFile) return;
-        const code = editor.getValue();
-        const blob = new Blob([code], { type: "text/javascript" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = currentFile;
-        a.click();
-        URL.revokeObjectURL(url);
-      }
 
-      // Initialize editor on load
-      document.addEventListener("DOMContentLoaded", initializeEditor);
-
-      // Add keyboard shortcuts
       document.addEventListener("keydown", function (event) {
         if (event.ctrlKey && event.key === "s") {
           event.preventDefault();
           saveCode();
         }
       });
-      function setupModuleResolution() {
-        // Set up the CompilerOptions for both JavaScript and TypeScript
-        const compilerOptions = {
-          allowNonTsExtensions: true,
-          moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-          target: monaco.languages.typescript.ScriptTarget.ES2020,
-          module: monaco.languages.typescript.ModuleKind.ESNext,
-          baseUrl: "/",
-          paths: {},
-          typeRoots: ["node_modules/@types"],
-        };
-        // Apply compiler options
-        monaco.languages.typescript.javascriptDefaults.setCompilerOptions(compilerOptions);
-        monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
-        // Set up model references for all files
-        files.forEach((fileData, fileName) => {
-          const uri = monaco.Uri.file(`/${fileName}`);
-          if (!monaco.editor.getModel(uri)) {
-            monaco.editor.createModel(fileData.content, fileData.language, uri);
-          }
-        });
+
+      function saveCode() {
+        const code = editor.getValue();
+        const fileName = document.getElementById("filename").value || "minecraft_script.js";
+        const blob = new Blob([code], { type: "text/javascript" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
       }
-      function toggleFileExplorer() {
-        const explorer = document.getElementById("fileExplorer");
-        if (!explorer) return;
-        explorer.classList.toggle("visible");
-        // Force layout update after toggle
-        setTimeout(() => {
-          if (editor) {
-            editor.layout();
-          }
-        }, 100);
-      }
+
+      // Initialize editor on load
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("filename").value = "index.js";
+      });
+
+      // Save content when closing the tab
+      window.addEventListener("beforeunload", () => {
+        localStorage.setItem("editorContent", editor.getValue());
+      });
+
+      initializeEditor();
     </script>
   </body>
 </html>
