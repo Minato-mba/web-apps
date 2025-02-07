@@ -1360,6 +1360,7 @@
           function showContextMenu() {
             const selectorMenu = document.querySelector(".menu-selector");
             selectorMenu.classList.remove("hidden");
+            document.activeElement?.blur();
           }
 
           editorElement.addEventListener("click", (event) => {
