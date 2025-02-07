@@ -19,515 +19,515 @@
     <meta name="msapplication-TileColor" content="#1e1e1e" />
     <link rel="icon" type="image/x-icon" href="content/pictures/web-editor/web-editor.png" />
     <style>
-:root {
-  /* Dark Theme (Default) */
-  --bg-color: #1e1e1e;
-  --text-color: #d4d4d4;
-  --button-bg: #3c3c3c;
-  --button-border: #454545;
-  --modal-bg: #2d2d2d;
-  --input-bg: #3c3c3c;
-  --hover-brightness: 1.15;
-  --scrollbar-color: #3c3c3c;
-  --scrollbar-thumb: #606060;
-}
+      :root {
+        /* Dark Theme (Default) */
+        --bg-color: #1e1e1e;
+        --text-color: #d4d4d4;
+        --button-bg: #3c3c3c;
+        --button-border: #454545;
+        --modal-bg: #2d2d2d;
+        --input-bg: #3c3c3c;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #3c3c3c;
+        --scrollbar-thumb: #606060;
+      }
 
-/* Theme Variations */
-[data-theme="hc-black"] {
-  --bg-color: #000000;
-  --text-color: #ffffff;
-  --button-bg: #000000;
-  --button-border: #ffffff;
-  --modal-bg: #000000;
-  --input-bg: #000000;
-  --hover-brightness: 1.25;
-  --scrollbar-color: #000000;
-  --scrollbar-thumb: #ffffff;
-}
+      /* Theme Variations */
+      [data-theme="hc-black"] {
+        --bg-color: #000000;
+        --text-color: #ffffff;
+        --button-bg: #000000;
+        --button-border: #ffffff;
+        --modal-bg: #000000;
+        --input-bg: #000000;
+        --hover-brightness: 1.25;
+        --scrollbar-color: #000000;
+        --scrollbar-thumb: #ffffff;
+      }
 
-[data-theme="vs"] {
-  --bg-color: #f3f3f3;
-  --text-color: #333333;
-  --button-bg: #e0e0e0;
-  --button-border: #cccccc;
-  --modal-bg: #ffffff;
-  --input-bg: #ffffff;
-  --hover-brightness: 0.95;
-  --scrollbar-color: #e0e0e0;
-  --scrollbar-thumb: #b0b0b0;
-}
+      [data-theme="vs"] {
+        --bg-color: #f3f3f3;
+        --text-color: #333333;
+        --button-bg: #e0e0e0;
+        --button-border: #cccccc;
+        --modal-bg: #ffffff;
+        --input-bg: #ffffff;
+        --hover-brightness: 0.95;
+        --scrollbar-color: #e0e0e0;
+        --scrollbar-thumb: #b0b0b0;
+      }
 
-[data-theme="dracula"] {
-  --bg-color: #282a36;
-  --text-color: #f8f8f2;
-  --button-bg: #44475a;
-  --button-border: #6272a4;
-  --modal-bg: #44475a;
-  --input-bg: #44475a;
-  --hover-brightness: 1.15;
-  --scrollbar-color: #44475a;
-  --scrollbar-thumb: #6272a4;
-}
+      [data-theme="dracula"] {
+        --bg-color: #282a36;
+        --text-color: #f8f8f2;
+        --button-bg: #44475a;
+        --button-border: #6272a4;
+        --modal-bg: #44475a;
+        --input-bg: #44475a;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #44475a;
+        --scrollbar-thumb: #6272a4;
+      }
 
-[data-theme="monokai"] {
-  --bg-color: #272822;
-  --text-color: #f8f8f2;
-  --button-bg: #3e3d32;
-  --button-border: #75715e;
-  --modal-bg: #3e3d32;
-  --input-bg: #3e3d32;
-  --hover-brightness: 1.15;
-  --scrollbar-color: #3e3d32;
-  --scrollbar-thumb: #75715e;
-}
+      [data-theme="monokai"] {
+        --bg-color: #272822;
+        --text-color: #f8f8f2;
+        --button-bg: #3e3d32;
+        --button-border: #75715e;
+        --modal-bg: #3e3d32;
+        --input-bg: #3e3d32;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #3e3d32;
+        --scrollbar-thumb: #75715e;
+      }
 
-[data-theme="solarized-dark"] {
-  --bg-color: #002b36;
-  --text-color: #839496;
-  --button-bg: #073642;
-  --button-border: #586e75;
-  --modal-bg: #073642;
-  --input-bg: #073642;
-  --hover-brightness: 1.15;
-  --scrollbar-color: #073642;
-  --scrollbar-thumb: #586e75;
-}
+      [data-theme="solarized-dark"] {
+        --bg-color: #002b36;
+        --text-color: #839496;
+        --button-bg: #073642;
+        --button-border: #586e75;
+        --modal-bg: #073642;
+        --input-bg: #073642;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #073642;
+        --scrollbar-thumb: #586e75;
+      }
 
-[data-theme="solarized-light"] {
-  --bg-color: #fdf6e3;
-  --text-color: #657b83;
-  --button-bg: #eee8d5;
-  --button-border: #93a1a1;
-  --modal-bg: #eee8d5;
-  --input-bg: #eee8d5;
-  --hover-brightness: 0.95;
-  --scrollbar-color: #eee8d5;
-  --scrollbar-thumb: #93a1a1;
-}
+      [data-theme="solarized-light"] {
+        --bg-color: #fdf6e3;
+        --text-color: #657b83;
+        --button-bg: #eee8d5;
+        --button-border: #93a1a1;
+        --modal-bg: #eee8d5;
+        --input-bg: #eee8d5;
+        --hover-brightness: 0.95;
+        --scrollbar-color: #eee8d5;
+        --scrollbar-thumb: #93a1a1;
+      }
 
-[data-theme="nord"] {
-  --bg-color: #2e3440;
-  --text-color: #d8dee9;
-  --button-bg: #3b4252;
-  --button-border: #4c566a;
-  --modal-bg: #3b4252;
-  --input-bg: #3b4252;
-  --hover-brightness: 1.15;
-  --scrollbar-color: #3b4252;
-  --scrollbar-thumb: #4c566a;
-}
+      [data-theme="nord"] {
+        --bg-color: #2e3440;
+        --text-color: #d8dee9;
+        --button-bg: #3b4252;
+        --button-border: #4c566a;
+        --modal-bg: #3b4252;
+        --input-bg: #3b4252;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #3b4252;
+        --scrollbar-thumb: #4c566a;
+      }
 
-[data-theme="gruvbox"] {
-  --bg-color: #282828;
-  --text-color: #ebdbb2;
-  --button-bg: #3c3836;
-  --button-border: #665c54;
-  --modal-bg: #3c3836;
-  --input-bg: #3c3836;
-  --hover-brightness: 1.15;
-  --scrollbar-color: #3c3836;
-  --scrollbar-thumb: #665c54;
-}
+      [data-theme="gruvbox"] {
+        --bg-color: #282828;
+        --text-color: #ebdbb2;
+        --button-bg: #3c3836;
+        --button-border: #665c54;
+        --modal-bg: #3c3836;
+        --input-bg: #3c3836;
+        --hover-brightness: 1.15;
+        --scrollbar-color: #3c3836;
+        --scrollbar-thumb: #665c54;
+      }
 
-body {
-  margin: 0;
-  padding: 10px;
-  font-family: Arial, sans-serif;
-  background: var(--bg-color);
-  color: var(--text-color);
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-  height: 100vh;
-}
+      body {
+        margin: 0;
+        padding: 10px;
+        font-family: Arial, sans-serif;
+        background: var(--bg-color);
+        color: var(--text-color);
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+        height: 100vh;
+      }
 
-.loading-bar {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background-color: var(--button-border);
-  z-index: 1001;
-}
+      .loading-bar {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background-color: var(--button-border);
+        z-index: 1001;
+      }
 
-.loading-progress {
-  height: 100%;
-  width: 0;
-  background-color: limegreen;
-  transition: width 0.3s ease;
-}
+      .loading-progress {
+        height: 100%;
+        width: 0;
+        background-color: limegreen;
+        transition: width 0.3s ease;
+      }
 
-#toolbar-container {
-  position: relative;
-  margin-bottom: 10px;
-}
+      #toolbar-container {
+        position: relative;
+        margin-bottom: 10px;
+      }
 
-#toolbar-toggle {
-  top: -10px;
-  padding: 4px 8px;
-  background: var(--button-bg);
-  border: 1px solid var(--button-border);
-  color: var(--text-color);
-  cursor: pointer;
-  border-radius: 4px 4px 0 0;
-  font-size: 12px;
-  z-index: 2;
-  white-space: nowrap;
-  text-align: center;
-}
+      #toolbar-toggle {
+        top: -10px;
+        padding: 4px 8px;
+        background: var(--button-bg);
+        border: 1px solid var(--button-border);
+        color: var(--text-color);
+        cursor: pointer;
+        border-radius: 4px 4px 0 0;
+        font-size: 12px;
+        z-index: 2;
+        white-space: nowrap;
+        text-align: center;
+      }
 
-#toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  height: 0;
-  opacity: 0;
-}
+      #toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        height: 0;
+        opacity: 0;
+      }
 
-#toolbar.visible {
-  height: auto;
-  opacity: 1;
-  padding: 8px 0;
-}
+      #toolbar.visible {
+        height: auto;
+        opacity: 1;
+        padding: 8px 0;
+      }
 
-.toolbar-btn {
-  padding: 12px 16px;
-  background: var(--button-bg);
-  border: 1px solid var(--button-border);
-  color: var(--text-color);
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
-  white-space: nowrap;
-  font-size: 14px;
-  flex: 1 1 auto;
-}
+      .toolbar-btn {
+        padding: 12px 16px;
+        background: var(--button-bg);
+        border: 1px solid var(--button-border);
+        color: var(--text-color);
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+        white-space: nowrap;
+        font-size: 14px;
+        flex: 1 1 auto;
+      }
 
-.toolbar-btn:hover {
-  filter: brightness(var(--hover-brightness));
-}
+      .toolbar-btn:hover {
+        filter: brightness(var(--hover-brightness));
+      }
 
-.toolbar-input {
-  padding: 12px;
-  background: var(--input-bg);
-  border: 1px solid var(--button-border);
-  color: var(--text-color);
-  border-radius: 4px;
-  font-family: Arial, sans-serif;
-  flex: 2 1 200px;
-  min-width: 120px;
-  font-size: 14px;
-}
+      .toolbar-input {
+        padding: 12px;
+        background: var(--input-bg);
+        border: 1px solid var(--button-border);
+        color: var(--text-color);
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        flex: 2 1 200px;
+        min-width: 120px;
+        font-size: 14px;
+      }
 
-.workspace-container {
-  display: flex;
-  height: calc(100vh - 70px);
-  margin-top: 10px;
-  overflow: hidden;
-  width: 100%;
-}
+      .workspace-container {
+        display: flex;
+        height: calc(100vh - 70px);
+        margin-top: 10px;
+        overflow: hidden;
+        width: 100%;
+      }
 
-.editor-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  min-width: 0;
-}
+      .editor-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        min-width: 0;
+      }
 
-#editor {
-  width: 100%;
-  height: calc(100vh - 120px);
-  border: 1px solid var(--button-border);
-  border-radius: 4px;
-  overflow: hidden;
-}
+      #editor {
+        width: 100%;
+        height: calc(100vh - 120px);
+        border: 1px solid var(--button-border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
 
-.file-explorer {
-  width: 200px;
-  background: var(--bg-color);
-  border-right: 1px solid var(--button-border);
-  display: none;
-  flex-direction: column;
-  padding: 8px;
-}
+      .file-explorer {
+        width: 200px;
+        background: var(--bg-color);
+        border-right: 1px solid var(--button-border);
+        display: none;
+        flex-direction: column;
+        padding: 8px;
+      }
 
-.file-explorer.visible {
-  display: flex !important;
-}
+      .file-explorer.visible {
+        display: flex !important;
+      }
 
-.file-explorer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--button-border);
-  margin-bottom: 8px;
-}
+      .file-explorer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--button-border);
+        margin-bottom: 8px;
+      }
 
-.file-explorer-title {
-  font-size: 14px;
-  font-weight: bold;
-}
+      .file-explorer-title {
+        font-size: 14px;
+        font-weight: bold;
+      }
 
-.file-list {
-  flex: 1;
-  overflow-y: auto;
-}
+      .file-list {
+        flex: 1;
+        overflow-y: auto;
+      }
 
-.file-item {
-  padding: 4px 8px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 4px;
-}
+      .file-item {
+        padding: 4px 8px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 4px;
+      }
 
-.file-item:hover {
-  background: var(--button-bg);
-}
+      .file-item:hover {
+        background: var(--button-bg);
+      }
 
-.file-item.active {
-  background: var(--button-border);
-}
+      .file-item.active {
+        background: var(--button-border);
+      }
 
-.tabs-container {
-  display: flex;
-  background: var(--bg-color);
-  border-bottom: 1px solid var(--button-border);
-  overflow-x: auto;
-  white-space: nowrap;
-  min-height: 32px;
-  max-height: 32px;
-  scrollbar-width: thin;
-  scrollbar-height: thin;
-}
+      .tabs-container {
+        display: flex;
+        background: var(--bg-color);
+        border-bottom: 1px solid var(--button-border);
+        overflow-x: auto;
+        white-space: nowrap;
+        min-height: 32px;
+        max-height: 32px;
+        scrollbar-width: thin;
+        scrollbar-height: thin;
+      }
 
-.tabs-container::-webkit-scrollbar {
-  height: 4px;
-}
+      .tabs-container::-webkit-scrollbar {
+        height: 4px;
+      }
 
-.tabs-container::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
-  border-radius: 2px;
-}
+      .tabs-container::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb);
+        border-radius: 2px;
+      }
 
-.tabs-container::-webkit-scrollbar-track {
-  background-color: var(--scrollbar-color);
-}
+      .tabs-container::-webkit-scrollbar-track {
+        background-color: var(--scrollbar-color);
+      }
 
-.tab {
-  display: flex;
-  align-items: center;
-  padding: 4px 12px;
-  background: var(--button-bg);
-  border: 1px solid var(--button-border);
-  border-bottom: none;
-  margin-right: 2px;
-  cursor: pointer;
-  border-radius: 4px 4px 0 0;
-  font-size: 12px;
-  height: 24px;
-  min-width: 50px;
-  max-width: 200px;
-}
+      .tab {
+        display: flex;
+        align-items: center;
+        padding: 4px 12px;
+        background: var(--button-bg);
+        border: 1px solid var(--button-border);
+        border-bottom: none;
+        margin-right: 2px;
+        cursor: pointer;
+        border-radius: 4px 4px 0 0;
+        font-size: 12px;
+        height: 24px;
+        min-width: 50px;
+        max-width: 200px;
+      }
 
-.tab span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 150px;
-}
+      .tab span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 150px;
+      }
 
-.tab.active {
-  background: var(--bg-color);
-  border-bottom: 1px solid var(--bg-color);
-  margin-bottom: -1px;
-}
+      .tab.active {
+        background: var(--bg-color);
+        border-bottom: 1px solid var(--bg-color);
+        margin-bottom: -1px;
+      }
 
-.tab-close {
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  margin-left: 8px;
-}
+      .tab-close {
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-left: 8px;
+      }
 
-.tab-close:hover {
-  background: var(--button-border);
-}
+      .tab-close:hover {
+        background: var(--button-border);
+      }
 
-.file-explorer-header .toolbar-btn {
-  padding: 0;
-  font-size: 12px;
-  height: 24px; 
-  width: 24px; 
-  min-height: 24px;
-  min-width: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1; 
-  flex: 0 0 24px;
-}
+      .file-explorer-header .toolbar-btn {
+        padding: 0;
+        font-size: 12px;
+        height: 24px;
+        width: 24px;
+        min-height: 24px;
+        min-width: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        aspect-ratio: 1;
+        flex: 0 0 24px;
+      }
 
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-}
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+      }
 
-.modal-content {
-  position: relative;
-  background: var(--modal-bg);
-  margin: auto;
-  padding: 20px;
-  width: 90%;
-  max-width: 500px;
-  border-radius: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 1px solid var(--button-border);
-}
+      .modal-content {
+        position: relative;
+        background: var(--modal-bg);
+        margin: auto;
+        padding: 20px;
+        width: 90%;
+        max-width: 500px;
+        border-radius: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 1px solid var(--button-border);
+      }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
 
-.modal-close {
-  cursor: pointer;
-  font-size: 24px;
-  padding: 0 8px;
-  color: var(--text-color);
-}
+      .modal-close {
+        cursor: pointer;
+        font-size: 24px;
+        padding: 0 8px;
+        color: var(--text-color);
+      }
 
-.modal-close:hover {
-  opacity: 0.8;
-}
+      .modal-close:hover {
+        opacity: 0.8;
+      }
 
-.settings-group {
-  margin-bottom: 15px;
-}
+      .settings-group {
+        margin-bottom: 15px;
+      }
 
-.settings-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--text-color);
-}
+      .settings-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-color);
+      }
 
-.version-select {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  background: var(--input-bg);
-  border: 1px solid var(--button-border);
-  color: var(--text-color);
-  border-radius: 4px;
-}
+      .version-select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        background: var(--input-bg);
+        border: 1px solid var(--button-border);
+        color: var(--text-color);
+        border-radius: 4px;
+      }
 
-.module-label {
-  margin: 8px 0 4px;
-  font-size: 0.9em;
-  color: var(--text-color);
-  opacity: 0.8;
-}
+      .module-label {
+        margin: 8px 0 4px;
+        font-size: 0.9em;
+        color: var(--text-color);
+        opacity: 0.8;
+      }
 
-#error-container {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 10000;
-}
+      #error-container {
+        position: fixed;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 10000;
+      }
 
-.error-toast {
-  background: #ff4444;
-  color: white;
-  width: 40%;
-  padding: 12px;
-  margin: 10px;
-  border-radius: 4px;
-  text-align: center;
-  opacity: 0;
-  transform: translateY(-20px);
-  animation: fadeInOut 4s ease-in-out;
-}
+      .error-toast {
+        background: #ff4444;
+        color: white;
+        width: 40%;
+        padding: 12px;
+        margin: 10px;
+        border-radius: 4px;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(-20px);
+        animation: fadeInOut 4s ease-in-out;
+      }
 
-@keyframes fadeInOut {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  10% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  90% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-}
+      @keyframes fadeInOut {
+        0% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        10% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        90% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+      }
 
-.monaco-editor .line-numbers {
-  font-size: 12px !important;
-  padding-left: 5px !important;
-  color: var(--text-color) !important;
-}
+      .monaco-editor .line-numbers {
+        font-size: 12px !important;
+        padding-left: 5px !important;
+        color: var(--text-color) !important;
+      }
 
-.monaco-editor .margin-view-overlays {
-  width: 40px !important;
-  background: var(--bg-color) !important;
-}
+      .monaco-editor .margin-view-overlays {
+        width: 40px !important;
+        background: var(--bg-color) !important;
+      }
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-  background-color: var(--scrollbar-color);
-}
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        background-color: var(--scrollbar-color);
+      }
 
-::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
-  border-radius: 4px;
-}
+      ::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb);
+        border-radius: 4px;
+      }
 
-@media (max-width: 480px) {
-  .toolbar-btn {
-    padding: 14px 12px;
-    font-size: 13px;
-  }
+      @media (max-width: 480px) {
+        .toolbar-btn {
+          padding: 14px 12px;
+          font-size: 13px;
+        }
 
-  .toolbar-input {
-    flex-basis: 100%;
-  }
+        .toolbar-input {
+          flex-basis: 100%;
+        }
 
-  .workspace-container {
-    height: calc(100vh - 90px);
-  }
-}
+        .workspace-container {
+          height: calc(100vh - 90px);
+        }
+      }
     </style>
   </head>
   <body>
@@ -573,10 +573,7 @@ body {
         <div class="settings-group">
           <label><input type="checkbox" id="minimap" /> Show Minimap</label>
           <label><input type="checkbox" id="wordWrap" checked /> Wrap Lines</label>
-          <label
-            >Font Size
-            <input type="number" id="fontSize" value="13" min="8" max="24" class="toolbar-input"
-          /></label>
+          <label>Font Size <input type="number" id="fontSize" value="13" min="8" max="24" class="toolbar-input" /></label>
           <label><input type="checkbox" id="lineNumbers" checked /> Show Line Numbers</label>
           <label><input type="checkbox" id="renderWhitespace" /> Render Whitespace</label>
           <label
@@ -598,10 +595,7 @@ body {
             >Auto-Save Interval (seconds)
             <input type="number" id="autoSaveInterval" min="5" value="30" class="toolbar-input" />
           </label>
-          <label
-            ><input type="checkbox" id="autoSaveEnabled" onchange="toggleInput()" />
-            Enable Auto-Save</label
-          >
+          <label><input type="checkbox" id="autoSaveEnabled" onchange="toggleInput()" /> Enable Auto-Save</label>
           <label
             >Language
             <select id="language" class="toolbar-input">
@@ -628,6 +622,12 @@ body {
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.js"></script>
     <script>
+      window.addEventListener("beforeunload", function (event) {
+          saveFilesToStorage();
+          event.preventDefault();
+          event.returnValue = "Are you sure you want to leave?";
+      });
+
       // File management system
       let files = new Map();
       let currentFile = null;
@@ -676,10 +676,8 @@ if (message === '!hello') {
             return "javascript";
         }
       }
-      // Update the openFile function
       function openFile(fileName) {
         if (!files.has(fileName)) return;
-        // Save current file content
         if (currentFile) {
           const currentContent = editor.getValue();
           files.get(currentFile).content = currentContent;
@@ -687,7 +685,6 @@ if (message === '!hello') {
         }
         currentFile = fileName;
         const file = files.get(fileName);
-        // Get or create model for the file
         const uri = monaco.Uri.file(`/${fileName}`);
         let model = monaco.editor.getModel(uri);
         if (!model) {
@@ -758,14 +755,21 @@ if (message === '!hello') {
           container.appendChild(tab);
         });
       }
+
       function closeFile(fileName) {
         if (!files.has(fileName)) return;
+        if(files.size === 1){
+          window.alert("You can't close the last file!");
+          return
+        }
+        if (!confirm(`Are you sure you want to close ${fileName}?`)) return;
         const uri = monaco.Uri.file(`/${fileName}`);
         const model = monaco.editor.getModel(uri);
         if (model) {
           model.dispose();
         }
         files.delete(fileName);
+        saveFilesToStorage();
         if (currentFile === fileName) {
           currentFile = null;
           const nextFile = Array.from(files.keys())[0];
@@ -778,25 +782,44 @@ if (message === '!hello') {
         updateTabs();
         updateFileExplorer();
       }
+
+
       function createNewFile() {
-        const fileName = prompt("Enter file name:", "untitled.js");
+        let name = "untitled";
+        let i = 1;
+        while (files.has(`${name}.js`)) {
+          name = `untitled${i}`;
+          i++;
+        }
+        
+        const fileName = prompt("Enter file name:", `${name}.js`);
         if (!fileName) return;
         if (files.has(fileName)) {
           showError("File already exists!");
           return;
         }
+
+        const currentTime = formatUTCDate(new Date());
         const content = "";
+
         files.set(fileName, {
           content,
           language: getFileLanguage(fileName),
+          lastModified: currentTime,
+          createdAt: currentTime,
+          author: "MinecraftBedrockArabic",
         });
+
         const uri = monaco.Uri.file(`/${fileName}`);
         monaco.editor.createModel(content, getFileLanguage(fileName), uri);
         document.getElementById("filename").value = fileName;
         openFile(fileName);
         updateFileExplorer();
+        saveFilesToStorage();
       }
-      // Update importFile function
+
+
+
       async function importFile() {
         const input = document.createElement("input");
         input.type = "file";
@@ -913,20 +936,11 @@ if (message === '!hello') {
               throw new Error(`HTTP ${response.status}`);
             }
             const types = await response.text();
-            const libJS = monaco.languages.typescript.javascriptDefaults.addExtraLib(
-              `declare module "${module.name}" { ${types} }`,
-              `file:///node_modules/${module.name}/index.d.ts`
-            );
-            const libTS = monaco.languages.typescript.typescriptDefaults.addExtraLib(
-              `declare module "${module.name}" { ${types} }`,
-              `file:///node_modules/${module.name}/index.d.ts`
-            );
+            const libJS = monaco.languages.typescript.javascriptDefaults.addExtraLib(`declare module "${module.name}" { ${types} }`, `file:///node_modules/${module.name}/index.d.ts`);
+            const libTS = monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare module "${module.name}" { ${types} }`, `file:///node_modules/${module.name}/index.d.ts`);
             typeLibs.set(module.name, { jsLib: libJS, tsLib: libTS });
           } catch (error) {
-            console.error(
-              `Failed to load ${module.name}@${module.currentVersion}:`,
-              error
-            );
+            console.error(`Failed to load ${module.name}@${module.currentVersion}:`, error);
             showError(`Failed to load ${module.name}@${module.currentVersion}`);
           }
           loadedModules++;
@@ -989,9 +1003,7 @@ if (message === '!hello') {
         const select = document.createElement("select");
         select.className = "version-select";
         select.id = module.selectorId;
-        select.innerHTML = versions
-          .map((v) => `<option value="${v}" ${v === module.currentVersion ? "selected" : ""}>${v}</option>`)
-          .join("");
+        select.innerHTML = versions.map((v) => `<option value="${v}" ${v === module.currentVersion ? "selected" : ""}>${v}</option>`).join("");
         container.appendChild(label);
         container.appendChild(select);
         if (versions.length === 0) {
@@ -1069,23 +1081,11 @@ if (message === '!hello') {
         localStorage.setItem("wordWrap", elements.wordWrap.checked);
         localStorage.setItem("fontSize", elements.fontSize.value);
         localStorage.setItem("lineNumbers", elements.lineNumbers.checked);
-        localStorage.setItem(
-          "renderWhitespace",
-          elements.renderWhitespace.checked
-        );
+        localStorage.setItem("renderWhitespace", elements.renderWhitespace.checked);
         localStorage.setItem("theme", elements.theme.value);
-        localStorage.setItem(
-          "autoClosingBrackets",
-          elements.autoClosingBrackets.checked
-        );
-        localStorage.setItem(
-          "autoSaveInterval",
-          elements.autoSaveInterval.value
-        );
-        localStorage.setItem(
-          "autoSaveEnabled",
-          elements.autoSaveEnabled.checked
-        );
+        localStorage.setItem("autoClosingBrackets", elements.autoClosingBrackets.checked);
+        localStorage.setItem("autoSaveInterval", elements.autoSaveInterval.value);
+        localStorage.setItem("autoSaveEnabled", elements.autoSaveEnabled.checked);
         localStorage.setItem("language", elements.language.value);
       }
       function loadSettings() {
@@ -1102,6 +1102,7 @@ if (message === '!hello') {
         elements.autoSaveEnabled.checked = stored.storedAutoSaveEnabled === "true";
         elements.language.value = stored.storedLanguage || "javascript";
       }
+
       async function initializeEditor() {
         loadSettings();
         const savedTheme = localStorage.getItem("theme") || "vs-dark";
@@ -1114,6 +1115,139 @@ if (message === '!hello') {
         require(["vs/editor/editor.main"], async () => {
           // Initialize type definitions first
           await loadTypeDefinitions();
+          const stored = getStoredSettings();
+
+          // Load saved files first
+          const savedFiles = localStorage.getItem("editor_files");
+          const defaultFileName = "main.js";
+
+          // Format current UTC date in YYYY-MM-DD HH:MM:SS format
+          const formatUTCDate = (date) => {
+            return date
+              .toISOString()
+              .replace("T", " ")
+              .replace(/\.\d+Z$/, "");
+          };
+
+          const defaultCode = `// Minecraft scripting with full autocomplete capabilities
+import { world, ItemStack } from '@minecraft/server';
+import { ActionFormData } from '@minecraft/server-ui';
+
+world.beforeEvents.itemUse.subscribe((event) => {
+    const { source, itemStack } = event;
+    if (itemStack.typeId !== "minecraft:stick") return;
+    new ActionFormData()
+        .title("Special Offer!")
+        .body("Do you want a free diamond?")
+        .button("Yes!")
+        .button("No")
+        .show(source)
+        .then(({ selection }) => {
+            if (selection !== 0) return;
+            source.getComponent("minecraft:inventory")?.container?.addItem(new ItemStack("minecraft:diamond", 1));
+            source.sendMessage("You received a free diamond!");
+        })
+});`;
+
+          let initialContent = defaultCode;
+          let initialFileName = defaultFileName;
+          let initialLanguage = stored.storedLanguage || "javascript";
+
+          if (savedFiles) {
+            const filesData = JSON.parse(savedFiles);
+            // Load all saved files into the files Map
+            Object.entries(filesData).forEach(([fileName, file]) => {
+              files.set(fileName, {
+                content: file.content,
+                language: file.language,
+                lastModified: file.lastModified || formatUTCDate(new Date()),
+              });
+            });
+
+            // Get the last modified file to use as initial content
+            const sortedFiles = Object.entries(filesData).sort((a, b) => new Date(b[1].lastModified || 0) - new Date(a[1].lastModified || 0));
+
+            if (sortedFiles.length > 0) {
+              const [firstFileName, firstFile] = sortedFiles[0];
+              initialContent = firstFile.content;
+              initialFileName = firstFileName;
+              initialLanguage = firstFile.language;
+            }
+          }
+
+          // Create editor with initial content
+          editor = monaco.editor.create(document.getElementById("editor"), {
+            value: initialContent,
+            language: initialLanguage,
+            theme: stored.storedTheme || "vs-dark",
+            automaticLayout: true,
+            minimap: { enabled: stored.storedMinimap === "true" },
+            wordWrap: stored.storedWordWrap === "true" ? "on" : "off",
+            fontSize: parseInt(stored.storedFontSize || "13"),
+            lineNumbers: stored.storedLineNumbers !== "false" ? "on" : "off",
+            autoClosingBrackets: stored.storedAutoClosingBrackets !== "false" ? "always" : "never",
+            renderWhitespace: stored.storedRenderWhitespace === "true" ? "all" : "none",
+            highlightActiveLine: true,
+            lineNumbersMinChars: 2,
+            suggest: {
+              snippetsPreventQuickSuggestions: false,
+              localityBonus: true,
+              shareSuggestSelections: true,
+              showIcons: true,
+              maxVisibleSuggestions: 12,
+              selectionMode: "always",
+            },
+            scrollBeyondLastLine: false,
+            scrollbar: {
+              horizontal: "auto",
+              vertical: "auto",
+              horizontalScrollbarSize: 12,
+              verticalScrollbarSize: 12,
+              alwaysConsumeMouseWheel: false,
+            },
+          });
+
+          // If no saved files exist, create the default file
+          if (files.size === 0) {
+            files.set(initialFileName, {
+              content: initialContent,
+              language: initialLanguage,
+              lastModified: formatUTCDate(new Date()),
+            });
+          }
+
+          // Set up models for all files
+          files.forEach((file, fileName) => {
+            const uri = monaco.Uri.file(`/${fileName}`);
+            if (!monaco.editor.getModel(uri)) {
+              monaco.editor.createModel(file.content, file.language, uri);
+            }
+          });
+
+          // Set current file and open it
+          currentFile = initialFileName;
+          if (currentFile) {
+            openFile(currentFile);
+            document.getElementById("filename").value = currentFile;
+          }
+
+          // Set up module resolution after editor is created
+          setupModuleResolution();
+
+          // Update UI
+          updateTabs();
+          updateFileExplorer();
+          startAutoSave();
+
+          // Set up file change tracking
+          editor.onDidChangeModelContent(() => {
+            if (currentFile) {
+              files.get(currentFile).lastModified = formatUTCDate(new Date());
+              // Update storage on each change
+              saveFilesToStorage();
+            }
+          });
+
           // ========== THEMES ========== //
           // add new themes here following the same format
           monaco.editor.defineTheme("dracula", {
@@ -1224,67 +1358,73 @@ if (message === '!hello') {
               "editorLineNumber.foreground": "#665c54",
             },
           });
-          const stored = getStoredSettings();
-          const defaultFileName = "index.js";
-          editor = monaco.editor.create(document.getElementById("editor"), {
-            value: defaultCode,
-            language: stored.storedLanguage || "javascript",
-            theme: stored.storedTheme || "vs-dark",
-            automaticLayout: true,
-            minimap: { enabled: stored.storedMinimap === "true" },
-            wordWrap: stored.storedWordWrap === "true" ? "on" : "off",
-            fontSize: parseInt(stored.storedFontSize || "13"),
-            lineNumbers: stored.storedLineNumbers !== "false" ? "on" : "off",
-            autoClosingBrackets: stored.storedAutoClosingBrackets !== "false" ? "always" : "never",
-            renderWhitespace: stored.storedRenderWhitespace === "true" ? "all" : "none",
-            highlightActiveLine: true,
-            lineNumbersMinChars: 2,
-            suggest: {
-              snippetsPreventQuickSuggestions: false,
-              localityBonus: true,
-              shareSuggestSelections: true,
-              showIcons: true,
-              maxVisibleSuggestions: 12,
-              selectionMode: "always",
-            },
-            scrollBeyondLastLine: false,
-            scrollbar: {
-              horizontal: "auto",
-              vertical: "auto",
-              horizontalScrollbarSize: 12,
-              verticalScrollbarSize: 12,
-              alwaysConsumeMouseWheel: false,
-            },
-          });
-          // Initialize files with default file
-          files.set(defaultFileName, {
-            content: defaultCode,
-            language: "javascript",
-          });
-          currentFile = defaultFileName;
-          // Set up module resolution after editor is created
-          setupModuleResolution();
-          // Update UI
-          updateTabs();
-          updateFileExplorer();
-          startAutoSave();
         });
+
         window.addEventListener("resize", () => {
           if (editor) {
             editor.layout();
           }
         });
       }
+
+      // Helper function to ensure consistent date formatting across the application
+      function formatUTCDate(date) {
+        return date
+          .toISOString()
+          .replace("T", " ")
+          .replace(/\.\d+Z$/, "");
+      }
+
+      function saveFilesToStorage() {
+        const filesData = {};
+        const currentTime = formatUTCDate(new Date());
+
+        files.forEach((file, fileName) => {
+          // If file was modified, use its lastModified time, otherwise use current time
+          filesData[fileName] = {
+            content: file.content,
+            language: file.language,
+            lastModified: file.lastModified || currentTime,
+            createdAt: file.createdAt || currentTime, // Preserve creation time if it exists
+            author: file.author || "MinecraftBedrockArabic", // Preserve or set author
+          };
+        });
+
+        try {
+          localStorage.setItem("editor_files", JSON.stringify(filesData));
+        } catch (error) {
+          showError("Failed to save files to storage: " + error.message);
+          console.error("Failed to save files to storage:", error);
+        }
+      }
+
       let autoSaveTimer;
       function startAutoSave() {
         const interval = parseInt(document.getElementById("autoSaveInterval").value) * 1000;
         const enabled = document.getElementById("autoSaveEnabled").checked;
+
         if (autoSaveTimer) clearInterval(autoSaveTimer);
         if (!enabled) return;
+
         autoSaveTimer = setInterval(() => {
+          // Save current file's content first
           if (currentFile) {
-            files.get(currentFile).content = editor.getValue();
+            const currentContent = editor.getValue();
+            files.get(currentFile).content = currentContent;
+            updateFileModel(currentFile, currentContent);
           }
+
+          // Save all other files' contents from their models
+          files.forEach((file, fileName) => {
+            if (fileName !== currentFile) {
+              const uri = monaco.Uri.file(`/${fileName}`);
+              const model = monaco.editor.getModel(uri);
+              if (model) {
+                const content = model.getValue();
+                files.get(fileName).content = content;
+              }
+            }
+          });
         }, interval);
       }
       function closeModal(modalId) {
@@ -1304,6 +1444,7 @@ if (message === '!hello') {
         a.click();
         URL.revokeObjectURL(url);
       }
+
       // Initialize editor on load
       document.addEventListener("DOMContentLoaded", initializeEditor);
       // Add keyboard shortcuts
