@@ -1365,6 +1365,29 @@
           editorElement.addEventListener("click", (event) => {
             event.stopPropagation();
           });
+
+          const keys = {
+            ArrowRight: {line:0, column:1},
+            ArrowLeft: {line:0, column:-1},
+            ArrowUp: {line:-1, column:0},
+            ArrowDown: {line:1, column:0},
+          }
+          document.addEventListener("keydown", (event) => {
+            if(!isMobile()) return;
+            const key = keys[event.key];
+            if(!key) return;
+            if(!key.shiftKey){
+              editor.setSelection(new monaco.Selection(editor.getCursorPosition().lineNumber + key.line, editor.getCursorPosition().column + key.column));
+              return
+            }
+            event.preventDefault();
+            const selection = editor.getSelection();
+            const start = selection.getStartPosition();
+            const end = selection.getEndPosition();
+            const newStart = new monaco.Position(start.lineNumber + key.line, start.column + key.column);
+            const newEnd = new monaco.Position(end.lineNumber + key.line, end.column + key.column);
+            editor.setSelection(new monaco.Selection(newStart, newEnd));
+          })
         });
 
         startAutoSave();
