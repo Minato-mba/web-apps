@@ -205,7 +205,6 @@
         transition: all 0.3s ease;
         overflow: hidden;
         padding: 10px 0 0 0;
-
       }
 
       #toolbar.visible {
@@ -472,13 +471,13 @@
         <button class="toolbar-btn" onclick="showVersions()">📦 Modules</button>
       </div>
       <!-- selection menu -->
-       <div class="menu-selector  hidden">
-          <div class="toolbar-btn copy" onclick="copySelection()">Copy</div>
-          <div class="toolbar-btn cut" onclick="cutSelection()">Cut</div>
-          <div class="toolbar-btn paste" onclick="pasteSelection()">Paste</div>
-          <div class="toolbar-btn select-all" onclick="selectAll()">Select all</div>
-          <div class="toolbar-btn format-document" onclick="formatDocument()">Format</div>
-       </div>
+      <div class="menu-selector hidden">
+        <div class="toolbar-btn copy" onclick="copySelection()">Copy</div>
+        <div class="toolbar-btn cut" onclick="cutSelection()">Cut</div>
+        <div class="toolbar-btn paste" onclick="pasteSelection()">Paste</div>
+        <div class="toolbar-btn select-all" onclick="selectAll()">Select all</div>
+        <div class="toolbar-btn format-document" onclick="formatDocument()">Format</div>
+      </div>
       <div></div>
     </div>
     <div id="editor"></div>
@@ -1162,7 +1161,7 @@
                 touchMoved = false;
                 event.preventDefault();
                 disabledMove = true;
-                
+
                 editor.focus();
                 if (initialSelection.isEmpty()) {
                   editor.setSelection(initialSelection);
@@ -1176,19 +1175,9 @@
 
                 if (target?.position) {
                   const newSelection = isLeft
-                    ? new monaco.Selection(
-                        target.position.lineNumber,
-                        target.position.column,
-                        initialSelection.endLineNumber,
-                        initialSelection.endColumn
-                      )
-                    : new monaco.Selection(
-                        initialSelection.startLineNumber,
-                        initialSelection.startColumn,
-                        target.position.lineNumber,
-                        target.position.column
-                      );
-                  
+                    ? new monaco.Selection(target.position.lineNumber, target.position.column, initialSelection.endLineNumber, initialSelection.endColumn)
+                    : new monaco.Selection(initialSelection.startLineNumber, initialSelection.startColumn, target.position.lineNumber, target.position.column);
+
                   editor.setSelection(newSelection);
                   touchMoved = true;
                 }
@@ -1201,19 +1190,9 @@
 
                 if (target?.position) {
                   const newSelection = isLeft
-                    ? new monaco.Selection(
-                        target.position.lineNumber,
-                        target.position.column,
-                        initialSelection.endLineNumber,
-                        initialSelection.endColumn
-                      )
-                    : new monaco.Selection(
-                        initialSelection.startLineNumber,
-                        initialSelection.startColumn,
-                        target.position.lineNumber,
-                        target.position.column
-                      );
-                  
+                    ? new monaco.Selection(target.position.lineNumber, target.position.column, initialSelection.endLineNumber, initialSelection.endColumn)
+                    : new monaco.Selection(initialSelection.startLineNumber, initialSelection.startColumn, target.position.lineNumber, target.position.column);
+
                   editor.setSelection(newSelection);
                   editor.focus();
                 }
@@ -1395,7 +1374,7 @@
           initializeSelector();
 
           function showContextMenu() {
-            const selectorMenu = document.querySelector(".menu-selector");            
+            const selectorMenu = document.querySelector(".menu-selector");
             selectorMenu.classList.remove("hidden");
           }
 
