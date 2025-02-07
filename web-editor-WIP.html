@@ -204,7 +204,7 @@
         align-items: center;
         transition: all 0.3s ease;
         overflow: hidden;
-        padding: 10px 0 0 0;
+        margin: 10px 0 0 0;
       }
 
       #toolbar.visible {
@@ -471,13 +471,13 @@
         <button class="toolbar-btn" onclick="showVersions()">📦 Modules</button>
       </div>
       <!-- selection menu -->
-      <div class="menu-selector hidden">
-        <div class="toolbar-btn copy" onclick="copySelection()">Copy</div>
-        <div class="toolbar-btn cut" onclick="cutSelection()">Cut</div>
-        <div class="toolbar-btn paste" onclick="pasteSelection()">Paste</div>
-        <div class="toolbar-btn select-all" onclick="selectAll()">Select all</div>
-        <div class="toolbar-btn format-document" onclick="formatDocument()">Format</div>
-      </div>
+       <div class="menu-selector hidden">
+          <div class="toolbar-btn" onclick="copy()">Copy</div>
+          <div class="toolbar-btn" onclick="cut()">Cut</div>
+          <div class="toolbar-btn" onclick="paste()">Paste</div>
+          <div class="toolbar-btn" onclick="selectAll()">Select all</div>
+          <div class="toolbar-btn" onclick="formatDocument()">Format</div>
+       </div>
       <div></div>
     </div>
     <div id="editor"></div>
@@ -1027,18 +1027,20 @@
             renderWhitespace: storedRenderWhitespace ? (storedRenderWhitespace === "true" ? "all" : "none") : "none",
             highlightActiveLine: true,
             lineNumbersMinChars: 2,
-            contextmenu: false,
           });
 
           let selectionsContainer;
           let rightSelector;
           let leftSelector;
+          let selectorMenu;
           let globalPoseMenu = 0;
           let touchTimeout;
           let touchCount = 0;
           let startPosition;
           let isSelecting = false;
           let disabledMove = false;
+          let tapsHeight = 40; // assuming you have some element on top that takes some height
+
 
           function initializeSelector() {
             selectionsContainer = document.createElement("div");
@@ -1055,6 +1057,7 @@
             const editorScrollableNode = document.querySelector(".lines-content.monaco-editor-background");
             editorScrollableNode.insertAdjacentElement("afterbegin", selectionsContainer);
 
+            selectorMenu = document.createElement("div");
             const outsetContainer = document.createElement("div");
             outsetContainer.className = "outset-shit-select";
 
@@ -1081,6 +1084,7 @@
               });
               currentScrollPosition = newScrollPosition;
               if (newScrollPosition < 5) {
+                selectorMenu.classList.remove("scrolled");
               }
             };
 
@@ -1106,7 +1110,12 @@
                 behavior: "smooth",
               });
               currentScrollPosition = newScrollPosition;
+              selectorMenu.classList.add("scrolled");
             };
+
+            selectorMenu.appendChild(outsetContainer);
+            selectorMenu.appendChild(rightArrow);
+            selectorMenu.appendChild(leftArrow);
 
             function isMobile() {
               const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -1121,6 +1130,8 @@
                 return true;
               return false;
             }
+
+            editorScrollableNode.insertAdjacentElement("afterbegin", selectorMenu);
 
             let lastTapTime = 0;
             const doubleTapDelay = 400; // milliseconds
@@ -1161,49 +1172,37 @@
                 touchMoved = false;
                 event.preventDefault();
                 disabledMove = true;
-
-                editor.focus();
-                if (initialSelection.isEmpty()) {
-                  editor.setSelection(initialSelection);
-                }
               });
 
               selector.addEventListener("touchmove", (event) => {
                 const touch = event.touches[0];
                 const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
-                event.preventDefault();
 
-                if (target?.position) {
+                if (target && target.position) {
                   const newSelection = isLeft
                     ? new monaco.Selection(target.position.lineNumber, target.position.column, initialSelection.endLineNumber, initialSelection.endColumn)
                     : new monaco.Selection(initialSelection.startLineNumber, initialSelection.startColumn, target.position.lineNumber, target.position.column);
-
                   editor.setSelection(newSelection);
                   touchMoved = true;
                 }
+                event.preventDefault();
               });
 
               selector.addEventListener("touchend", (event) => {
-                event.preventDefault();
-                const touch = event.changedTouches[0];
-                const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
+                if (!touchMoved) {
+                  const touch = event.changedTouches[0];
+                  const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
 
-                if (target?.position) {
-                  const newSelection = isLeft
-                    ? new monaco.Selection(target.position.lineNumber, target.position.column, initialSelection.endLineNumber, initialSelection.endColumn)
-                    : new monaco.Selection(initialSelection.startLineNumber, initialSelection.startColumn, target.position.lineNumber, target.position.column);
-
-                  editor.setSelection(newSelection);
-                  editor.focus();
+                  if (target && target.position) {
+                    const newSelection = isLeft
+                      ? new monaco.Selection(target.position.lineNumber, target.position.column, initialSelection.endLineNumber, initialSelection.endColumn)
+                      : new monaco.Selection(initialSelection.startLineNumber, initialSelection.startColumn, target.position.lineNumber, target.position.column);
+                    editor.setSelection(newSelection);
+                  }
                 }
-
-                // Delay state reset to maintain selection
-                setTimeout(() => {
-                  touchStartPos = null;
-                  initialSelection = null;
-                  touchMoved = false;
-                  disabledMove = false;
-                }, 100);
+                touchStartPos = null;
+                initialSelection = null;
+                touchMoved = false;
               });
             }
 
@@ -1261,6 +1260,12 @@
             editor.getAction("editor.action.formatDocument").run();
           }
 
+          window.copy = copy;
+          window.cut = cut;
+          window.paste = paste;
+          window.formatDocument = formatDocument;
+          window.selectAll = selectAll;
+
           function getLineYCoordinate(position) {
             const lineTop = editor.getTopForLineNumber(position.lineNumber);
             const editorCoords = editorElement.getBoundingClientRect();
@@ -1283,10 +1288,13 @@
           }
 
           const editorElement = document.getElementById("editor");
-          const tapsHeight = 40; // assuming you have some element on top that takes some height
           const leftLength = document.querySelector(".monaco-editor .margin").offsetWidth;
 
           editorElement.addEventListener("touchstart", (event) => {
+            if (selectorMenu.contains(event.target) || selectionsContainer.contains(event.target)) {
+              event.stopPropagation();
+              event.preventDefault();
+            }
             touchCount++;
             if (touchTimeout) {
               clearTimeout(touchTimeout);
@@ -1294,7 +1302,11 @@
 
             setTimeout(() => {
               const selection = editor.getSelection();
-              if (!selection.isEmpty()) showContextMenu();
+              const isSelecting = selection.startColumn !== selection.endColumn || selection.startLineNumber !== selection.endLineNumber || selection.startColumn !== selection.positionColumn || selection.startLineNumber !== selection.positionLineNumber;
+              if (isSelecting) {
+                tapsHeight = 100
+                showContextMenu()
+              };
             }, 400);
 
             const touch = event.touches[0];
@@ -1343,9 +1355,7 @@
             const startPosition = selection.getStartPosition();
             const endPosition = selection.getEndPosition();
 
-            if (selection.isEmpty()) {
-              const selectorMenu = document.querySelector(".menu-selector");
-              selectorMenu.classList.add("hidden");
+            if (selection.isEmpty()) {              
               selectionsContainer.classList.add("hidden");
               return;
             }
@@ -1374,7 +1384,7 @@
           initializeSelector();
 
           function showContextMenu() {
-            const selectorMenu = document.querySelector(".menu-selector");
+            const selectorMenu = document.querySelector(".menu-selector");            
             selectorMenu.classList.remove("hidden");
           }
 
