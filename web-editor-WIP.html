@@ -3,581 +3,531 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
     <!-- Primary Meta Tags -->
     <title>Script Api Editor</title>
     <meta property="og:title" content="Script Api Editor" />
     <meta property="og:description" content="A simple web-based code editor for Minecraft Bedrock Edition scripting with real-time autocomplete." />
-
     <meta property="og:image" content="https://minato-mba.github.io/web-apps/content/pictures/web-editor/screenshot.png" />
     <meta property="og:image:width" content="1350" />
     <meta property="og:image:height" content="643" />
-
     <meta name="twitter:card" content="summary_large_image" />
     <meta property="twitter:image" content="https://minato-mba.github.io/web-apps/content/pictures/web-editor/screenshot.png" />
-
     <meta name="theme-color" content="#1e1e1e" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f3f3f3" media="(prefers-color-scheme: light)" />
     <meta name="apple-mobile-web-app-title" content="Script Api Editor" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="msapplication-TileColor" content="#1e1e1e" />
-
     <link rel="icon" type="image/x-icon" href="content/pictures/web-editor/web-editor.png" />
     <style>
-      :root {
-        /* dark theme (default) */
-        --bg-color: #1e1e1e;
-        --text-color: #d4d4d4;
-        --button-bg: #3c3c3c;
-        --button-border: #454545;
-        --modal-bg: #2d2d2d;
-        --input-bg: #3c3c3c;
-        --hover-brightness: 1.15;
-        --scrollbar-color: #3c3c3c;
-        --scrollbar-thumb: #606060;
-      }
+:root {
+  /* Dark Theme (Default) */
+  --bg-color: #1e1e1e;
+  --text-color: #d4d4d4;
+  --button-bg: #3c3c3c;
+  --button-border: #454545;
+  --modal-bg: #2d2d2d;
+  --input-bg: #3c3c3c;
+  --hover-brightness: 1.15;
+  --scrollbar-color: #3c3c3c;
+  --scrollbar-thumb: #606060;
+}
 
-      /* Theme Variations */
-      [data-theme="hc-black"] {
-        --bg-color: #000000;
-        --text-color: #ffffff;
-        --button-bg: #000000;
-        --button-border: #ffffff;
-        --modal-bg: #000000;
-        --input-bg: #000000;
-        --hover-brightness: 1.25;
-        --scrollbar-color: #000000;
-        --scrollbar-thumb: #ffffff;
-      }
+/* Theme Variations */
+[data-theme="hc-black"] {
+  --bg-color: #000000;
+  --text-color: #ffffff;
+  --button-bg: #000000;
+  --button-border: #ffffff;
+  --modal-bg: #000000;
+  --input-bg: #000000;
+  --hover-brightness: 1.25;
+  --scrollbar-color: #000000;
+  --scrollbar-thumb: #ffffff;
+}
 
-      [data-theme="vs"] {
-        --bg-color: #f3f3f3;
-        --text-color: #333333;
-        --button-bg: #e0e0e0;
-        --button-border: #cccccc;
-        --modal-bg: #ffffff;
-        --input-bg: #ffffff;
-        --hover-brightness: 0.95;
-        --scrollbar-color: #e0e0e0;
-        --scrollbar-thumb: #b0b0b0;
-      }
+[data-theme="vs"] {
+  --bg-color: #f3f3f3;
+  --text-color: #333333;
+  --button-bg: #e0e0e0;
+  --button-border: #cccccc;
+  --modal-bg: #ffffff;
+  --input-bg: #ffffff;
+  --hover-brightness: 0.95;
+  --scrollbar-color: #e0e0e0;
+  --scrollbar-thumb: #b0b0b0;
+}
 
-      [data-theme="dracula"] {
-        --bg-color: #282a36;
-        --text-color: #f8f8f2;
-        --button-bg: #44475a;
-        --button-border: #6272a4;
-        --modal-bg: #44475a;
-        --input-bg: #44475a;
-        --hover-brightness: 1.15;
-        --scrollbar-color: #44475a;
-        --scrollbar-thumb: #6272a4;
-      }
+[data-theme="dracula"] {
+  --bg-color: #282a36;
+  --text-color: #f8f8f2;
+  --button-bg: #44475a;
+  --button-border: #6272a4;
+  --modal-bg: #44475a;
+  --input-bg: #44475a;
+  --hover-brightness: 1.15;
+  --scrollbar-color: #44475a;
+  --scrollbar-thumb: #6272a4;
+}
 
-      [data-theme="monokai"] {
-        --bg-color: #272822;
-        --text-color: #f8f8f2;
-        --button-bg: #3e3d32;
-        --button-border: #75715e;
-        --modal-bg: #3e3d32;
-        --input-bg: #3e3d32;
-        --hover-brightness: 1.15;
-        --scrollbar-color: #3e3d32;
-        --scrollbar-thumb: #75715e;
-      }
+[data-theme="monokai"] {
+  --bg-color: #272822;
+  --text-color: #f8f8f2;
+  --button-bg: #3e3d32;
+  --button-border: #75715e;
+  --modal-bg: #3e3d32;
+  --input-bg: #3e3d32;
+  --hover-brightness: 1.15;
+  --scrollbar-color: #3e3d32;
+  --scrollbar-thumb: #75715e;
+}
 
-      [data-theme="solarized-dark"] {
-        --bg-color: #002b36;
-        --text-color: #839496;
-        --button-bg: #073642;
-        --button-border: #586e75;
-        --modal-bg: #073642;
-        --input-bg: #073642;
-        --hover-brightness: 1.15;
-        --scrollbar-color: #073642;
-        --scrollbar-thumb: #586e75;
-      }
+[data-theme="solarized-dark"] {
+  --bg-color: #002b36;
+  --text-color: #839496;
+  --button-bg: #073642;
+  --button-border: #586e75;
+  --modal-bg: #073642;
+  --input-bg: #073642;
+  --hover-brightness: 1.15;
+  --scrollbar-color: #073642;
+  --scrollbar-thumb: #586e75;
+}
 
-      [data-theme="solarized-light"] {
-        --bg-color: #fdf6e3;
-        --text-color: #657b83;
-        --button-bg: #eee8d5;
-        --button-border: #93a1a1;
-        --modal-bg: #eee8d5;
-        --input-bg: #eee8d5;
-        --hover-brightness: 0.95;
-        --scrollbar-color: #eee8d5;
-        --scrollbar-thumb: #93a1a1;
-      }
+[data-theme="solarized-light"] {
+  --bg-color: #fdf6e3;
+  --text-color: #657b83;
+  --button-bg: #eee8d5;
+  --button-border: #93a1a1;
+  --modal-bg: #eee8d5;
+  --input-bg: #eee8d5;
+  --hover-brightness: 0.95;
+  --scrollbar-color: #eee8d5;
+  --scrollbar-thumb: #93a1a1;
+}
 
-      [data-theme="nord"] {
-        --bg-color: #2e3440;
-        --text-color: #d8dee9;
-        --button-bg: #3b4252;
-        --button-border: #4c566a;
-        --modal-bg: #3b4252;
-        --input-bg: #3b4252;
-        --hover-brightness: 1.15;
-        --scrollbar-color: #3b4252;
-        --scrollbar-thumb: #4c566a;
-      }
+[data-theme="nord"] {
+  --bg-color: #2e3440;
+  --text-color: #d8dee9;
+  --button-bg: #3b4252;
+  --button-border: #4c566a;
+  --modal-bg: #3b4252;
+  --input-bg: #3b4252;
+  --hover-brightness: 1.15;
+  --scrollbar-color: #3b4252;
+  --scrollbar-thumb: #4c566a;
+}
 
-      [data-theme="gruvbox"] {
-        --bg-color: #282828;
-        --text-color: #ebdbb2;
-        --button-bg: #3c3836;
-        --button-border: #665c54;
-        --modal-bg: #3c3836;
-        --input-bg: #3c3836;
-        --hover-brightness: 1.15;
-        --scrollbar-color: #3c3836;
-        --scrollbar-thumb: #665c54;
-      }
+[data-theme="gruvbox"] {
+  --bg-color: #282828;
+  --text-color: #ebdbb2;
+  --button-bg: #3c3836;
+  --button-border: #665c54;
+  --modal-bg: #3c3836;
+  --input-bg: #3c3836;
+  --hover-brightness: 1.15;
+  --scrollbar-color: #3c3836;
+  --scrollbar-thumb: #665c54;
+}
 
-      /* Base Styles */
-      body {
-        margin: 0;
-        padding: 10px;
-        font-family: Arial, sans-serif;
-        background: var(--bg-color);
-        color: var(--text-color);
-        -webkit-font-smoothing: antialiased;
-        overflow: hidden;
-        height: 100vh;
-      }
+body {
+  margin: 0;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  height: 100vh;
+}
 
-      /* Loading Bar */
-      .loading-bar {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background-color: var(--button-border);
-        z-index: 1001;
-      }
+.loading-bar {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--button-border);
+  z-index: 1001;
+}
 
-      .loading-progress {
-        height: 100%;
-        width: 0;
-        background-color: limegreen;
-        transition: width 0.3s ease;
-      }
+.loading-progress {
+  height: 100%;
+  width: 0;
+  background-color: limegreen;
+  transition: width 0.3s ease;
+}
 
-      /* Toolbar Styles */
-      #toolbar-container {
-        position: relative;
-        margin-bottom: 10px;
-      }
+#toolbar-container {
+  position: relative;
+  margin-bottom: 10px;
+}
 
-      #toolbar-toggle {
-        top: -10px;
-        padding: 4px 8px;
-        background: var(--button-bg);
-        border: 1px solid var(--button-border);
-        color: var(--text-color);
-        cursor: pointer;
-        border-radius: 4px 4px 0 0;
-        font-size: 12px;
-        z-index: 2;
-        white-space: nowrap;
-        text-align: center;
-      }
+#toolbar-toggle {
+  top: -10px;
+  padding: 4px 8px;
+  background: var(--button-bg);
+  border: 1px solid var(--button-border);
+  color: var(--text-color);
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  font-size: 12px;
+  z-index: 2;
+  white-space: nowrap;
+  text-align: center;
+}
 
-      #toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        align-items: center;
-        transition: all 0.3s ease;
-        overflow: hidden;
-        height: 0;
-        opacity: 0;
-      }
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  height: 0;
+  opacity: 0;
+}
 
-      #toolbar.visible {
-        height: auto;
-        opacity: 1;
-        padding: 8px 0;
-      }
+#toolbar.visible {
+  height: auto;
+  opacity: 1;
+  padding: 8px 0;
+}
 
-      /* Button and Input Styles */
-      .toolbar-btn {
-        padding: 12px 16px;
-        background: var(--button-bg);
-        border: 1px solid var(--button-border);
-        color: var(--text-color);
-        cursor: pointer;
-        border-radius: 4px;
-        transition: all 0.2s;
-        white-space: nowrap;
-        font-size: 14px;
-        flex: 1 1 auto;
-      }
+.toolbar-btn {
+  padding: 12px 16px;
+  background: var(--button-bg);
+  border: 1px solid var(--button-border);
+  color: var(--text-color);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-size: 14px;
+  flex: 1 1 auto;
+}
 
-      .toolbar-btn:hover {
-        filter: brightness(var(--hover-brightness));
-      }
+.toolbar-btn:hover {
+  filter: brightness(var(--hover-brightness));
+}
 
-      .toolbar-input {
-        padding: 12px;
-        background: var(--input-bg);
-        border: 1px solid var(--button-border);
-        color: var(--text-color);
-        border-radius: 4px;
-        font-family: Arial, sans-serif;
-        flex: 2 1 200px;
-        min-width: 120px;
-        font-size: 14px;
-      }
+.toolbar-input {
+  padding: 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--button-border);
+  color: var(--text-color);
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+  flex: 2 1 200px;
+  min-width: 120px;
+  font-size: 14px;
+}
 
-      /* Workspace and Editor Layout */
-      .workspace-container {
-        display: flex;
-        height: calc(100vh - 70px);
-        margin-top: 10px;
-        overflow: hidden;
-        width: 100%;
-      }
+.workspace-container {
+  display: flex;
+  height: calc(100vh - 70px);
+  margin-top: 10px;
+  overflow: hidden;
+  width: 100%;
+}
 
-      .editor-container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        overflow: hidden;
-        min-width: 0;
-      }
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  min-width: 0;
+}
 
-      #editor {
-        width: 100%;
-        height: calc(100vh - 120px);
-        border: 1px solid var(--button-border);
-        border-radius: 4px;
-        overflow: hidden;
-      }
+#editor {
+  width: 100%;
+  height: calc(100vh - 120px);
+  border: 1px solid var(--button-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
 
-      /* File Explorer */
-      .file-explorer {
-        width: 200px;
-        background: var(--bg-color);
-        border-right: 1px solid var(--button-border);
-        display: none;
-        flex-direction: column;
-        padding: 8px;
-      }
+.file-explorer {
+  width: 200px;
+  background: var(--bg-color);
+  border-right: 1px solid var(--button-border);
+  display: none;
+  flex-direction: column;
+  padding: 8px;
+}
 
-      .file-explorer.visible {
-        display: flex !important;
-      }
+.file-explorer.visible {
+  display: flex !important;
+}
 
-      .file-explorer-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--button-border);
-        margin-bottom: 8px;
-      }
+.file-explorer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--button-border);
+  margin-bottom: 8px;
+}
 
-      .file-explorer-title {
-        font-size: 14px;
-        font-weight: bold;
-      }
+.file-explorer-title {
+  font-size: 14px;
+  font-weight: bold;
+}
 
-      .file-list {
-        flex: 1;
-        overflow-y: auto;
-      }
+.file-list {
+  flex: 1;
+  overflow-y: auto;
+}
 
-      /* File Items and Tabs */
-      .file-item {
-        padding: 4px 8px;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 4px;
-      }
+.file-item {
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px;
+}
 
-      .file-item:hover {
-        background: var(--button-bg);
-      }
+.file-item:hover {
+  background: var(--button-bg);
+}
 
-      .file-item.active {
-        background: var(--button-border);
-      }
+.file-item.active {
+  background: var(--button-border);
+}
 
-      .tabs-container {
-        display: flex;
-        background: var(--bg-color);
-        border-bottom: 1px solid var(--button-border);
-        overflow-x: auto;
-        white-space: nowrap;
-        min-height: 40px;
-        max-height: 40px;
-      }
+.tabs-container {
+  display: flex;
+  background: var(--bg-color);
+  border-bottom: 1px solid var(--button-border);
+  overflow-x: auto;
+  white-space: nowrap;
+  min-height: 32px;
+  max-height: 32px;
+  scrollbar-width: thin;
+  scrollbar-height: thin;
+}
 
-      .tab {
-        display: flex;
-        align-items: center;
-        padding: 8px 16px;
-        background: var(--button-bg);
-        border: 1px solid var(--button-border);
-        border-bottom: none;
-        margin-right: 2px;
-        cursor: pointer;
-        border-radius: 4px 4px 0 0;
-      }
+.tabs-container::-webkit-scrollbar {
+  height: 4px;
+}
 
-      .tab.active {
-        background: var(--bg-color);
-        border-bottom: 1px solid var(--bg-color);
-        margin-bottom: -1px;
-      }
+.tabs-container::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 2px;
+}
 
-      .tab-close {
-        width: 16px;
-        height: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        margin-left: 8px;
-      }
+.tabs-container::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-color);
+}
 
-      .tab-close:hover {
-        background: var(--button-border);
-      }
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--button-bg);
+  border: 1px solid var(--button-border);
+  border-bottom: none;
+  margin-right: 2px;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  font-size: 12px;
+  height: 24px;
+  min-width: 50px;
+  max-width: 200px;
+}
 
-      /* Modal Styles */
-      .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        z-index: 1000;
-      }
+.tab span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+}
 
-      .modal-content {
-        position: relative;
-        background: var(--modal-bg);
-        margin: auto;
-        padding: 20px;
-        width: 90%;
-        max-width: 500px;
-        border-radius: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        border: 1px solid var(--button-border);
-      }
+.tab.active {
+  background: var(--bg-color);
+  border-bottom: 1px solid var(--bg-color);
+  margin-bottom: -1px;
+}
 
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-      }
+.tab-close {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-left: 8px;
+}
 
-      .modal-close {
-        cursor: pointer;
-        font-size: 24px;
-        padding: 0 8px;
-        color: var(--text-color);
-      }
+.tab-close:hover {
+  background: var(--button-border);
+}
 
-      .modal-close:hover {
-        opacity: 0.8;
-      }
+.file-explorer-header .toolbar-btn {
+  padding: 0;
+  font-size: 12px;
+  height: 24px; 
+  width: 24px; 
+  min-height: 24px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1; 
+  flex: 0 0 24px;
+}
 
-      /* Settings Styles */
-      .settings-group {
-        margin-bottom: 15px;
-      }
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+}
 
-      .settings-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: var(--text-color);
-      }
+.modal-content {
+  position: relative;
+  background: var(--modal-bg);
+  margin: auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 1px solid var(--button-border);
+}
 
-      .version-select {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
-        background: var(--input-bg);
-        border: 1px solid var(--button-border);
-        color: var(--text-color);
-        border-radius: 4px;
-      }
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
 
-      .module-label {
-        margin: 8px 0 4px;
-        font-size: 0.9em;
-        color: var(--text-color);
-        opacity: 0.8;
-      }
+.modal-close {
+  cursor: pointer;
+  font-size: 24px;
+  padding: 0 8px;
+  color: var(--text-color);
+}
 
-      /* Error Container */
-      #error-container {
-        position: fixed;
-        top: 10%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        z-index: 10000;
-      }
+.modal-close:hover {
+  opacity: 0.8;
+}
 
-      .error-toast {
-        background: #ff4444;
-        color: white;
-        width: 40%;
-        padding: 12px;
-        margin: 10px;
-        border-radius: 4px;
-        text-align: center;
-        opacity: 0;
-        transform: translateY(-20px);
-        animation: fadeInOut 4s ease-in-out;
-      }
+.settings-group {
+  margin-bottom: 15px;
+}
 
-      @keyframes fadeInOut {
-        0% {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        10% {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        90% {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        100% {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-      }
+.settings-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
 
-      /* Monaco Editor Overrides */
-      .monaco-editor .line-numbers {
-        font-size: 12px !important;
-        padding-left: 5px !important;
-        color: var(--text-color) !important;
-      }
+.version-select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--button-border);
+  color: var(--text-color);
+  border-radius: 4px;
+}
 
-      .monaco-editor .margin-view-overlays {
-        width: 40px !important;
-        background: var(--bg-color) !important;
-      }
+.module-label {
+  margin: 8px 0 4px;
+  font-size: 0.9em;
+  color: var(--text-color);
+  opacity: 0.8;
+}
 
-      /* Scrollbar Styling */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-        background-color: var(--scrollbar-color);
-      }
+#error-container {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10000;
+}
 
-      ::-webkit-scrollbar-thumb {
-        background-color: var(--scrollbar-thumb);
-        border-radius: 4px;
-      }
+.error-toast {
+  background: #ff4444;
+  color: white;
+  width: 40%;
+  padding: 12px;
+  margin: 10px;
+  border-radius: 4px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: fadeInOut 4s ease-in-out;
+}
 
-      /* Responsive Design */
-      @media (max-width: 480px) {
-        .toolbar-btn {
-          padding: 14px 12px;
-          font-size: 13px;
-        }
-        .toolbar-input {
-          flex-basis: 100%;
-        }
-        .workspace-container {
-          height: calc(100vh - 90px);
-        }
-      }
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
 
-      /* Additional styles for mobile functionality */
-      .selections {
-        position: absolute;
-        display: flex;
-        gap: 10px;
-        z-index: 1000;
-      }
+.monaco-editor .line-numbers {
+  font-size: 12px !important;
+  padding-left: 5px !important;
+  color: var(--text-color) !important;
+}
 
-      .selector {
-        width: 20px;
-        height: 20px;
-        background-color: #0078d7;
-        border-radius: 50%;
-        cursor: pointer;
-      }
+.monaco-editor .margin-view-overlays {
+  width: 40px !important;
+  background: var(--bg-color) !important;
+}
 
-      .menu-selector {
-        position: absolute;
-        background-color: #2d2d2d;
-        border-radius: 8px;
-        padding: 10px;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-      }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: var(--scrollbar-color);
+}
 
-      .menu-selector.hidden {
-        display: none;
-      }
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
 
-      .mnc {
-        padding: 8px;
-        cursor: pointer;
-        color: #d4d4d4;
-      }
+@media (max-width: 480px) {
+  .toolbar-btn {
+    padding: 14px 12px;
+    font-size: 13px;
+  }
 
-      .mnc.hovered {
-        background-color: #3c3c3c;
-      }
+  .toolbar-input {
+    flex-basis: 100%;
+  }
 
-      .right-arrow-mnc {
-        width: 20px;
-        height: 20px;
-        background-color: #0078d7;
-        border-radius: 50%;
-        cursor: pointer;
-        position: absolute;
-        right: -30px;
-        top: 50%;
-        transform: translateY(-50%);
-      }
-
-      .right-arrow-mnc.left {
-        left: -30px;
-        right: auto;
-      }
-
-      .outset-shit-select {
-        display: flex;
-        overflow-x: auto;
-        gap: 10px;
-      }
-
-      .inset-menu {
-        display: flex;
-        gap: 10px;
-      }
-
-      .hidden {
-        display: none;
-      }
-      
+  .workspace-container {
+    height: calc(100vh - 90px);
+  }
+}
     </style>
   </head>
   <body>
@@ -600,7 +550,6 @@
         <button class="toolbar-btn" onclick="showVersions()">📦 Modules</button>
       </div>
     </div>
-
     <div class="workspace-container">
       <div id="fileExplorer" class="file-explorer">
         <div class="file-explorer-header">
@@ -614,7 +563,6 @@
         <div id="editor"></div>
       </div>
     </div>
-
     <!-- settings menu -->
     <div id="settingsModal" class="modal">
       <div class="modal-content">
@@ -625,7 +573,10 @@
         <div class="settings-group">
           <label><input type="checkbox" id="minimap" /> Show Minimap</label>
           <label><input type="checkbox" id="wordWrap" checked /> Wrap Lines</label>
-          <label>Font Size <input type="number" id="fontSize" value="13" min="8" max="24" class="toolbar-input" /></label>
+          <label
+            >Font Size
+            <input type="number" id="fontSize" value="13" min="8" max="24" class="toolbar-input"
+          /></label>
           <label><input type="checkbox" id="lineNumbers" checked /> Show Line Numbers</label>
           <label><input type="checkbox" id="renderWhitespace" /> Render Whitespace</label>
           <label
@@ -647,7 +598,10 @@
             >Auto-Save Interval (seconds)
             <input type="number" id="autoSaveInterval" min="5" value="30" class="toolbar-input" />
           </label>
-          <label><input type="checkbox" id="autoSaveEnabled" onchange="toggleInput()" /> Enable Auto-Save</label>
+          <label
+            ><input type="checkbox" id="autoSaveEnabled" onchange="toggleInput()" />
+            Enable Auto-Save</label
+          >
           <label
             >Language
             <select id="language" class="toolbar-input">
@@ -659,7 +613,6 @@
         <button class="toolbar-btn" onclick="applySettings()">Apply</button>
       </div>
     </div>
-
     <!-- version selection menu -->
     <div id="versionModal" class="modal">
       <div class="modal-content">
@@ -681,7 +634,6 @@
       let editor;
       let typeLibs = new Map();
       let isToolbarVisible = false;
-
       const defaultCode = `// Minecraft scripting with full autocomplete capabilities
 import { world, ItemStack } from '@minecraft/server';
 import { ActionFormData } from '@minecraft/server-ui';
@@ -694,52 +646,9 @@ if (message === '!hello') {
   player.sendMessage('Hello, ' + player.name + '!');
 }
 });`;
-
-      let closedError = true;
-      let disabledMove = false;
-      let selectionsContainer;
-      let rightSelector;
-      let leftSelector;
-      let selectorMenu;
-      let globalPoseMenu = 0;
-      let touchTimeout;
-      let touchCount = 0;
-      let startPosition;
-      let isSelecting = false;
-      let currentScrollPosition = 0;
-
-      function getLineYCoordinate(position) {
-        const lineTop = editor.getTopForLineNumber(position.lineNumber);
-        const editorCoords = editorElement.getBoundingClientRect();
-        const lineY = window.scrollY + editorCoords.top + lineTop - tapsHeight;
-        return lineY;
-    }
-
-    function isPositionInSelection(position) {
-        const selection = editor.getSelection();
-        if (!selection || selection.isEmpty()) {
-            return false;
-        }
-
-        const startPosition = selection.getStartPosition();
-        const endPosition = selection.getEndPosition();
-
-        // Compare the position with the selection range
-        const isInRange = (
-            position.lineNumber > startPosition.lineNumber ||
-            (position.lineNumber === startPosition.lineNumber && position.column >= startPosition.column)
-        ) && (
-                position.lineNumber < endPosition.lineNumber ||
-                (position.lineNumber === endPosition.lineNumber && position.column <= endPosition.column)
-            );
-
-        return isInRange;
-    }
-
       function toggleInput() {
         document.getElementById("autoSaveInterval").disabled = !document.getElementById("autoSaveEnabled").checked;
       }
-
       // Error handling
       let count = 0;
       function showError(message) {
@@ -748,7 +657,6 @@ if (message === '!hello') {
         const toast = document.createElement("div");
         toast.className = "error-toast";
         toast.textContent = message;
-
         setTimeout(() => {
           errorContainer.appendChild(toast);
           setTimeout(() => {
@@ -757,7 +665,6 @@ if (message === '!hello') {
           }, 4000);
         }, count * 500);
       }
-
       function getFileLanguage(fileName) {
         const ext = fileName.split(".").pop().toLowerCase();
         switch (ext) {
@@ -769,48 +676,37 @@ if (message === '!hello') {
             return "javascript";
         }
       }
-
       // Update the openFile function
       function openFile(fileName) {
         if (!files.has(fileName)) return;
-
         // Save current file content
         if (currentFile) {
           const currentContent = editor.getValue();
           files.get(currentFile).content = currentContent;
           updateFileModel(currentFile, currentContent);
         }
-
         currentFile = fileName;
         const file = files.get(fileName);
-
         // Get or create model for the file
         const uri = monaco.Uri.file(`/${fileName}`);
         let model = monaco.editor.getModel(uri);
-
         if (!model) {
           model = monaco.editor.createModel(file.content, file.language, uri);
         }
-
         editor.setModel(model);
         updateTabs();
         updateFileExplorer();
       }
-
       function updateFileExplorer() {
         const fileList = document.getElementById("fileList");
         if (!fileList) return;
-
         fileList.innerHTML = "";
-
         files.forEach((file, fileName) => {
           const item = document.createElement("div");
           item.className = `file-item ${currentFile === fileName ? "active" : ""}`;
-
           const nameSpan = document.createElement("span");
           nameSpan.textContent = fileName;
           nameSpan.onclick = () => openFile(fileName);
-
           const closeBtn = document.createElement("span");
           closeBtn.innerHTML = "&times;";
           closeBtn.className = "tab-close";
@@ -818,13 +714,12 @@ if (message === '!hello') {
             e.stopPropagation();
             closeFile(fileName);
           };
-
           item.appendChild(nameSpan);
           item.appendChild(closeBtn);
           fileList.appendChild(item);
         });
       }
-
+      // Add function to update file models
       function updateFileModel(fileName, content) {
         const uri = monaco.Uri.file(`/${fileName}`);
         const model = monaco.editor.getModel(uri);
@@ -832,30 +727,24 @@ if (message === '!hello') {
           model.setValue(content);
         }
       }
-
       function updateTabs() {
         const container = document.getElementById("tabsContainer");
         if (!container) {
           console.error("Tabs container not found");
           return;
         }
-
         container.innerHTML = "";
-
         files.forEach((file, fileName) => {
           const tab = document.createElement("div");
           tab.className = `tab ${currentFile === fileName ? "active" : ""}`;
-
           const tabContent = document.createElement("div");
           tabContent.style.display = "flex";
           tabContent.style.alignItems = "center";
           tabContent.style.gap = "8px";
-
           const nameSpan = document.createElement("span");
           nameSpan.textContent = fileName;
           nameSpan.style.cursor = "pointer";
           nameSpan.onclick = () => openFile(fileName);
-
           const closeBtn = document.createElement("span");
           closeBtn.innerHTML = "&times;";
           closeBtn.className = "tab-close";
@@ -863,25 +752,20 @@ if (message === '!hello') {
             e.stopPropagation();
             closeFile(fileName);
           };
-
           tabContent.appendChild(nameSpan);
           tabContent.appendChild(closeBtn);
           tab.appendChild(tabContent);
           container.appendChild(tab);
         });
       }
-
       function closeFile(fileName) {
         if (!files.has(fileName)) return;
-
         const uri = monaco.Uri.file(`/${fileName}`);
         const model = monaco.editor.getModel(uri);
         if (model) {
           model.dispose();
         }
-
         files.delete(fileName);
-
         if (currentFile === fileName) {
           currentFile = null;
           const nextFile = Array.from(files.keys())[0];
@@ -891,41 +775,33 @@ if (message === '!hello') {
             editor.setValue("");
           }
         }
-
         updateTabs();
         updateFileExplorer();
       }
-
       function createNewFile() {
         const fileName = prompt("Enter file name:", "untitled.js");
         if (!fileName) return;
-
         if (files.has(fileName)) {
           showError("File already exists!");
           return;
         }
-
         const content = "";
         files.set(fileName, {
           content,
           language: getFileLanguage(fileName),
         });
-
         const uri = monaco.Uri.file(`/${fileName}`);
         monaco.editor.createModel(content, getFileLanguage(fileName), uri);
-
         document.getElementById("filename").value = fileName;
         openFile(fileName);
         updateFileExplorer();
       }
-
       // Update importFile function
       async function importFile() {
         const input = document.createElement("input");
         input.type = "file";
         input.accept = ".js,.ts";
         input.multiple = true;
-
         input.onchange = async function () {
           for (const file of this.files) {
             const content = await file.text();
@@ -933,20 +809,16 @@ if (message === '!hello') {
               content,
               language: getFileLanguage(file.name),
             });
-
             // Create model for imported file
             const uri = monaco.Uri.file(`/${file.name}`);
             monaco.editor.createModel(content, getFileLanguage(file.name), uri);
           }
-
           if (this.files.length > 0) {
             openFile(this.files[0].name);
           }
         };
-
         input.click();
       }
-
       const MODULES = [
         {
           name: "@minecraft/server",
@@ -985,34 +857,27 @@ if (message === '!hello') {
           typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/vanilla-data@${version}/lib/index.d.ts`,
         },
       ];
-
       function showLoadingBar() {
         document.getElementById("loadingBar").style.display = "block";
         document.querySelector(".loading-progress").style.width = "0";
       }
-
       function updateLoadingProgress(current, total) {
         document.querySelector(".loading-progress").style.width = `${(current / total) * 100}%`;
       }
-
       function hideLoadingBar() {
         setTimeout(() => {
           document.getElementById("loadingBar").style.display = "none";
         }, 300);
       }
-
       function toggleToolbar() {
         isToolbarVisible = !isToolbarVisible;
         const toolbar = document.getElementById("toolbar");
         const toggleBtn = document.getElementById("toolbar-toggle");
-
         toolbar.classList.toggle("visible", isToolbarVisible);
         toggleBtn.textContent = `${isToolbarVisible ? "△ Hide" : "▽ Show"} Toolbar`;
       }
-
       async function loadTypeDefinitions() {
         showLoadingBar();
-
         // Clear existing type definitions safely
         if (typeLibs.size > 0) {
           typeLibs.forEach((lib) => {
@@ -1025,7 +890,6 @@ if (message === '!hello') {
           });
         }
         typeLibs.clear();
-
         // Set compiler options
         monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
           allowNonTsExtensions: true,
@@ -1033,17 +897,14 @@ if (message === '!hello') {
           target: monaco.languages.typescript.ScriptTarget.ES2020,
           checkJs: true,
         });
-
         monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
           allowNonTsExtensions: true,
           moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
           target: monaco.languages.typescript.ScriptTarget.ES2020,
           strict: true,
         });
-
         const totalModules = MODULES.length;
         let loadedModules = 0;
-
         for (const module of MODULES) {
           try {
             const response = await fetch(module.typesUrl(module.currentVersion));
@@ -1052,12 +913,20 @@ if (message === '!hello') {
               throw new Error(`HTTP ${response.status}`);
             }
             const types = await response.text();
-
-            const libJS = monaco.languages.typescript.javascriptDefaults.addExtraLib(`declare module "${module.name}" { ${types} }`, `file:///node_modules/${module.name}/index.d.ts`);
-            const libTS = monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare module "${module.name}" { ${types} }`, `file:///node_modules/${module.name}/index.d.ts`);
+            const libJS = monaco.languages.typescript.javascriptDefaults.addExtraLib(
+              `declare module "${module.name}" { ${types} }`,
+              `file:///node_modules/${module.name}/index.d.ts`
+            );
+            const libTS = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+              `declare module "${module.name}" { ${types} }`,
+              `file:///node_modules/${module.name}/index.d.ts`
+            );
             typeLibs.set(module.name, { jsLib: libJS, tsLib: libTS });
           } catch (error) {
-            console.error(`Failed to load ${module.name}@${module.currentVersion}:`, error);
+            console.error(
+              `Failed to load ${module.name}@${module.currentVersion}:`,
+              error
+            );
             showError(`Failed to load ${module.name}@${module.currentVersion}`);
           }
           loadedModules++;
@@ -1065,19 +934,15 @@ if (message === '!hello') {
         }
         hideLoadingBar();
       }
-
       let isClicked = false;
       async function showVersions() {
         if (isClicked) return;
         isClicked = true;
         const versionSelectors = document.getElementById("versionSelectors");
         versionSelectors.innerHTML = "";
-
         const totalModules = MODULES.length;
         let loadedModules = 0;
-
         showLoadingBar();
-
         for (const module of MODULES) {
           const versions = await fetchVersions(module.name);
           const select = createVersionSelector(module, versions);
@@ -1085,28 +950,22 @@ if (message === '!hello') {
           loadedModules++;
           updateLoadingProgress(loadedModules, totalModules);
         }
-
         hideLoadingBar();
         isClicked = false;
         document.getElementById("versionModal").style.display = "block";
       }
-
       async function loadSelectedVersions() {
         showLoadingBar();
-
         for (const module of MODULES) {
           const selectedVersion = document.getElementById(module.selectorId).value;
           console.log(`Updating ${module.name} to version ${selectedVersion}`);
           module.currentVersion = selectedVersion;
         }
-
         await loadTypeDefinitions();
         closeModal("versionModal");
         editor.setValue(editor.getValue());
-
         hideLoadingBar();
       }
-
       async function fetchVersions(packageName) {
         try {
           const response = await fetch(`https://data.jsdelivr.com/v1/package/npm/${packageName}`);
@@ -1122,28 +981,25 @@ if (message === '!hello') {
           return [];
         }
       }
-
       function createVersionSelector(module, versions) {
         const container = document.createElement("div");
         const label = document.createElement("div");
         label.className = "module-label";
         label.textContent = module.name;
-
         const select = document.createElement("select");
         select.className = "version-select";
         select.id = module.selectorId;
-        select.innerHTML = versions.map((v) => `<option value="${v}" ${v === module.currentVersion ? "selected" : ""}>${v}</option>`).join("");
-
+        select.innerHTML = versions
+          .map((v) => `<option value="${v}" ${v === module.currentVersion ? "selected" : ""}>${v}</option>`)
+          .join("");
         container.appendChild(label);
         container.appendChild(select);
-
         if (versions.length === 0) {
           select.disabled = true;
           select.innerHTML = `<option>No versions available</option>`;
         }
         return container;
       }
-
       function getSettingElements() {
         return {
           miniMap: document.getElementById("minimap"),
@@ -1158,7 +1014,6 @@ if (message === '!hello') {
           language: document.getElementById("language"),
         };
       }
-
       function getStoredSettings() {
         return {
           storedMinimap: localStorage.getItem("minimap"),
@@ -1173,7 +1028,6 @@ if (message === '!hello') {
           storedLanguage: localStorage.getItem("language"),
         };
       }
-
       function showSettings() {
         const elements = getSettingElements();
         if (Object.values(elements).every((el) => el)) {
@@ -1183,13 +1037,11 @@ if (message === '!hello') {
           console.error("One or more settings elements are missing in the DOM.");
         }
       }
-
       function applySettings() {
         startAutoSave();
         const theme = document.getElementById("theme").value;
         const selectedLanguage = document.getElementById("language").value;
         document.body.setAttribute("data-theme", theme);
-
         editor.updateOptions({
           theme: theme,
           autoClosingBrackets: document.getElementById("autoClosingBrackets").checked,
@@ -1199,10 +1051,8 @@ if (message === '!hello') {
           renderWhitespace: document.getElementById("renderWhitespace").checked ? "all" : "none",
           minimap: { enabled: document.getElementById("minimap").checked },
         });
-
         const model = editor.getModel();
         monaco.editor.setModelLanguage(model, selectedLanguage);
-
         // Apply body class for theme change
         document.body.classList.remove("high-contrast-theme", "light-theme");
         if (theme === "vs") {
@@ -1210,30 +1060,37 @@ if (message === '!hello') {
         } else if (theme === "hc-black") {
           document.body.classList.add("high-contrast-theme");
         }
-
         closeModal("settingsModal");
         saveSettings();
       }
-
       function saveSettings() {
         const elements = getSettingElements();
-
         localStorage.setItem("minimap", elements.miniMap.checked);
         localStorage.setItem("wordWrap", elements.wordWrap.checked);
         localStorage.setItem("fontSize", elements.fontSize.value);
         localStorage.setItem("lineNumbers", elements.lineNumbers.checked);
-        localStorage.setItem("renderWhitespace", elements.renderWhitespace.checked);
+        localStorage.setItem(
+          "renderWhitespace",
+          elements.renderWhitespace.checked
+        );
         localStorage.setItem("theme", elements.theme.value);
-        localStorage.setItem("autoClosingBrackets", elements.autoClosingBrackets.checked);
-        localStorage.setItem("autoSaveInterval", elements.autoSaveInterval.value);
-        localStorage.setItem("autoSaveEnabled", elements.autoSaveEnabled.checked);
+        localStorage.setItem(
+          "autoClosingBrackets",
+          elements.autoClosingBrackets.checked
+        );
+        localStorage.setItem(
+          "autoSaveInterval",
+          elements.autoSaveInterval.value
+        );
+        localStorage.setItem(
+          "autoSaveEnabled",
+          elements.autoSaveEnabled.checked
+        );
         localStorage.setItem("language", elements.language.value);
       }
-
       function loadSettings() {
         const elements = getSettingElements();
         const stored = getStoredSettings();
-
         elements.miniMap.checked = stored.storedMinimap === "true";
         elements.wordWrap.checked = stored.storedWordWrap === "true";
         elements.fontSize.value = stored.storedFontSize || "13";
@@ -1245,18 +1102,15 @@ if (message === '!hello') {
         elements.autoSaveEnabled.checked = stored.storedAutoSaveEnabled === "true";
         elements.language.value = stored.storedLanguage || "javascript";
       }
-
       async function initializeEditor() {
         loadSettings();
         const savedTheme = localStorage.getItem("theme") || "vs-dark";
         document.body.setAttribute("data-theme", savedTheme);
-
         require.config({
           paths: {
             vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs",
           },
         });
-
         require(["vs/editor/editor.main"], async () => {
           // Initialize type definitions first
           await loadTypeDefinitions();
@@ -1280,7 +1134,6 @@ if (message === '!hello') {
               "editorLineNumber.foreground": "#6272a4",
             },
           });
-
           monaco.editor.defineTheme("monokai", {
             base: "vs-dark",
             inherit: true,
@@ -1299,7 +1152,6 @@ if (message === '!hello') {
               "editorLineNumber.foreground": "#75715e",
             },
           });
-
           monaco.editor.defineTheme("solarized-dark", {
             base: "vs-dark",
             inherit: true,
@@ -1318,7 +1170,6 @@ if (message === '!hello') {
               "editorLineNumber.foreground": "#586e75",
             },
           });
-
           monaco.editor.defineTheme("solarized-light", {
             base: "vs",
             inherit: true,
@@ -1337,7 +1188,6 @@ if (message === '!hello') {
               "editorLineNumber.foreground": "#93a1a1",
             },
           });
-
           monaco.editor.defineTheme("nord", {
             base: "vs-dark",
             inherit: true,
@@ -1356,7 +1206,6 @@ if (message === '!hello') {
               "editorLineNumber.foreground": "#4c566a",
             },
           });
-
           monaco.editor.defineTheme("gruvbox", {
             base: "vs-dark",
             inherit: true,
@@ -1375,10 +1224,8 @@ if (message === '!hello') {
               "editorLineNumber.foreground": "#665c54",
             },
           });
-
           const stored = getStoredSettings();
           const defaultFileName = "index.js";
-
           editor = monaco.editor.create(document.getElementById("editor"), {
             value: defaultCode,
             language: stored.storedLanguage || "javascript",
@@ -1409,59 +1256,45 @@ if (message === '!hello') {
               alwaysConsumeMouseWheel: false,
             },
           });
-
           // Initialize files with default file
           files.set(defaultFileName, {
             content: defaultCode,
             language: "javascript",
           });
           currentFile = defaultFileName;
-
           // Set up module resolution after editor is created
           setupModuleResolution();
-
           // Update UI
           updateTabs();
           updateFileExplorer();
           startAutoSave();
-
-          // Initialize mobile functionality
-          initializeMobileFunctions();
         });
-
         window.addEventListener("resize", () => {
           if (editor) {
             editor.layout();
           }
         });
       }
-
       let autoSaveTimer;
       function startAutoSave() {
         const interval = parseInt(document.getElementById("autoSaveInterval").value) * 1000;
         const enabled = document.getElementById("autoSaveEnabled").checked;
-
         if (autoSaveTimer) clearInterval(autoSaveTimer);
         if (!enabled) return;
-
         autoSaveTimer = setInterval(() => {
           if (currentFile) {
             files.get(currentFile).content = editor.getValue();
           }
         }, interval);
       }
-
       function closeModal(modalId) {
         document.getElementById(modalId).style.display = "none";
       }
-
       async function formatCode() {
         await editor.getAction("editor.action.formatDocument").run();
       }
-
       function saveCode() {
         if (!currentFile) return;
-
         const code = editor.getValue();
         const blob = new Blob([code], { type: "text/javascript" });
         const url = URL.createObjectURL(blob);
@@ -1471,10 +1304,8 @@ if (message === '!hello') {
         a.click();
         URL.revokeObjectURL(url);
       }
-
       // Initialize editor on load
       document.addEventListener("DOMContentLoaded", initializeEditor);
-
       // Add keyboard shortcuts
       document.addEventListener("keydown", function (event) {
         if (event.ctrlKey && event.key === "s") {
@@ -1482,7 +1313,6 @@ if (message === '!hello') {
           saveCode();
         }
       });
-
       function setupModuleResolution() {
         // Set up the CompilerOptions for both JavaScript and TypeScript
         const compilerOptions = {
@@ -1494,11 +1324,9 @@ if (message === '!hello') {
           paths: {},
           typeRoots: ["node_modules/@types"],
         };
-
         // Apply compiler options
         monaco.languages.typescript.javascriptDefaults.setCompilerOptions(compilerOptions);
         monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
-
         // Set up model references for all files
         files.forEach((fileData, fileName) => {
           const uri = monaco.Uri.file(`/${fileName}`);
@@ -1507,371 +1335,16 @@ if (message === '!hello') {
           }
         });
       }
-
       function toggleFileExplorer() {
         const explorer = document.getElementById("fileExplorer");
         if (!explorer) return;
-
         explorer.classList.toggle("visible");
-
         // Force layout update after toggle
         setTimeout(() => {
           if (editor) {
             editor.layout();
           }
         }, 100);
-      }
-
-      // Mobile functions
-      function initializeMobileFunctions() {
-        const editorElement = document.getElementById("editor");
-
-        // Create the selectors container
-        selectionsContainer = document.createElement("div");
-        selectionsContainer.className = "selections hidden";
-
-        // Create the right-selector and left-selector divs
-        rightSelector = document.createElement("div");
-        rightSelector.className = "sele.selector right-selector";
-        leftSelector = document.createElement("div");
-        leftSelector.className = "sele.selector left-selector";
-
-        // Append the selectors to the container
-        selectionsContainer.appendChild(rightSelector);
-        selectionsContainer.appendChild(leftSelector);
-
-        // Add the selections container to the Monaco editor scrollable area
-        const editorScrollableNode = document.querySelector(".lines-content.monaco-editor-background");
-        editorScrollableNode.insertAdjacentElement("afterbegin", selectionsContainer);
-
-        // Create the selector menu
-        selectorMenu = document.createElement("div");
-        selectorMenu.className = "menu-selector hidden";
-
-        // Create the outer container
-        const outsetContainer = document.createElement("div");
-        outsetContainer.className = "outset-shit-select";
-
-        // Create the inner menu container
-        const insetMenu = document.createElement("div");
-        insetMenu.className = "inset-menu";
-
-        // Create and append menu items to the inner menu container
-        const menuItems = [
-          { className: "copy", text: "Copy", action: copy },
-          { className: "cut", text: "Cut", action: cut },
-          { className: "paste", text: "Paste", action: paste },
-          { className: "select", text: "Select all", action: selectAll },
-          { className: "undo", text: "Undo", action: undo },
-          { className: "redo", text: "Redo", action: redo },
-          { className: "format", text: "Format document", action: formatDocument },
-        ];
-
-        menuItems.forEach((item) => {
-          const div = document.createElement("div");
-          div.className = `mnc ${item.className}`;
-          div.innerHTML = `<span>${item.text}</span>`;
-          div.ontouchstart = function () {
-            this.classList.add("hovered");
-          };
-          div.ontouchmove = function () {
-            this.classList.remove("hovered");
-          };
-          div.ontouchend = function () {
-            this.classList.remove("hovered");
-            item.action();
-            selectorMenu.classList.add("hidden");
-          };
-          insetMenu.appendChild(div);
-        });
-
-        // Create and append the right-arrow element
-        const leftArrow = document.createElement("div");
-        leftArrow.className = "right-arrow-mnc left";
-        leftArrow.ontouchstart = function () {
-          this.classList.add("hovered");
-        };
-        leftArrow.ontouchmove = function () {
-          this.classList.remove("hovered");
-        };
-
-        leftArrow.ontouchend = function () {
-          this.classList.remove("hovered");
-          const containerWidth = outsetContainer.offsetWidth;
-          let newScrollPosition = currentScrollPosition - containerWidth;
-          if (newScrollPosition < 0) {
-            newScrollPosition = 0;
-          }
-          outsetContainer.scrollTo({
-            left: newScrollPosition,
-            behavior: "smooth",
-          });
-          currentScrollPosition = newScrollPosition;
-          if (newScrollPosition < 5) {
-            selectorMenu.classList.remove("scrolled");
-          }
-        };
-
-        const rightArrow = document.createElement("div");
-        rightArrow.className = "right-arrow-mnc";
-        rightArrow.ontouchstart = function () {
-          this.classList.add("hovered");
-        };
-        rightArrow.ontouchmove = function () {
-          this.classList.remove("hovered");
-        };
-
-        rightArrow.ontouchend = function () {
-          this.classList.remove("hovered");
-          const containerWidth = outsetContainer.offsetWidth;
-          const scrollWidth = outsetContainer.scrollWidth;
-          let newScrollPosition = currentScrollPosition + containerWidth;
-          if (newScrollPosition > scrollWidth) {
-            newScrollPosition = scrollWidth;
-          }
-          outsetContainer.scrollTo({
-            left: newScrollPosition,
-            behavior: "smooth",
-          });
-          currentScrollPosition = newScrollPosition;
-          selectorMenu.classList.add("scrolled");
-        };
-
-        outsetContainer.appendChild(insetMenu);
-        selectorMenu.appendChild(outsetContainer);
-        selectorMenu.appendChild(rightArrow);
-        selectorMenu.appendChild(leftArrow);
-
-        selectorMenu.addEventListener("touchstart", (event) => {
-          const touch = event.touches[0];
-          event.preventDefault();
-          disabledMove = true;
-        });
-
-        selectorMenu.addEventListener("touchmove", (event) => {
-          const touch = event.touches[0];
-          event.preventDefault();
-          disabledMove = true;
-        });
-
-        selectorMenu.addEventListener("touchend", (event) => {
-          const touch = event.touches[0];
-          event.preventDefault();
-          disabledMove = false;
-        });
-
-        editorScrollableNode.insertAdjacentElement("afterbegin", selectorMenu);
-
-        function handleSelectorTouch(selector, isLeft) {
-          let touchStartPos;
-          let initialSelection;
-          let touchMoved = false; // Track if touchmove occurred
-          let touchEndTimeout; // Timeout to handle fast moves
-
-          selector.addEventListener("touchstart", (event) => {
-            const touch = event.touches[0];
-            touchStartPos = { x: touch.clientX, y: touch.clientY };
-            initialSelection = editor.getSelection();
-            touchMoved = false; // Reset touchMoved flag
-            if (touchEndTimeout) clearTimeout(touchEndTimeout);
-            event.preventDefault();
-            disabledMove = true;
-          });
-
-          selector.addEventListener("touchmove", (event) => {
-            const touch = event.touches[0];
-            const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
-
-            if (target && target.position) {
-              const newSelection = isLeft
-                ? new monaco.Selection(target.position.lineNumber, target.position.column, initialSelection.endLineNumber, initialSelection.endColumn)
-                : new monaco.Selection(initialSelection.startLineNumber, initialSelection.startColumn, target.position.lineNumber, target.position.column);
-              editor.setSelection(newSelection);
-              touchMoved = true; // Mark that touchmove occurred
-            }
-            event.preventDefault();
-          });
-
-          selector.addEventListener("touchend", (event) => {
-            if (!touchMoved) {
-              const touch = event.changedTouches[0];
-              const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
-
-              if (target && target.position) {
-                const newSelection = isLeft
-                  ? new monaco.Selection(target.position.lineNumber, target.position.column, initialSelection.endLineNumber, initialSelection.endColumn)
-                  : new monaco.Selection(initialSelection.startLineNumber, initialSelection.startColumn, target.position.lineNumber, target.position.column);
-                editor.setSelection(newSelection);
-              }
-            }
-            touchStartPos = null;
-            initialSelection = null;
-            touchMoved = false;
-          });
-        }
-
-        handleSelectorTouch(leftSelector, true);
-        handleSelectorTouch(rightSelector, false);
-
-        editorElement.addEventListener("touchstart", (event) => {
-          if (selectorMenu.contains(event.target) || selectionsContainer.contains(event.target)) {
-            event.stopPropagation();
-            event.preventDefault();
-          }
-          touchCount++;
-          if (touchTimeout) {
-            clearTimeout(touchTimeout);
-          }
-
-          touchTimeout = setTimeout(() => {
-            isSelecting = true;
-            if (!isPositionInSelection(startPosition)) {
-              editor.setPosition(startPosition);
-            }
-            let YValue = getLineYCoordinate(startPosition);
-            showContextMenu(event.touches[0].clientX, YValue - 50);
-          }, 1000); // 1 second long press to show context menu
-          const touch = event.touches[0];
-          const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
-          if (target && target.position) {
-            startPosition = target.position;
-          }
-        });
-
-        editorElement.addEventListener("touchend", () => {
-          if (touchTimeout) {
-            clearTimeout(touchTimeout);
-          }
-          if (isSelecting) {
-            isSelecting = false;
-          }
-          if (disabledMove) {
-            disabledMove = false;
-          }
-        });
-
-        const tapsHeight = -3; // assuming you have some element on top that takes some height
-        const leftLength = document.querySelector(".monaco-editor .margin").offsetWidth;
-
-        editorElement.addEventListener("touchmove", (event) => {
-          if (touchTimeout) {
-            clearTimeout(touchTimeout);
-          }
-
-          if (disabledMove) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
-
-          if (startPosition && isSelecting) {
-            event.preventDefault();
-            event.stopPropagation();
-            const touch = event.touches[0];
-            const target = editor.getTargetAtClientPoint(touch.clientX, touch.clientY);
-            if (target && target.position) {
-              editor.setSelection(new monaco.Selection(startPosition.lineNumber, startPosition.column, target.position.lineNumber, target.position.column));
-              isSelecting = true;
-            }
-          }
-        });
-
-        editor.onDidChangeCursorSelection((e) => {
-          const selection = e.selection;
-          const startPosition = selection.getStartPosition();
-          const endPosition = selection.getEndPosition();
-
-          if (selection.isEmpty()) {
-            // Hide the selections container when there's no selection
-            selectionsContainer.classList.add("hidden");
-            selectorMenu.classList.add("hidden");
-            return;
-          }
-
-          // Get the top position of the start and end lines
-          const startLineTop = editor.getTopForLineNumber(startPosition.lineNumber);
-          const endLineTop = editor.getTopForLineNumber(endPosition.lineNumber);
-
-          // Get the position of the start and end of the selection in client coordinates
-          const startCoords = editor.getScrolledVisiblePosition(startPosition);
-          const endCoords = editor.getScrolledVisiblePosition(endPosition);
-
-          if (startCoords && endCoords) {
-            const editorCoords = editorElement.getBoundingClientRect();
-
-            // Calculate positions for the selectors based on line number top positions
-            const leftSelectorX = editorCoords.left + startCoords.left - leftLength;
-            const leftSelectorY = editorCoords.top + startLineTop - tapsHeight;
-            const rightSelectorX = editorCoords.left + endCoords.left - leftLength;
-            const rightSelectorY = editorCoords.top + endLineTop - tapsHeight;
-
-            // Update the left-selector position
-            leftSelector.style.transform = `translateX(${leftSelectorX - 30}px) translateY(${leftSelectorY - 8}px)`;
-            // Update the right-selector position
-            rightSelector.style.transform = `translateX(${rightSelectorX - 30}px) translateY(${rightSelectorY - 8}px)`;
-            globalPoseMenu = leftSelectorY - 50;
-          }
-
-          // Show the selections container when there is a selection
-          selectionsContainer.classList.remove("hidden");
-        });
-
-        function showContextMenu(x, y) {
-          let top = globalPoseMenu == 0 ? y : globalPoseMenu;
-          if (top < 50) {
-            top = 60;
-          }
-          selectorMenu.style.transform = `translateY(${top}px)`;
-          selectorMenu.classList.remove("hidden");
-        }
-
-        editorElement.addEventListener("click", (event) => {
-          event.stopPropagation();
-        });
-      }
-
-      function copy() {
-        const selection = editor.getSelection();
-        const selectedText = editor.getModel().getValueInRange(selection);
-        navigator.clipboard.writeText(selectedText).then(() => {
-          showError("Copied to clipboard");
-        });
-      }
-
-      function cut() {
-        const selection = editor.getSelection();
-        const selectedText = editor.getModel().getValueInRange(selection);
-        navigator.clipboard.writeText(selectedText).then(() => {
-          editor.executeEdits("", [{ range: selection, text: "" }]);
-        });
-      }
-
-      function paste() {
-        navigator.clipboard.readText().then((text) => {
-          const selection = editor.getSelection();
-          editor.executeEdits("", [{ range: selection, text }]);
-        });
-      }
-
-      function selectAll() {
-        editor.focus();
-        const model = editor.getModel();
-        if (model) {
-          const fullRange = model.getFullModelRange();
-          editor.setSelection(fullRange);
-        }
-      }
-
-      function undo() {
-        editor.trigger("keyboard", "undo", null);
-      }
-
-      function redo() {
-        editor.trigger("keyboard", "redo", null);
-      }
-
-      function formatDocument() {
-        editor.focus();
-        editor.getAction("editor.action.formatDocument").run();
       }
     </script>
   </body>
