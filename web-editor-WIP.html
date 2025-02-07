@@ -649,6 +649,7 @@ if (message === '!hello') {
       function toggleInput() {
         document.getElementById("autoSaveInterval").disabled = !document.getElementById("autoSaveEnabled").checked;
       }
+
       // Error handling
       let count = 0;
       function showError(message) {
@@ -716,6 +717,7 @@ if (message === '!hello') {
           fileList.appendChild(item);
         });
       }
+
       // Add function to update file models
       function updateFileModel(fileName, content) {
         const uri = monaco.Uri.file(`/${fileName}`);
@@ -1444,6 +1446,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
 
       // Initialize editor on load
       document.addEventListener("DOMContentLoaded", initializeEditor);
+
       // Add keyboard shortcuts
       document.addEventListener("keydown", function (event) {
         if (event.ctrlKey && event.key === "s") {
