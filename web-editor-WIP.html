@@ -732,6 +732,7 @@
     let isClicked = false;
     async function showVersions() {
       if (isClicked) return;
+      editor.setSelection({ startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: 1 });
       isClicked = true;
       const versionSelectors = document.getElementById("versionSelectors");
       versionSelectors.innerHTML = "";
@@ -823,6 +824,7 @@
       };
     }
     function showSettings() {
+      editor.setSelection({ startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: 1 });
       const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language } = getSettingElements();
 
       if (minimap && wordWrap && fontSize && lineNumbers && renderWhitespace && theme && autoClosingBrackets && language) {
@@ -1434,7 +1436,7 @@
 
     function closeModal(modalId) { document.getElementById(modalId).style.display = "none"; }
 
-    async function formatCode() { await editor.getAction("editor.action.formatDocument").run(); }
+    async function formatCode() { await editor.getAction("editor.action.formatDocument").run();}
 
     document.addEventListener("keydown", function (event) {
       if (event.ctrlKey && event.key === "s") {
