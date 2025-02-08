@@ -506,14 +506,14 @@
       <button class="toolbar-btn left-arrow" onclick="selectMove('left')">&#8592;</button>
       <button class="toolbar-btn up-arrow" onclick="selectMove('up')">&#8593;</button>
       <button class="toolbar-btn right-arrow" onclick="selectMove('right')">&#8594;</button>
-      <button class="toolbar-btn">Copy</button>
+      <button class="toolbar-btn" onabort="copy()">Copy</button>
       <button class="toolbar-btn down-arrow" onclick="selectMove('down')">&#8595;</button>
       <button class="toolbar-btn home-arrow" onclick="selectMove('home')">&#8676;</button>
-      <button class="toolbar-btn">Paste</button>
+      <button class="toolbar-btn" onabort="paste()">Paste</button>
       <button class="toolbar-btn end-arrow" onclick="selectMove('end')">&#8677;</button>
-      <button class="toolbar-btn">Select All</button>
-      <button class="toolbar-btn">Format</button>
-      <button class="toolbar-btn">Cut</button>
+      <button class="toolbar-btn" onclick="selectAll()">Select All</button>
+      <button class="toolbar-btn" onclick="formatSelection()">Format</button>
+      <button class="toolbar-btn" onclick="cut()">Cut</button>
     </div>
   </div>
   <div id="editor"></div>
@@ -1257,6 +1257,7 @@
             .catch((err) => {
               editor.executeEdits("", [{ range: selection, text: "" }]);
             });
+            editor.focus();
         }
 
         function paste() {
@@ -1272,15 +1273,15 @@
             });
         }
 
-        function formatDocument() {
+        function formatSelection() {
           editor.focus();
-          editor.getAction("editor.action.formatDocument").run();
+          editor.getAction("editor.action.formatSelection").run();
         }
 
         window.copy = copy;
         window.cut = cut;
         window.paste = paste;
-        window.formatDocument = formatDocument;
+        window.formatSelection = formatSelection;
         window.selectAll = selectAll;
 
         function getLineYCoordinate(position) {
@@ -1351,6 +1352,7 @@
             const selectorMenu = document.querySelector(".arrow-container");
             selectorMenu.style.display = "none";
             selectionsContainer.classList.add("hidden");
+            editor.focus();
             return;
           }
 
