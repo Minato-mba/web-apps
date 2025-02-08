@@ -733,6 +733,7 @@
     async function showVersions() {
       if (isClicked) return;
       editor.setSelection({ startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: 1 });
+      editor.blur()
       isClicked = true;
       const versionSelectors = document.getElementById("versionSelectors");
       versionSelectors.innerHTML = "";
@@ -825,6 +826,7 @@
     }
     function showSettings() {
       editor.setSelection({ startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: 1 });
+      editor.blur();
       const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language } = getSettingElements();
 
       if (minimap && wordWrap && fontSize && lineNumbers && renderWhitespace && theme && autoClosingBrackets && language) {
