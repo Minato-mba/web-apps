@@ -572,7 +572,10 @@
           strict: true,
         });
 
-        typeLibs.forEach((lib) => lib.dispose());
+        typeLibs.forEach((lib) => {
+            lib.jsLib?.dispose();
+            lib.tsLib?.dispose();
+        });
         typeLibs.clear();
 
         const totalModules = MODULES.length;
