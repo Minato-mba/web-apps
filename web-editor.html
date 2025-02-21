@@ -351,7 +351,8 @@
       border-radius: 4px;
     }
 
-    #error-container, #notification-container {
+    #error-container,
+    #notification-container {
       position: fixed;
       top: 10%;
       left: 50%;
@@ -362,8 +363,9 @@
       align-items: center;
       z-index: 10000;
     }
-    
-    .error-toast, .notification {
+
+    .error-toast,
+    .notification {
       background: #ff4444;
       color: white;
       width: 40%;
@@ -507,6 +509,7 @@
       <button class="toolbar-btn" onclick="copyWithCodeBlock()">Copy &lt;&gt;</button>
       <button class="toolbar-btn" onclick="showSettings()">⚙️ Settings</button>
       <button class="toolbar-btn" onclick="showVersions()">📦 Modules</button>
+      <button class="toolbar-btn" id="compileBtn" onclick="compileTypeScript()">🔄 Compile TS</button>
     </div>
     <!-- selection menu -->
     <div id="arrow-layout" class="arrow-container hidden">
@@ -579,6 +582,7 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/typescript/5.3.3/typescript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/eruda/3.4.1/eruda.min.js"
     integrity="sha512-3RVqOZtMevFOLeXCp0/Wl7np/l3J3MMysaFDUhNh+hdKx+Wb0lMXuHwA6CZ/+4DfYZM01Om1as8g+mnTaQH9vA=="
@@ -604,7 +608,7 @@
         }, 2500);
       }, errorCount * 20);
     }
-    
+
     let notificationCount = 0;
     function showNotification(message) {
       notificationCount += 1;
@@ -620,7 +624,7 @@
           notificationCount -= 1;
         }, 4000);
       }, notificationCount * 500);
-    } 
+    }
     // ========== modules ========== //
     // add new modules here following the same format
     const MODULES = [
@@ -708,8 +712,8 @@
       });
 
       typeLibs.forEach((lib) => {
-          lib.jsLib?.dispose();
-          lib.tsLib?.dispose();
+        lib.jsLib?.dispose();
+        lib.tsLib?.dispose();
       });
       typeLibs.clear();
 
@@ -727,7 +731,7 @@
 
           const libJS = monaco.languages.typescript.javascriptDefaults.addExtraLib(`declare module "${module.name}" { ${types} }`, `file:///node_modules/${module.name}/index.d.ts`);
           const libTS = monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare module "${module.name}" { ${types} }`, `file:///node_modules/${module.name}/index.d.ts`);
-          
+
           typeLibs.set(module.name, { jsLib: libJS, tsLib: libTS });
         } catch (error) {
           console.error(`Failed to load ${module.name}@${module.currentVersion}:`, error);
@@ -866,6 +870,8 @@
       startAutoSave();
       const theme = document.getElementById("theme").value;
       const selectedLanguage = document.getElementById("language").value;
+      const compileBtn = document.getElementById("compileBtn");
+      if (compileBtn) compileBtn.style.display = selectedLanguage === "typescript" ? "block" : "none";
       document.body.setAttribute("data-theme", theme);
       const selectedTheme = document.getElementById("theme").value;
       editor.updateOptions({
@@ -1306,7 +1312,7 @@
             .catch((err) => {
               editor.executeEdits("", [{ range: selection, text: "" }]);
             });
-            editor.focus();
+          editor.focus();
         }
 
         function paste() {
@@ -1484,7 +1490,7 @@
 
     function closeModal(modalId) { document.getElementById(modalId).style.display = "none"; }
 
-    async function formatCode() { await editor.getAction("editor.action.formatDocument").run();}
+    async function formatCode() { await editor.getAction("editor.action.formatDocument").run(); }
 
     document.addEventListener("keydown", function (event) {
       if (event.ctrlKey && event.key === "s") {
@@ -1505,9 +1511,42 @@
       URL.revokeObjectURL(url);
     }
 
+    function compileTypeScript() {
+      if (document.getElementById("language").value !== "typescript") {
+        showError("Compilation is only available for TypeScript files");
+        return;
+      }
+
+      const code = editor.getValue();
+
+      try {
+        const result = ts.transpileModule(code, {
+          compilerOptions: {
+            target: ts.ScriptTarget.ES2020,
+            module: ts.ModuleKind.ESNext,
+            strict: true
+          }
+        });
+
+        document.getElementById("language").value = "javascript";
+        monaco.editor.setModelLanguage(editor.getModel(), "javascript");
+        editor.setValue(result.outputText);
+        showNotification("Successfully compiled to JavaScript");
+        saveSetting();
+      } catch (error) {
+        showError(`Compilation error: ${error.message}`);
+        console.error("TypeScript compilation error:", error);
+      }
+    }
+
     // Initialize editor on load
     document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("filename").value = "index.js";
+      const compileBtn = document.getElementById("compileBtn");
+      const language = document.getElementById("language").value;
+      if (compileBtn) {
+        compileBtn.style.display = language === "typescript" ? "block" : "none";
+      }
     });
 
     // Save content when closing the tab
