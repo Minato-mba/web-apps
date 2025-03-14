@@ -90,4 +90,5 @@ The editor provides several types of components that can be added to your chest 
 ## Credits
 
 - Created by minato4743.
-- Uses JSZip library for ZIP file generation.
+- Uses JSZip library for ZIP file generation
+- [Blockstate Team](https://blockstate.team) for the use of there cooking pot UI from [furniture-venture-v2](https://blockstate.team/projects/furniture-venture-v2). (Originally from [farmer's delight](https://modrinth.com/mod/farmers-delight) cooking pot).
