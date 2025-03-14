@@ -189,12 +189,13 @@
 }
 
 .mobile-component-drawer .component-item.touch-dragging {
-    background-color: var(--mc-accent);
-    transform: scale(0.95);
+    background-color: inherit;
+    transform: none;
+    opacity: 1;
 }
 
 .editor-component.touch-dragging {
-    opacity: 0.7;
+    opacity: 1;
     z-index: 1000;
 }
 
@@ -236,4 +237,40 @@
 
 .mobile-view .component-container {
     min-height: 200px;
+}
+
+.mobile-component-drawer .component-item.selected {
+    background-color: var(--mc-accent);
+    box-shadow: 0 0 0 2px white;
+    position: relative;
+}
+
+.mobile-component-drawer .component-item.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    color: white;
+    font-weight: bold;
+}
+
+.mobile-placement-instructions {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    z-index: 2000;
+    text-align: center;
+    animation: pulse 2s infinite;
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
 }
