@@ -1,0 +1,255 @@
+@font-face {
+    font-family: 'Minecraft';
+    src: url('https://raw.githubusercontent.com/Minato-mba/Minato-mba.github.io/refs/heads/main/assets/fonts/minecraft.otf') format('opentype');
+}
+.preview-canvas {
+    background-image: url('https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/textures/ui/panorama_0.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    min-height: 300px; 
+    font-family: 'Minecraft', 'Inter', sans-serif;
+    overflow: hidden;
+    border-radius: 6px;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.chest-panel-background {
+    background-color: rgba(16, 18, 22, 0.7);
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-canvas .component-container {
+    background-color: transparent;
+    
+    position: absolute;
+    width: 176px; 
+    left: 0;
+}
+
+.preview-canvas .chest-panel {
+    border-image-source: url('https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/textures/ui/dialog_background_opaque.png');
+    border-image-slice: 4 fill;
+    border-image-width: 4px;
+    image-rendering: pixelated;
+    border-image-repeat: stretch;
+    box-sizing: border-box;
+}
+
+.preview-canvas .inventory-label {
+    color: #9FA3AF;
+    size: small;
+}.preview-canvas .debug-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 176px;
+    height: 166px;
+    pointer-events: none;
+}
+
+.preview-canvas .debug-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 7px;
+    height: 100%;
+    background-color: rgba(255,0,0,0.3);
+    z-index: 100;
+}.preview-component {
+    position: absolute;
+    pointer-events: none;
+}
+
+.preview-component.container-item,
+.preview-component.container-item-with-picture,
+.preview-component.container-type {
+    width: 18px;
+    height: 18px;
+    border-top: 1px solid #373737;
+    border-left: 1px solid #373737;
+    border-bottom: 1px solid white;
+    border-right: 1px solid white;
+    box-sizing: border-box;
+    background-color: #8b8b8b;
+}
+
+.preview-canvas .inventory-cell, 
+.preview-canvas .hotbar-cell {
+    width: 18px;
+    height: 18px;
+    border-top: 1px solid #373737;
+    border-left: 1px solid #373737;
+    border-bottom: 1px solid white;
+    border-right: 1px solid white;
+    box-sizing: border-box;
+    background-color: #8b8b8b;
+}
+
+.preview-component.container-item-with-picture {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.preview-component.container-item-with-picture::after {
+    content: "";
+    width: 12px;
+    height: 12px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.preview-component.container-item-with-picture[data-picture="textures/ui/book_ui"]::after {
+    background-image: url('../assets/images/ui/book_ui.png');
+}
+
+.preview-component.container-item-with-picture[data-picture="textures/ui/shard_ui"]::after {
+    background-image: url('../assets/images/ui/shard_ui.png');
+}
+
+.preview-component.container-item-with-picture[data-picture="textures/ui/potion_ui"]::after {
+    background-image: url('../assets/images/ui/potion_ui.png');
+}
+
+.preview-component.container-item-with-picture[data-picture="textures/ui/dust_ui"]::after {
+    background-image: url('../assets/images/ui/dust_ui.png');
+}
+
+.preview-component.progress-bar {
+    width: 22px;
+    height: 15px;
+    background-image: url('../assets/images/ui/progress_bar/progress_bar.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.preview-component.progress-bar[data-value="0"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar0.png');
+}
+
+.preview-component.progress-bar[data-value="1"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar1.png');
+}
+
+.preview-component.progress-bar[data-value="2"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar2.png');
+}
+
+.preview-component.progress-bar[data-value="3"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar3.png');
+}
+
+.preview-component.progress-bar[data-value="4"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar4.png');
+}
+
+.preview-component.progress-bar[data-value="5"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar5.png');
+}
+
+.preview-component.progress-bar[data-value="6"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar6.png');
+}
+
+.preview-component.progress-bar[data-value="7"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar7.png');
+}
+
+.preview-component.progress-bar[data-value="8"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar8.png');
+}
+
+.preview-component.progress-bar[data-value="9"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar9.png');
+}
+
+.preview-component.on_off-item {
+    width: 16px;
+    height: 14px;
+    background-image: url('../assets/images/ui/on_off/on_off.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.preview-component.on_off-item.active {
+    background-image: url('../assets/images/ui/on_off/on_off_active.png');
+}
+
+.preview-component.pot {
+    width: 26px;
+    height: 30px;
+    background-image: url('../assets/images/ui/pot.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.preview-component.pot::after {
+    content: attr(data-count);
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 10px;
+    color: white;
+    text-shadow: 1px 1px 1px black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 12px;
+    height: 12px;
+}
+
+.preview-component.container-type {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+}
+
+.preview-component.container-type::after {
+    content: attr(data-type);
+    color: white;
+    text-shadow: 1px 1px 1px black;
+}
+
+.preview-component.image {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.preview-component.image[data-texture="textures/ui/altar_cross"] {
+    background-image: url('../assets/images/ui/altar_cross.png');
+}
+
+.preview-component.image[data-texture="textures/ui/dark_plus"] {
+    background-image: url('../assets/images/ui/dark_plus.png');
+}
+
+.preview-component.image[data-texture="textures/ui/on_off/on_off"] {
+    background-image: url('../assets/images/ui/on_off/on_off.png');
+}
+
+.preview-component.image[data-texture="textures/ui/pot/pot"] {
+    background-image: url('../assets/images/ui/pot.png');
+}
+
+.preview-component.label {
+    color: var(--mc-text);
+    font-size: 10px;
+    white-space: nowrap;
+    text-shadow: none;
+}

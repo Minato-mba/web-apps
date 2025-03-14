@@ -1,0 +1,336 @@
+.component-icon.container-item {
+    background-image: url('../assets/images/slot.png');
+}
+
+.component-icon.container-item-picture {
+    background-image: url('../assets/images/slot_pic.png');
+}
+
+.component-icon.progress-bar {
+    background-image: url('../assets/images/progress_bar.png');
+}
+
+.component-icon.on_off-item {
+    background-image: url('../assets/images/on_off.png');
+}
+
+.component-icon.pot {
+    background-image: url('../assets/images/uninteractable_slot.png');
+}
+
+.component-icon.container-type {
+    background-image: url('../assets/images/slot_pic.png');
+}
+
+.component-icon.image {
+    background-image: url('../assets/images/image.png');
+}
+
+.component-icon.label {
+    background-image: url('../assets/images/label.png');
+}
+
+.component-icon {
+    opacity: 0.5;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.component-icon:hover {
+    opacity: 1;
+}
+
+.editor-component {
+    position: absolute;
+    cursor: move;
+    outline: 1px dashed rgba(255, 255, 255, 0.25);
+    background-color: rgba(100, 100, 100, 0.05);
+}
+
+.editor-component:hover {
+    outline: 1px solid rgba(77, 157, 224, 0.6);
+    background-color: rgba(77, 157, 224, 0.1);
+}
+
+.editor-component.selected {
+    outline: 2px solid var(--mc-selection);
+    background-color: rgba(77, 157, 224, 0.15);
+}
+
+.editor-component.container-item {
+    
+    outline: none;
+    background-color: var(--mc-item-slot);
+    border: 2px solid var(--mc-item-slot-border);
+}
+
+.editor-component.container-item:hover,
+.editor-component.container-item.selected {
+    outline: 2px solid var(--mc-selection);
+}
+
+.editor-component.container-item-with-picture {
+    
+    outline: none;
+    background-color: var(--mc-item-slot);
+    border: 2px solid var(--mc-item-slot-border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.editor-component.container-item-with-picture:hover,
+.editor-component.container-item-with-picture.selected {
+    outline: 2px solid var(--mc-selection);
+}
+
+.editor-component.container-item {
+    width: 18px;
+    height: 18px;
+    background-color: var(--mc-item-slot);
+    border: 2px solid var(--mc-item-slot-border);
+}
+
+.editor-component.container-item-with-picture {
+    width: 18px;
+    height: 18px;
+    background-color: var(--mc-item-slot);
+    border: 2px solid var(--mc-item-slot-border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.editor-component.container-item-with-picture::after {
+    content: "";
+    width: 12px;
+    height: 12px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.editor-component.container-item-with-picture[data-picture="textures/ui/book_ui"]::after {
+    background-image: url('../assets/images/ui/book_ui.png');
+}
+
+.editor-component.container-item-with-picture[data-picture="textures/ui/shard_ui"]::after {
+    background-image: url('../assets/images/ui/shard_ui.png');
+}
+
+.editor-component.container-item-with-picture[data-picture="textures/ui/potion_ui"]::after {
+    background-image: url('../assets/images/ui/potion_ui.png');
+}
+
+.editor-component.container-item-with-picture[data-picture="textures/ui/dust_ui"]::after {
+    background-image: url('../assets/images/ui/dust_ui.png');
+}
+
+.editor-component.progress-bar {
+    width: 22px;
+    height: 15px;
+    background-image: url('../assets/images/ui/progress_bar/progress_bar.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.editor-component.progress-bar[data-value="0"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar0.png');
+}
+
+.editor-component.progress-bar[data-value="1"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar1.png');
+}
+
+.editor-component.progress-bar[data-value="2"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar2.png');
+}
+
+.editor-component.progress-bar[data-value="3"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar3.png');
+}
+
+.editor-component.progress-bar[data-value="4"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar4.png');
+}
+
+.editor-component.progress-bar[data-value="5"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar5.png');
+}
+
+.editor-component.progress-bar[data-value="6"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar6.png');
+}
+
+.editor-component.progress-bar[data-value="7"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar7.png');
+}
+
+.editor-component.progress-bar[data-value="8"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar8.png');
+}
+
+.editor-component.progress-bar[data-value="9"] {
+    background-image: url('../assets/images/ui/progress_bar/progress_bar9.png');
+}
+
+.editor-component.on_off-item {
+    width: 16px;
+    height: 14px;
+    background-image: url('../assets/images/ui/on_off/on_off.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.editor-component.on_off-item.active {
+    background-image: url('../assets/images/ui/on_off/on_off_active.png');
+}
+
+.editor-component.pot {
+    width: 26px;
+    height: 30px;
+    background-image: url('../assets/images/ui/pot.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.editor-component.pot::after {
+    content: attr(data-count);
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 10px;
+    color: white;
+    text-shadow: 1px 1px 1px black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 12px;
+    height: 12px;
+}
+
+.editor-component.container-type {
+    width: 18px;
+    height: 18px;
+    background-color: var(--mc-item-slot);
+    border: 2px solid var(--mc-item-slot-border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+}
+
+.editor-component.container-type::after {
+    content: none;
+}
+
+.editor-component.image {
+    
+    background-color: rgba(100, 100, 100, 0.15);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.editor-component.image:hover {
+    background-color: rgba(100, 100, 100, 0.3);
+}
+
+.editor-component.image[data-texture="textures/ui/altar_cross"] {
+    background-image: url('../assets/images/ui/altar_cross.png');
+}
+
+.editor-component.image[data-texture="textures/ui/dark_plus"] {
+    background-image: url('../assets/images/ui/dark_plus.png');
+}
+
+.editor-component.image[data-texture="textures/ui/on_off/on_off"] {
+    background-image: url('../assets/images/ui/on_off/on_off.png');
+}
+
+.editor-component.image[data-texture="textures/ui/pot/pot"] {
+    background-image: url('../assets/images/ui/pot.png');
+}
+
+.editor-component.label {
+    text-shadow: 1px 1px 1px black;
+    font-size: 10px;
+    padding: 2px;
+    white-space: nowrap;
+    background-color: rgba(100, 100, 100, 0.15);
+    border-radius: 3px;
+}
+
+.editor-component.label:hover {
+    background-color: rgba(100, 100, 100, 0.3);
+}
+
+.template-preview.vanilla {
+    background-image: url('../assets/images/vanilla.png');
+    image-rendering: pixelated;
+    opacity: 0.5;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.template-preview.vanilla:hover {
+    opacity: 1;
+}
+
+.template-preview.cooking-pot {
+    background-image: url('../assets/images/cooking-pot.png');
+    image-rendering: pixelated;
+    opacity: 0.5;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.template-preview.cooking-pot:hover {
+    opacity: 1;
+}
+
+.template-preview.crafting {
+    background-image: url('../assets/images/crafting.png');
+    image-rendering: pixelated;
+    opacity: 0.5;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.template-preview.crafting:hover {
+    opacity: 1;
+}
+
+.template-preview.altar {
+    background-image: url('../assets/images/altar.png');
+    image-rendering: pixelated;
+    opacity: 0.5;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.template-preview.altar:hover {
+    opacity: 1;
+}
+
+.component-container {
+    width: 176px;
+    position: absolute;
+    height: 76px;
+    min-height: 76px;
+}
+
+.inventory-bottom-half {
+    height: 166px;
+    position: relative;
+}

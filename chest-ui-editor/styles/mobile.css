@@ -1,0 +1,219 @@
+@media (max-width: 1024px) {
+    .button-text {
+        display: none;
+    }
+    
+    .action-button {
+        min-width: 42px;
+        height: 42px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-nav {
+        display: flex;
+    }
+    
+    .main-content {
+        flex-direction: column;
+        overflow: auto;
+    }
+    
+    .sidebar,
+    .editor-area,
+    .preview-area {
+        width: 100%;
+        max-height: none;
+        transition: opacity 0.3s, height 0.3s;
+    }
+    
+    .sidebar.hidden,
+    .editor-area.hidden,
+    .preview-area.hidden {
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .components-list-panel, 
+    .component-palette-panel {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .component-list-panel {
+        overflow: hidden;
+    }
+    
+    .component-item {
+        width: calc(50% - 6px);
+    }
+    
+    .panel-header h3 {
+        font-size: 15px;
+    }
+    
+    .chest-panel {
+        transform-origin: top left;
+        transform: scale(0.9);
+        margin: 10px auto;
+    }
+    
+    .component-list {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .app-container {
+        padding: 10px;
+    }
+    
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .header h1 {
+        text-align: center;
+        font-size: 1.6rem;
+    }
+    
+    .actions {
+        justify-content: center;
+    }
+    
+    .component-item {
+        width: 100%;
+    }
+    
+    .chest-panel {
+        transform: scale(0.75);
+    }
+    
+    .template-item {
+        min-width: 100px;
+    }
+}
+
+@media (max-height: 700px) {
+    .component-list {
+        max-height: 150px;
+    }
+    
+    .component-list-container {
+        max-height: 100px;
+    }
+}
+
+@media (pointer: coarse) {
+    button, 
+    .component-item,
+    .template-item,
+    .component-list-item,
+    .fold-button,
+    .color-option {
+        min-height: 44px;
+    }
+    
+    .fold-button {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    input, select {
+        height: 44px;
+        font-size: 16px;
+    }
+    
+    .property-group {
+        padding: 12px;
+    }
+}
+
+.mobile-component-drawer {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(26, 29, 36, 0.97);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    max-height: 60vh;
+    overflow-y: auto;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.mobile-component-drawer.open {
+    transform: translateY(0);
+}
+
+.mobile-component-drawer .drawer-header {
+    background-color: rgba(36, 40, 48, 0.9);
+    color: var(--mc-text);
+    padding: 12px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #3F4455;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.mobile-component-drawer .component-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 12px;
+}
+
+.mobile-component-drawer .component-item {
+    background-color: #343A46;
+    border-radius: 4px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    cursor: grab;
+    height: auto;
+}
+
+.mobile-view .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1A1D24;
+    z-index: 1001; 
+}
+
+.mobile-view .mobile-nav-button {
+    flex: 1;
+    padding: 10px;
+    background-color: #343A46;
+    color: var(--mc-text);
+    border: none;
+    border-right: 1px solid #3F4455;
+    cursor: pointer;
+}
+
+.mobile-view .mobile-nav-button:last-child {
+    border-right: none;
+}
+
+.mobile-view .mobile-nav-button.active {
+    background-color: var(--mc-accent);
+}
+
+.mobile-view .main-content {
+    margin-bottom: 50px; 
+}
+
+.mobile-view .component-container {
+    min-height: 200px;
+}
