@@ -118,8 +118,10 @@ const editor = {
         }, { passive: false });
         
         document.body.addEventListener('touchend', e => {
-            if (this.currentTouchComponent) {
-                this.currentTouchComponent.element.classList.remove('touch-dragging');
+            if (this.currentTouchComponent && this.currentTouchComponent.element) {
+                if (this.currentTouchComponent.element.classList) {
+                    this.currentTouchComponent.element.classList.remove('touch-dragging');
+                }
                 this.currentTouchComponent = null;
             }
         });
@@ -160,7 +162,9 @@ const editor = {
             
             e.preventDefault();
             
-            const componentId = component.getAttribute('data-id');
+            const componentId = component.getAttribute ? component.getAttribute('data-id') : null;
+            if (!componentId) return;
+            
             draggedComponent = this.getComponentById(componentId);
             
             if (!draggedComponent) return;
@@ -243,10 +247,13 @@ const editor = {
         };
     },
     findComponentElement: function(target) {
-        while (target && !target.classList.contains('editor-component')) {
+        while (target && target !== this.canvas) {
+            if (target.classList && target.classList.contains('editor-component')) {
+                return target;
+            }
             target = target.parentElement;
         }
-        return target;
+        return null;
     },
     getComponentById: function(id) {
         return this.components.find(c => c.id === id) || null;
