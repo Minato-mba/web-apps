@@ -111,6 +111,7 @@ const mobile = {
                 const type = comp.getAttribute('data-type');
                 
                 this.classList.add('touch-dragging');
+                
             }, { passive: false });
         });
         
@@ -118,6 +119,18 @@ const mobile = {
             const touchElements = drawer.querySelectorAll('.touch-dragging');
             touchElements.forEach(el => el.classList.remove('touch-dragging'));
         });
+        
+        const closeButton = document.createElement('button');
+        closeButton.className = 'drawer-close-button';
+        closeButton.innerHTML = 'Done';
+        closeButton.addEventListener('click', function() {
+            drawer.classList.remove('open');
+            const showComponentsBtn = document.getElementById('show-components');
+            if (showComponentsBtn) {
+                showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Open Components';
+            }
+        });
+        drawer.querySelector('.drawer-header').appendChild(closeButton);
     },
     checkMobileLayout: function() {
         const isMobile = window.innerWidth < 768;
