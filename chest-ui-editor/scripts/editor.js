@@ -176,6 +176,7 @@ const editor = {
             if (!draggedComponent) return;
             
             this.selectComponent(draggedComponent);
+            this.isDraggingComponent = true;
             
             const touch = e.touches[0];
             startX = touch.clientX;
@@ -184,8 +185,8 @@ const editor = {
             offsetY = draggedComponent.y;
             
             document.addEventListener('touchmove', onTouchMove, { passive: false });
-            document.addEventListener('touchend', onTouchEnd);
-            document.addEventListener('touchcancel', onTouchEnd);
+            document.addEventListener('touchend', onTouchEnd, { passive: false });
+            document.addEventListener('touchcancel', onTouchEnd, { passive: false });
         }, { passive: false });
         
         document.body.addEventListener('touchmove', e => {
@@ -231,6 +232,7 @@ const editor = {
             if (!draggedComponent) return;
             
             e.preventDefault();
+            e.stopPropagation();
             
             const touch = e.touches[0];
             
@@ -250,6 +252,9 @@ const editor = {
         
         const onTouchEnd = e => {
             if (!draggedComponent) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
             
             this.isDraggingComponent = false;
             draggedComponent = null;
