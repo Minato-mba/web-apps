@@ -76,15 +76,61 @@ const editor = {
                 const type = item.getAttribute('data-type');
                 e.dataTransfer.setData('component-type', type);
             });
+            
+            item.addEventListener('touchstart', e => {
+                this.handleComponentTouchStart(e, item);
+            });
+        });
+        
+        this.canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+        }, { passive: false });
+        
+        this.canvas.addEventListener('touchend', e => {
+            this.handleCanvasTouchEnd(e);
         });
     },
+    
+    handleComponentTouchStart: function(e, componentItem) {
+        const type = componentItem.getAttribute('data-type');
+        this.touchDragType = type;
+        
+        componentItem.classList.add('touch-dragging');
+        
+        window.addEventListener('touchend', () => {
+            componentItem.classList.remove('touch-dragging');
+            this.touchDragType = null;
+        }, { once: true });
+    },
+    
+    handleCanvasTouchEnd: function(e) {
+        if (!this.touchDragType) return;
+        
+        const type = this.touchDragType;
+        const touch = e.changedTouches[0];
+        
+        const rect = this.canvas.getBoundingClientRect();
+        let x = touch.clientX - rect.left;
+        let y = touch.clientY - rect.top;
+        
+        if (this.snapToGrid) {
+            x = util.snapToGrid(x);
+            y = util.snapToGrid(y);
+        }
+        
+        const component = createComponent(type, x, y);
+        this.addComponent(component);
+        this.selectComponent(component);
+        
+        this.touchDragType = null;
+    },
+    
     setupComponentDragging: function() {
         let draggedComponent = null;
         let startX = 0;
         let startY = 0;
         let offsetX = 0;
         let offsetY = 0;
-        
         
         this.canvas.addEventListener('mousedown', e => {
             const component = this.findComponentElement(e.target);
@@ -97,20 +143,39 @@ const editor = {
             
             if (!draggedComponent) return;
             
-            
             this.selectComponent(draggedComponent);
-            
             
             startX = e.clientX;
             startY = e.clientY;
             offsetX = draggedComponent.x;
             offsetY = draggedComponent.y;
             
-            
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
         });
         
+        this.canvas.addEventListener('touchstart', e => {
+            const component = this.findComponentElement(e.target);
+            if (!component) return;
+            
+            e.preventDefault();
+            
+            const componentId = component.getAttribute('data-id');
+            draggedComponent = this.getComponentById(componentId);
+            
+            if (!draggedComponent) return;
+            
+            this.selectComponent(draggedComponent);
+            
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            offsetX = draggedComponent.x;
+            offsetY = draggedComponent.y;
+            
+            document.addEventListener('touchmove', onTouchMove, { passive: false });
+            document.addEventListener('touchend', onTouchEnd);
+        }, { passive: false });
         
         const onMouseMove = e => {
             if (!draggedComponent) return;
@@ -135,7 +200,6 @@ const editor = {
             this.updateComponentPosition(draggedComponent);
         };
         
-        
         const onMouseUp = e => {
             if (!draggedComponent) return;
             
@@ -144,6 +208,36 @@ const editor = {
             
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
+        };
+        
+        const onTouchMove = e => {
+            if (!draggedComponent) return;
+            
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            
+            let newX = offsetX + (touch.clientX - startX);
+            let newY = offsetY + (touch.clientY - startY);
+            
+            if (this.snapToGrid) {
+                newX = util.snapToGrid(newX);
+                newY = util.snapToGrid(newY);
+            }
+            
+            draggedComponent.x = newX;
+            draggedComponent.y = newY;
+            
+            this.updateComponentPosition(draggedComponent);
+        };
+        
+        const onTouchEnd = e => {
+            if (!draggedComponent) return;
+            
+            draggedComponent = null;
+            
+            document.removeEventListener('touchmove', onTouchMove);
+            document.removeEventListener('touchend', onTouchEnd);
         };
     },
     findComponentElement: function(target) {
