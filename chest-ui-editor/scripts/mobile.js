@@ -15,6 +15,7 @@ const mobile = {
         this.createFloatingComponentPanel();
         this.createFloatingTemplatesPanel();
         this.createFloatingPropertiesPanel();
+        this.createPropertiesButton();
         
         showComponentsBtn.addEventListener('click', function() {
             const drawer = document.getElementById('mobile-component-drawer');
@@ -305,6 +306,23 @@ const mobile = {
         }
     },
     
+    createPropertiesButton: function() {
+        const button = document.createElement('button');
+        button.id = 'mobile-properties-button';
+        button.className = 'mobile-properties-button';
+        button.innerHTML = '<i class="fas fa-sliders-h"></i> Edit Properties';
+        button.style.display = 'none';
+        document.querySelector('.app-container').appendChild(button);
+        
+        button.addEventListener('click', () => {
+            if (this.propertiesDrawer) {
+                this.propertiesDrawer.classList.add('open');
+            }
+        });
+        
+        this.propertiesButton = button;
+    },
+    
     createFloatingPropertiesPanel: function() {
         const drawer = document.createElement('div');
         drawer.id = 'mobile-properties-drawer';
@@ -339,32 +357,48 @@ const mobile = {
         editor.selectComponent = function(component) {
             originalSelectComponent.call(editor, component);
             
-            if (window.innerWidth < 768 && component) {
-                console.log('Component selected on mobile, showing properties');
+            if (window.innerWidth < 768) {
+                if (mobile.propertiesButton) {
+                    mobile.propertiesButton.style.display = 'none';
+                }
                 
-                const componentType = componentTypes[component.type];
-                if (!componentType) return;
-                
-                const templateId = componentType.template.substring(1);
-                const template = document.getElementById(templateId);
-                if (!template) return;
-                
-                const content = document.importNode(template.content, true);
-                
-                setTimeout(() => {
-                    propertiesContainer.innerHTML = '';
-                    propertiesContainer.appendChild(content);
+                if (component) {
+                    console.log('Component selected on mobile, showing properties button');
                     
-                    mobile.setMobilePropertyValues(propertiesContainer, component);
-                    
-                    if (componentType) {
-                        drawerHeader.querySelector('span').textContent = `${componentType.name} Properties`;
+                    // Show the button at the bottom of the screen instead of next to the component
+                    if (mobile.propertiesButton) {
+                        mobile.propertiesButton.style.display = 'flex';
+                        // No need to position relative to the component anymore
                     }
                     
-                    mobile.setupPropertyEventListeners(propertiesContainer);
+                    const componentType = componentTypes[component.type];
+                    if (!componentType) return;
                     
-                    drawer.classList.add('open');
-                }, 200);
+                    const templateId = componentType.template.substring(1);
+                    const template = document.getElementById(templateId);
+                    if (!template) return;
+                    
+                    const content = document.importNode(template.content, true);
+                    
+                    mobile.propertiesContainer.innerHTML = '';
+                    mobile.propertiesContainer.appendChild(content);
+                    
+                    mobile.setMobilePropertyValues(mobile.propertiesContainer, component);
+                    
+                    if (componentType) {
+                        mobile.propertiesDrawerHeader.querySelector('span').textContent = 
+                            `${componentType.name} Properties`;
+                    }
+                    
+                    mobile.setupPropertyEventListeners(mobile.propertiesContainer);
+                } else {
+                    if (mobile.propertiesDrawer) {
+                        mobile.propertiesDrawer.classList.remove('open');
+                    }
+                    if (mobile.propertiesButton) {
+                        mobile.propertiesButton.style.display = 'none';
+                    }
+                }
             }
         };
         
@@ -373,10 +407,10 @@ const mobile = {
             originalUpdateComponentPosition.call(editor, component);
             
             if (window.innerWidth < 768 && editor.selectedComponent && 
-                component.id === editor.selectedComponent.id &&
-                mobile.propertiesDrawer.classList.contains('open')) {
+                component.id === editor.selectedComponent.id) {
                 
                 mobile.updateMobilePropertyValues(component);
+                
             }
         };
         
@@ -553,6 +587,8 @@ const mobile = {
             document.querySelector('.editor-area').style.display = 'block';
             document.querySelector('.preview-area').style.display = 'block';
             document.querySelector('.template-selector-panel').style.display = 'block';
+            
+            if (this.propertiesButton) this.propertiesButton.style.display = 'none';
         }
     }
 };
