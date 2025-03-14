@@ -24,7 +24,6 @@ const mobile = {
                 drawer.classList.add('open');
                 showComponentsBtn.innerHTML = '<i class="fas fa-times"></i> Close Components';
                 
-                // Close template drawer if open
                 const templateDrawer = document.getElementById('mobile-templates-drawer');
                 if (templateDrawer && templateDrawer.classList.contains('open')) {
                     templateDrawer.classList.remove('open');
@@ -83,7 +82,6 @@ const mobile = {
                 templateDrawer.classList.add('open');
                 showTemplatesBtn.innerHTML = '<i class="fas fa-times"></i> Close Templates';
                 
-                // Close component drawer if open
                 const componentDrawer = document.getElementById('mobile-component-drawer');
                 if (componentDrawer && componentDrawer.classList.contains('open')) {
                     componentDrawer.classList.remove('open');
@@ -210,42 +208,59 @@ const mobile = {
         drawer.id = 'mobile-templates-drawer';
         drawer.className = 'mobile-templates-drawer';
         
-        // Clone the template list
         const templateList = document.querySelector('.template-list');
         const clonedList = templateList.cloneNode(true);
         drawer.appendChild(clonedList);
         
-        // Create header
         const drawerHeader = document.createElement('div');
         drawerHeader.className = 'drawer-header';
         drawerHeader.innerHTML = '<span>Select a template</span>';
         drawer.insertBefore(drawerHeader, clonedList);
         
-        // Add to document
         document.querySelector('.app-container').appendChild(drawer);
         
-        // Add event listeners to template items
         const templateItems = drawer.querySelectorAll('.template-item');
         templateItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                const templateName = item.getAttribute('data-template');
-                if (templateName) {
-                    // Use the existing template functionality
-                    if (window.templates && templates.loadTemplate) {
-                        templates.loadTemplate(templateName);
+            ['click', 'touchend'].forEach(eventType => {
+                item.addEventListener(eventType, (e) => {
+                    if (eventType === 'touchend') {
+                        e.preventDefault
+                    }
+                    
+                    const templateName = item.getAttribute('data-template');
+                    
+                    item.classList.add('template-selected');
+                    setTimeout(() => {
+                        item.classList.remove('template-selected');
+                    }, 300);
+                    
+                    if (templateName && window.templates && typeof window.templates.loadTemplate === 'function') {
+                        window.templates.loadTemplate(templateName);
                         
-                        // Close the drawer
                         drawer.classList.remove('open');
                         const showTemplatesBtn = document.getElementById('show-templates');
                         if (showTemplatesBtn) {
                             showTemplatesBtn.innerHTML = '<i class="fas fa-layer-group"></i> Open Templates';
                         }
                     }
-                }
+                });
+            });
+            
+            item.addEventListener('touchstart', () => {
+                item.classList.add('template-active');
+            });
+            
+            item.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    item.classList.remove('template-active');
+                }, 150);
+            });
+            
+            item.addEventListener('touchcancel', () => {
+                item.classList.remove('template-active');
             });
         });
         
-        // Add close button
         const closeButton = document.createElement('button');
         closeButton.className = 'drawer-close-button';
         closeButton.innerHTML = 'Done';
