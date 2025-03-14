@@ -156,6 +156,19 @@
     border-bottom: 1px solid #3F4455;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.drawer-close-button {
+    background-color: var(--mc-accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .mobile-component-drawer .component-list {
