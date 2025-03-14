@@ -38,7 +38,6 @@ const exporter = {
     generatePlaceholderTexture: function(path) {
         return new Promise(async (resolve) => {
             try {
-                // attempt to fetch the texture from the web app's UI folder
                 const response = await fetch(`../assets/${path.replace('textures', 'images')}.png`);
                 console.log(path);
                 
@@ -56,7 +55,6 @@ const exporter = {
                 console.log(`Failed to load texture from ${path}, generating placeholder instead`);
             }
             
-            // if texture couldn't be fetched, generate a placeholder
             const canvas = document.createElement('canvas');
             canvas.width = 64;
             canvas.height = 64;

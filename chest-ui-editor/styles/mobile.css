@@ -158,7 +158,8 @@
 }
 
 .mobile-component-drawer,
-.mobile-templates-drawer {
+.mobile-templates-drawer,
+.mobile-properties-drawer {
     display: none;
     position: fixed;
     bottom: 0;
@@ -169,19 +170,21 @@
     z-index: 1000;
     transform: translateY(100%);
     transition: transform 0.3s ease-in-out;
-    max-height: 60vh;
+    max-height: 70vh;
     overflow-y: auto;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
 }
 
 .mobile-component-drawer.open,
-.mobile-templates-drawer.open {
+.mobile-templates-drawer.open,
+.mobile-properties-drawer.open {
     transform: translateY(0);
 }
 
 .mobile-component-drawer .drawer-header,
-.mobile-templates-drawer .drawer-header {
+.mobile-templates-drawer .drawer-header,
+.mobile-properties-drawer .drawer-header {
     background-color: rgba(36, 40, 48, 0.9);
     color: var(--mc-text);
     padding: 12px;
@@ -193,6 +196,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .drawer-close-button {
@@ -359,4 +365,105 @@
     height: 60px;
     background-size: cover;
     background-position: center;
+}
+
+/* Mobile properties drawer specific styles */
+.mobile-properties-container {
+    padding: 12px;
+}
+
+.mobile-properties-drawer .property-group {
+    margin-bottom: 16px;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.mobile-properties-drawer .property {
+    margin-bottom: 10px;
+}
+
+.mobile-properties-drawer .property:last-child {
+    margin-bottom: 0;
+}
+
+.mobile-properties-drawer label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.mobile-properties-drawer input[type="number"],
+.mobile-properties-drawer input[type="text"],
+.mobile-properties-drawer input[type="range"],
+.mobile-properties-drawer select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 16px;
+    height: 46px;
+}
+
+.mobile-properties-drawer input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+
+.mobile-properties-drawer .color-picker-controls {
+    margin-bottom: 8px;
+}
+
+.mobile-properties-drawer .color-channels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.mobile-properties-drawer .color-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+}
+
+.mobile-properties-drawer .color-option {
+    width: 30px;
+    height: 30px;
+}
+
+.mobile-properties-drawer {
+    z-index: 2000; /* Ensure properties drawer is on top */
+}
+
+/* Make sure the properties drawer is visible when open */
+.mobile-properties-drawer.open {
+    display: block;
+    transform: translateY(0);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Improve visibility of selected components on mobile */
+.mobile-view .editor-component.selected {
+    outline: 2px solid #7C38D1;
+    box-shadow: 0 0 15px rgba(124, 56, 209, 0.6);
+    z-index: 10;
+}
+
+/* Add an indication that component is tappable to edit properties */
+.mobile-view .editor-component {
+    position: absolute;
+    cursor: pointer;
+}
+
+.mobile-view .editor-component:active {
+    outline: 2px solid rgba(124, 56, 209, 0.6);
+}
+
+/* Color picker improvements for mobile */
+.mobile-properties-drawer .color-picker .color-option {
+    width: 35px;
+    height: 35px;
+    margin: 3px;
 }

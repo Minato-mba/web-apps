@@ -14,6 +14,7 @@ const mobile = {
         
         this.createFloatingComponentPanel();
         this.createFloatingTemplatesPanel();
+        this.createFloatingPropertiesPanel();
         
         showComponentsBtn.addEventListener('click', function() {
             const drawer = document.getElementById('mobile-component-drawer');
@@ -180,8 +181,8 @@ const mobile = {
         if (!this.selectedComponentType) return;
         
         const rect = e.currentTarget.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
+        let x = Math.floor(e.clientX - rect.left);
+        let y = Math.floor(e.clientY - rect.top);
         
         if (editor.snapToGrid) {
             x = util.snapToGrid(x);
@@ -226,7 +227,8 @@ const mobile = {
             });
             
             item.addEventListener('touchend', (e) => {
-                e.preventDefaultateSelection(item);
+                e.preventDefault();
+                this.handleTemplateSelection(item);
             });
             
             item.addEventListener('touchstart', () => {
@@ -303,11 +305,221 @@ const mobile = {
         }
     },
     
+    createFloatingPropertiesPanel: function() {
+        const drawer = document.createElement('div');
+        drawer.id = 'mobile-properties-drawer';
+        drawer.className = 'mobile-properties-drawer';
+        
+        const drawerHeader = document.createElement('div');
+        drawerHeader.className = 'drawer-header';
+        drawerHeader.innerHTML = '<span>Properties</span>';
+        drawer.appendChild(drawerHeader);
+        
+        const propertiesContainer = document.createElement('div');
+        propertiesContainer.id = 'mobile-properties-container';
+        propertiesContainer.className = 'mobile-properties-container';
+        propertiesContainer.innerHTML = '<p class="no-selection">No component selected</p>';
+        drawer.appendChild(propertiesContainer);
+        
+        const closeButton = document.createElement('button');
+        closeButton.className = 'drawer-close-button';
+        closeButton.innerHTML = 'Done';
+        closeButton.addEventListener('click', function() {
+            drawer.classList.remove('open');
+        });
+        drawerHeader.appendChild(closeButton);
+        
+        document.querySelector('.app-container').appendChild(drawer);
+        
+        this.propertiesDrawer = drawer;
+        this.propertiesContainer = propertiesContainer;
+        this.propertiesDrawerHeader = drawerHeader;
+        
+        const originalSelectComponent = editor.selectComponent;
+        editor.selectComponent = function(component) {
+            originalSelectComponent.call(editor, component);
+            
+            if (window.innerWidth < 768 && component) {
+                console.log('Component selected on mobile, showing properties');
+                
+                const componentType = componentTypes[component.type];
+                if (!componentType) return;
+                
+                const templateId = componentType.template.substring(1);
+                const template = document.getElementById(templateId);
+                if (!template) return;
+                
+                const content = document.importNode(template.content, true);
+                
+                setTimeout(() => {
+                    propertiesContainer.innerHTML = '';
+                    propertiesContainer.appendChild(content);
+                    
+                    mobile.setMobilePropertyValues(propertiesContainer, component);
+                    
+                    if (componentType) {
+                        drawerHeader.querySelector('span').textContent = `${componentType.name} Properties`;
+                    }
+                    
+                    mobile.setupPropertyEventListeners(propertiesContainer);
+                    
+                    drawer.classList.add('open');
+                }, 200);
+            }
+        };
+        
+        const originalUpdateComponentPosition = editor.updateComponentPosition;
+        editor.updateComponentPosition = function(component) {
+            originalUpdateComponentPosition.call(editor, component);
+            
+            if (window.innerWidth < 768 && editor.selectedComponent && 
+                component.id === editor.selectedComponent.id &&
+                mobile.propertiesDrawer.classList.contains('open')) {
+                
+                mobile.updateMobilePropertyValues(component);
+            }
+        };
+        
+        this.canvas = document.getElementById('component-container');
+        this.canvas.addEventListener('click', (e) => {
+            if (e.target === this.canvas) {
+                drawer.classList.remove('open');
+            }
+        });
+    },
+
+    updateMobilePropertyValues: function(component) {
+        if (!this.propertiesContainer || !component) return;
+        
+        const xInput = this.propertiesContainer.querySelector('[data-property="x"]');
+        const yInput = this.propertiesContainer.querySelector('[data-property="y"]');
+        
+        if (xInput) xInput.value = component.x;
+        if (yInput) yInput.value = component.y;
+    },
+
+    setMobilePropertyValues: function(container, component) {
+        const xInput = container.querySelector('[data-property="x"]');
+        const yInput = container.querySelector('[data-property="y"]');
+        if (xInput) xInput.value = component.x;
+        if (yInput) yInput.value = component.y;
+        
+        const widthInput = container.querySelector('[data-property="width"]');
+        const heightInput = container.querySelector('[data-property="height"]');
+        if (widthInput) widthInput.value = component.width;
+        if (heightInput) heightInput.value = component.height;
+        
+        Object.keys(component.properties).forEach(propName => {
+            const input = container.querySelector(`[data-property="${propName}"]`);
+            if (!input) return;
+            
+            const propValue = component.properties[propName];
+            
+            if (input.type === 'checkbox') {
+                input.checked = !!propValue;
+            } else if (input.tagName === 'SELECT') {
+                input.value = propValue;
+            } else if (input.type === 'range') {
+                input.value = propValue;
+                const display = input.nextElementSibling;
+                if (display && display.classList.contains('value-display')) {
+                    display.textContent = util.formatNumber(propValue);
+                }
+            } else {
+                input.value = propValue;
+            }
+        });
+        
+        if (component.type === 'label' && component.properties.color) {
+            const colorR = container.querySelector('[data-property="color-r"]');
+            const colorG = container.querySelector('[data-property="color-g"]');
+            const colorB = container.querySelector('[data-property="color-b"]');
+            const colorPreview = container.querySelector('.color-preview');
+            
+            if (colorR) colorR.value = component.properties.color[0];
+            if (colorG) colorG.value = component.properties.color[1];
+            if (colorB) colorB.value = component.properties.color[2];
+            
+            if (colorPreview) {
+                const colorHex = util.rgbArrayToHex(component.properties.color);
+                colorPreview.style.backgroundColor = colorHex;
+            }
+            
+            const colorOptions = container.querySelectorAll('.color-option');
+            colorOptions.forEach(option => {
+                const colorData = option.getAttribute('data-color');
+                try {
+                    const colorArray = JSON.parse(colorData.replace(/'/g, '"'));
+                    if (JSON.stringify(colorArray) === JSON.stringify(component.properties.color)) {
+                        option.classList.add('selected');
+                    }
+                } catch (e) {
+                    console.error('Error parsing color data', e);
+                }
+            });
+        }
+    },
+
+    setupPropertyEventListeners: function(container) {
+        const inputs = container.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const propName = input.getAttribute('data-property');
+            if (!propName) return;
+            
+            if (input.type === 'checkbox') {
+                input.addEventListener('change', (e) => {
+                    const desktopInput = document.querySelector(`[data-property="${propName}"]`);
+                    if (desktopInput) {
+                        desktopInput.checked = e.target.checked;
+                        const event = new Event('change', { bubbles: true });
+                        desktopInput.dispatchEvent(event);
+                    }
+                });
+            } 
+            else if (input.type === 'range') {
+                input.addEventListener('input', (e) => {
+                    const desktopInput = document.querySelector(`[data-property="${propName}"]`);
+                    if (desktopInput) {
+                        desktopInput.value = e.target.value;
+                        const event = new Event('input', { bubbles: true });
+                        desktopInput.dispatchEvent(event);
+                        
+                        const valueDisplay = input.nextElementSibling;
+                        if (valueDisplay && valueDisplay.classList.contains('value-display')) {
+                            valueDisplay.textContent = util.formatNumber(e.target.value);
+                        }
+                    }
+                });
+            }
+            else {
+                input.addEventListener('input', (e) => {
+                    const desktopInput = document.querySelector(`[data-property="${propName}"]`);
+                    if (desktopInput) {
+                        desktopInput.value = e.target.value;
+                        const event = new Event('input', { bubbles: true });
+                        desktopInput.dispatchEvent(event);
+                    }
+                });
+            }
+        });
+        
+        const colorOptions = container.querySelectorAll('.color-option');
+        colorOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                const desktopOption = document.querySelector(`.properties-panel .color-option[data-color='${option.getAttribute('data-color')}']`);
+                if (desktopOption) {
+                    desktopOption.click();
+                }
+            });
+        });
+    },
+    
     checkMobileLayout: function() {
         const isMobile = window.innerWidth < 768;
         const mobileNav = document.querySelector('.mobile-nav');
         const componentDrawer = document.getElementById('mobile-component-drawer');
         const templateDrawer = document.getElementById('mobile-templates-drawer');
+        const propertiesDrawer = document.getElementById('mobile-properties-drawer');
         
         if (isMobile) {
             mobileNav.style.display = 'flex';
@@ -315,6 +527,7 @@ const mobile = {
             
             if (componentDrawer) componentDrawer.style.display = 'block';
             if (templateDrawer) templateDrawer.style.display = 'block';
+            if (propertiesDrawer) propertiesDrawer.style.display = 'block';
             
             document.querySelector('.sidebar').style.display = 'none';
             document.querySelector('.editor-area').style.display = 'block';
@@ -334,6 +547,7 @@ const mobile = {
             
             if (componentDrawer) componentDrawer.style.display = 'none';
             if (templateDrawer) templateDrawer.style.display = 'none';
+            if (propertiesDrawer) propertiesDrawer.style.display = 'none';
             
             document.querySelector('.sidebar').style.display = 'block';
             document.querySelector('.editor-area').style.display = 'block';
