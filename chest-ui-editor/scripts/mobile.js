@@ -1,4 +1,3 @@
-
 const mobile = {
     
     init: function() {
@@ -106,6 +105,23 @@ const mobile = {
                     original.dispatchEvent(event);
                 }
             });
+            
+            comp.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                const type = comp.getAttribute('data-type');
+                
+                this.classList.add('touch-dragging');
+                
+                const drawer = document.getElementById('mobile-component-drawer');
+                if (drawer && drawer.classList.contains('open')) {
+                    drawer.classList.remove('open');
+                }
+            }, { passive: false });
+        });
+        
+        drawer.addEventListener('touchend', function(e) {
+            const touchElements = drawer.querySelectorAll('.touch-dragging');
+            touchElements.forEach(el => el.classList.remove('touch-dragging'));
         });
     },
     checkMobileLayout: function() {
