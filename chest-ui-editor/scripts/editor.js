@@ -125,6 +125,12 @@ const editor = {
                 this.currentTouchComponent = null;
             }
         });
+        
+        document.body.addEventListener('touchmove', e => {
+            if (this.currentTouchComponent) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     },
     
     setupComponentDragging: function() {
@@ -180,6 +186,12 @@ const editor = {
             document.addEventListener('touchmove', onTouchMove, { passive: false });
             document.addEventListener('touchend', onTouchEnd);
             document.addEventListener('touchcancel', onTouchEnd);
+        }, { passive: false });
+        
+        document.body.addEventListener('touchmove', e => {
+            if (this.isDraggingComponent) {
+                e.preventDefault();
+            }
         }, { passive: false });
         
         const onMouseMove = e => {
@@ -239,6 +251,7 @@ const editor = {
         const onTouchEnd = e => {
             if (!draggedComponent) return;
             
+            this.isDraggingComponent = false;
             draggedComponent = null;
             
             document.removeEventListener('touchmove', onTouchMove);
