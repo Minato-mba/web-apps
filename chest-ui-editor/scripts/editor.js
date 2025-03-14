@@ -111,6 +111,17 @@ const editor = {
                 const component = createComponent(this.currentTouchComponent.type, x, y);
                 this.addComponent(component);
                 this.selectComponent(component);
+                
+                setTimeout(() => {
+                    const drawer = document.getElementById('mobile-component-drawer');
+                    if (drawer && drawer.classList.contains('open')) {
+                        drawer.classList.remove('open');
+                        const showComponentsBtn = document.getElementById('show-components');
+                        if (showComponentsBtn) {
+                            showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Open Components';
+                        }
+                    }
+                }, 300);
             }
             
             this.currentTouchComponent.element.classList.remove('touch-dragging');
