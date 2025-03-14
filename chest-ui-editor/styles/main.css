@@ -412,6 +412,7 @@ button:active {
     padding: 0;
     cursor: pointer;
     z-index: 10;
+    min-height: unset;
 }
 
 .chest-close-button:hover {
