@@ -221,29 +221,12 @@ const mobile = {
         
         const templateItems = drawer.querySelectorAll('.template-item');
         templateItems.forEach(item => {
-            ['click', 'touchend'].forEach(eventType => {
-                item.addEventListener(eventType, (e) => {
-                    if (eventType === 'touchend') {
-                        e.preventDefault
-                    }
-                    
-                    const templateName = item.getAttribute('data-template');
-                    
-                    item.classList.add('template-selected');
-                    setTimeout(() => {
-                        item.classList.remove('template-selected');
-                    }, 300);
-                    
-                    if (templateName && window.templates && typeof window.templates.loadTemplate === 'function') {
-                        window.templates.loadTemplate(templateName);
-                        
-                        drawer.classList.remove('open');
-                        const showTemplatesBtn = document.getElementById('show-templates');
-                        if (showTemplatesBtn) {
-                            showTemplatesBtn.innerHTML = '<i class="fas fa-layer-group"></i> Open Templates';
-                        }
-                    }
-                });
+            item.addEventListener('click', (e) => {
+                this.handleTemplateSelection(item);
+            });
+            
+            item.addEventListener('touchend', (e) => {
+                e.preventDefaultateSelection(item);
             });
             
             item.addEventListener('touchstart', () => {
@@ -272,6 +255,52 @@ const mobile = {
             }
         });
         drawer.querySelector('.drawer-header').appendChild(closeButton);
+    },
+
+    handleTemplateSelection: function(templateItem) {
+        const templateName = templateItem.getAttribute('data-template');
+        
+        templateItem.classList.add('template-selected');
+        setTimeout(() => {
+            templateItem.classList.remove('template-selected');
+        }, 300);
+        
+        if (templateName) {
+            console.log('Mobile template selection:', templateName);
+            
+            if (window.templates && typeof window.templates.loadTemplate === 'function') {
+                try {
+                    window.templates.loadTemplate(templateName);
+                    console.log('Template loaded successfully');
+                    
+                    const drawer = document.getElementById('mobile-templates-drawer');
+                    if (drawer) {
+                        drawer.classList.remove('open');
+                    }
+                    
+                    const showTemplatesBtn = document.getElementById('show-templates');
+                    if (showTemplatesBtn) {
+                        showTemplatesBtn.innerHTML = '<i class="fas fa-layer-group"></i> Open Templates';
+                    }
+                } catch (err) {
+                    console.error('Error loading template:', err);
+                    
+                    const originalTemplate = document.querySelector(`.template-selector-panel .template-item[data-template="${templateName}"]`);
+                    if (originalTemplate) {
+                        console.log('Triggering click on original template item');
+                        originalTemplate.click();
+                    }
+                }
+            } else {
+                console.error('Templates object or loadTemplate function not available');
+                
+                const originalTemplate = document.querySelector(`.template-selector-panel .template-item[data-template="${templateName}"]`);
+                if (originalTemplate) {
+                    console.log('Triggering click on original template item');
+                    originalTemplate.click();
+                }
+            }
+        }
     },
     
     checkMobileLayout: function() {
