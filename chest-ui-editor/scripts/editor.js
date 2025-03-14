@@ -79,32 +79,61 @@ const editor = {
             
             item.addEventListener('touchstart', e => {
                 this.handleComponentTouchStart(e, item);
-            });
+            }, { passive: false });
         });
         
         this.canvas.addEventListener('touchmove', e => {
-            e.preventDefault();
+            if (this.touchDragInProgress) {
+                e.preventDefault();
+            }
         }, { passive: false });
         
         this.canvas.addEventListener('touchend', e => {
             this.handleCanvasTouchEnd(e);
-        });
+        }, { passive: false });
     },
     
     handleComponentTouchStart: function(e, componentItem) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const type = componentItem.getAttribute('data-type');
         this.touchDragType = type;
+        this.touchDragInProgress = true;
         
         componentItem.classList.add('touch-dragging');
         
-        window.addEventListener('touchend', () => {
-            componentItem.classList.remove('touch-dragging');
+        this.draggedItem = componentItem;
+        
+        document.body.removeEventListener('touchend', this.handleGlobalTouchEnd);
+        document.body.removeEventListener('touchcancel', this.handleGlobalTouchEnd);
+        
+        this.handleGlobalTouchEnd = this.handleGlobalTouchEnd.bind(this);
+        
+        document.body.addEventListener('touchend', this.handleGlobalTouchEnd);
+        document.body.addEventListener('touchcancel', this.handleGlobalTouchEnd);
+    },
+    
+    handleGlobalTouchEnd: function(e) {
+        if (this.draggedItem) {
+            this.draggedItem.classList.remove('touch-dragging');
+            this.draggedItem = null;
+        }
+        
+        setTimeout(() => {
             this.touchDragType = null;
-        }, { once: true });
+            this.touchDragInProgress = false;
+        }, 100);
+        
+        document.body.removeEventListener('touchend', this.handleGlobalTouchEnd);
+        document.body.removeEventListener('touchcancel', this.handleGlobalTouchEnd);
     },
     
     handleCanvasTouchEnd: function(e) {
         if (!this.touchDragType) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
         
         const type = this.touchDragType;
         const touch = e.changedTouches[0];
@@ -121,8 +150,6 @@ const editor = {
         const component = createComponent(type, x, y);
         this.addComponent(component);
         this.selectComponent(component);
-        
-        this.touchDragType = null;
     },
     
     setupComponentDragging: function() {
