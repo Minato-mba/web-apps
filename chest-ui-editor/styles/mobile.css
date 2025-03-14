@@ -110,14 +110,6 @@
 }
 
 @media (pointer: coarse) {
-    button, 
-    .component-item,
-    .template-item,
-    .component-list-item,
-    .fold-button,
-    .color-option {
-        min-height: 44px;
-    }
     
     .fold-button {
         padding: 12px;
@@ -181,6 +173,21 @@
     align-items: center;
     cursor: grab;
     height: auto;
+}
+
+.mobile-component-drawer .component-item.touch-dragging {
+    background-color: var(--mc-accent);
+    transform: scale(0.95);
+}
+
+.editor-component.touch-dragging {
+    opacity: 0.7;
+    z-index: 1000;
+}
+
+.component-item:active,
+.editor-component:active {
+    transform: scale(0.95);
 }
 
 .mobile-view .mobile-nav {
