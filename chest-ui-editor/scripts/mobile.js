@@ -111,11 +111,6 @@ const mobile = {
                 const type = comp.getAttribute('data-type');
                 
                 this.classList.add('touch-dragging');
-                
-                const drawer = document.getElementById('mobile-component-drawer');
-                if (drawer && drawer.classList.contains('open')) {
-                    drawer.classList.remove('open');
-                }
             }, { passive: false });
         });
         
