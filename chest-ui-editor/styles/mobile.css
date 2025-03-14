@@ -132,21 +132,6 @@
     .property-group {
         padding: 12px;
     }
-    
-    .editor-component {
-        min-width: 30px;
-        min-height: 30px;
-    }
-    
-    .editor-component::before {
-        content: '';
-        position: absolute;
-        top: -8px;
-        left: -8px;
-        right: -8px;
-        bottom: -8px;
-        z-index: -1;
-    }
 }
 
 .mobile-component-drawer {
@@ -196,23 +181,6 @@
     align-items: center;
     cursor: grab;
     height: auto;
-}
-
-.component-item.touch-dragging {
-    opacity: 0.6;
-    transform: scale(0.95);
-    box-shadow: 0 0 10px rgba(124, 56, 209, 0.7);
-    background-color: var(--mc-button-hover);
-    position: relative;
-    z-index: 10;
-}
-
-/* Style for when a component is being dragged by touch */
-.editor-component.touch-dragging {
-    opacity: 0.8;
-    outline: 2px solid var(--mc-accent) !important;
-    box-shadow: 0 0 15px rgba(124, 56, 209, 0.7);
-    z-index: 100;
 }
 
 .mobile-view .mobile-nav {
