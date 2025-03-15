@@ -37,6 +37,7 @@
     background-repeat: no-repeat;
     background-size: cover;
 }
+
 .component-icon:hover {
     opacity: 1;
 }
@@ -59,7 +60,7 @@
 }
 
 .editor-component.container-item {
-    
+
     outline: none;
     background-color: var(--mc-item-slot);
     border: 2px solid var(--mc-item-slot-border);
@@ -71,7 +72,7 @@
 }
 
 .editor-component.container-item-with-picture {
-    
+
     outline: none;
     background-color: var(--mc-item-slot);
     border: 2px solid var(--mc-item-slot-border);
@@ -125,6 +126,20 @@
 
 .editor-component.container-item-with-picture[data-picture="textures/ui/dust_ui"]::after {
     background-image: url('../assets/images/ui/dust_ui.png');
+}
+
+.editor-component.container-item-with-picture.custom-picture::after,
+.preview-component.container-item-with-picture.custom-picture::after {
+    display: none;
+}
+
+.editor-component.container-item-with-picture .custom-picture-content,
+.preview-component.container-item-with-picture .custom-picture-content {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .editor-component.progress-bar {
@@ -227,7 +242,7 @@
 }
 
 .editor-component.image {
-    
+
     background-color: rgba(100, 100, 100, 0.15);
     background-size: contain;
     background-repeat: no-repeat;
@@ -333,4 +348,28 @@
 .inventory-bottom-half {
     height: 166px;
     position: relative;
+}
+
+.editor-component.image.custom-image,
+.preview-component.image.custom-image {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.image-upload-container {
+    margin-top: 8px;
+}
+
+.upload-image-btn {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.custom-image-preview {
+    width: 100%;
+    height: 80px;
+    margin-top: 5px;
+    border: 1px solid var(--mc-border);
+    background-color: rgba(0, 0, 0, 0.2);
 }

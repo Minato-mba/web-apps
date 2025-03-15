@@ -1,35 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chest UI Editor</title>
-    
+
     <!-- Primary Meta Tags -->
-    <meta name="description" content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
+    <meta name="description"
+        content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
     <meta name="keywords" content="Minecraft, Bedrock, UI Editor, Chest UI, Game Development">
     <meta name="author" content="minato4743">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://minato-mba.github.io/web-apps/chest-ui-editor">
     <meta property="og:title" content="Chest UI Editor">
-    <meta property="og:description" content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
+    <meta property="og:description"
+        content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
     <meta property="og:image" content="assets/images/preview.png">
-    
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://minato-mba.github.io/web-apps/chest-ui-editor">
     <meta name="twitter:title" content="Chest UI Editor">
-    <meta name="twitter:description" content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
+    <meta name="twitter:description"
+        content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
     <meta name="twitter:image" content="assets/images/preview.png">
-    
+
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="32x32" href="assets/images/favicons/logo32.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicons/logo32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicons/logo16.png">
     <meta name="theme-color" content="#4CAF50">
-    
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles/main.css">
@@ -38,18 +42,23 @@
     <link rel="stylesheet" href="styles/mobile.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="app-container">
         <div class="header">
             <h1>Chest UI Editor</h1>
             <div class="actions">
-                <button id="new-project" class="action-button" title="New Project"><i class="fas fa-file"></i><span class="button-text">New</span></button>
-                <button id="load-project" class="action-button" title="Load Project"><i class="fas fa-folder-open"></i><span class="button-text">Load</span></button>
-                <button id="save-project" class="action-button" title="Save Project"><i class="fas fa-save"></i><span class="button-text">Save</span></button>
-                <button id="export-json" class="action-button" title="Export JSON"><i class="fas fa-file-export"></i><span class="button-text">Export</span></button>
+                <button id="new-project" class="action-button" title="New Project"><i class="fas fa-file"></i><span
+                        class="button-text">New</span></button>
+                <button id="load-project" class="action-button" title="Load Project"><i
+                        class="fas fa-folder-open"></i><span class="button-text">Load</span></button>
+                <button id="save-project" class="action-button" title="Save Project"><i class="fas fa-save"></i><span
+                        class="button-text">Save</span></button>
+                <button id="export-json" class="action-button" title="Export JSON"><i
+                        class="fas fa-file-export"></i><span class="button-text">Export</span></button>
             </div>
         </div>
-        
+
         <div class="mobile-nav">
             <button id="show-components" class="mobile-nav-button active"><i class="fas fa-th"></i> Components</button>
             <button id="show-editor" class="mobile-nav-button"><i class="fas fa-edit"></i> Editor</button>
@@ -312,7 +321,7 @@
         </div>
     </div>
 
-    
+
     <template id="container-item-properties">
         <div class="property-group">
             <h4>Position</h4>
@@ -517,6 +526,14 @@
             <div class="property">
                 <label>Texture:</label>
                 <input type="text" data-property="texture" class="texture-input" value="textures/ui/altar_cross">
+                <div class="image-upload-container">
+                    <button type="button" class="upload-image-btn">Upload Custom Image</button>
+                    <input type="file" id="image-upload" class="image-upload" accept="image/*" style="display:none">
+                </div>
+                <div class="image-preview-container" style="display:none">
+                    <p>Custom image:</p>
+                    <div class="custom-image-preview"></div>
+                </div>
             </div>
             <div class="property">
                 <label>Alpha:</label>
@@ -550,15 +567,18 @@
                     <div class="color-channels">
                         <div class="property">
                             <label>R:</label>
-                            <input type="number" data-property="color-r" min="0" max="1" step="0.01" value="1.0" class="color-channel-input">
+                            <input type="number" data-property="color-r" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
                         </div>
                         <div class="property">
                             <label>G:</label>
-                            <input type="number" data-property="color-g" min="0" max="1" step="0.01" value="1.0" class="color-channel-input">
+                            <input type="number" data-property="color-g" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
                         </div>
                         <div class="property">
                             <label>B:</label>
-                            <input type="number" data-property="color-b" min="0" max="1" step="0.01" value="1.0" class="color-channel-input">
+                            <input type="number" data-property="color-b" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
                         </div>
                     </div>
                     <div class="color-preview"></div>
@@ -587,4 +607,5 @@
     <script src="scripts/export.js"></script>
     <script src="scripts/app.js"></script>
 </body>
+
 </html>

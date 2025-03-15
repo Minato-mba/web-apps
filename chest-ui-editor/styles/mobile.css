@@ -2,7 +2,7 @@
     .button-text {
         display: none;
     }
-    
+
     .action-button {
         min-width: 42px;
         height: 42px;
@@ -13,12 +13,12 @@
     .mobile-nav {
         display: flex;
     }
-    
+
     .main-content {
         flex-direction: column;
         overflow: auto;
     }
-    
+
     .sidebar,
     .editor-area,
     .preview-area {
@@ -26,7 +26,7 @@
         max-height: none;
         transition: opacity 0.3s, height 0.3s;
     }
-    
+
     .sidebar.hidden,
     .editor-area.hidden,
     .preview-area.hidden {
@@ -36,41 +36,41 @@
         margin: 0;
         padding: 0;
     }
-    
-    .components-list-panel, 
+
+    .components-list-panel,
     .component-palette-panel {
         max-height: none;
         overflow: visible;
     }
-    
+
     .component-list-panel {
         overflow: hidden;
     }
-    
+
     .component-item {
         width: calc(50% - 6px);
     }
-    
+
     .panel-header h3 {
         font-size: 15px;
     }
-    
+
     .chest-panel {
         transform-origin: top left;
         transform: scale(0.9);
         margin: 10px auto;
     }
-    
+
     .component-list {
         grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     }
-    
+
     .template-selector-panel {
         width: 100%;
         max-height: none;
         margin-bottom: 60px;
     }
-    
+
     .template-list {
         grid-template-columns: repeat(2, 1fr);
         padding: 8px;
@@ -81,45 +81,45 @@
     .app-container {
         padding: 10px;
     }
-    
+
     .header {
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
     }
-    
+
     .header h1 {
         text-align: center;
         font-size: 1.6rem;
     }
-    
+
     .actions {
         justify-content: center;
     }
-    
+
     .component-item {
         width: 100%;
     }
-    
+
     .chest-panel {
         transform: scale(0.75);
     }
-    
+
     .template-item {
         min-width: unset;
         width: 100%;
     }
-    
+
     .template-preview {
         width: 90%;
         height: 50px;
     }
-    
+
     .mobile-nav {
         overflow-x: auto;
         justify-content: flex-start;
     }
-    
+
     .mobile-nav-button {
         min-width: 80px;
         flex: 0 0 auto;
@@ -134,24 +134,25 @@
     .component-list {
         max-height: 150px;
     }
-    
+
     .component-list-container {
         max-height: 100px;
     }
 }
 
 @media (pointer: coarse) {
-    
+
     .fold-button {
         padding: 12px;
         font-size: 16px;
     }
-    
-    input, select {
+
+    input,
+    select {
         height: 44px;
         font-size: 16px;
     }
-    
+
     .property-group {
         padding: 12px;
     }
@@ -250,7 +251,7 @@
     left: 0;
     width: 100%;
     background-color: #1A1D24;
-    z-index: 1001; 
+    z-index: 1001;
     display: flex;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -275,7 +276,7 @@
 }
 
 .mobile-view .main-content {
-    margin-bottom: 50px; 
+    margin-bottom: 50px;
 }
 
 .mobile-view .component-container {
@@ -313,9 +314,17 @@
 }
 
 @keyframes pulse {
-    0% { opacity: 0.7; }
-    50% { opacity: 1; }
-    100% { opacity: 0.7; }
+    0% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.7;
+    }
 }
 
 .mobile-templates-drawer .template-list {
@@ -353,9 +362,17 @@
 }
 
 @keyframes flash-selection {
-    0% { background-color: var(--mc-accent); }
-    50% { background-color: var(--mc-success); }
-    100% { background-color: var(--mc-accent); }
+    0% {
+        background-color: var(--mc-accent);
+    }
+
+    50% {
+        background-color: var(--mc-success);
+    }
+
+    100% {
+        background-color: var(--mc-accent);
+    }
 }
 
 .mobile-templates-drawer .template-preview {

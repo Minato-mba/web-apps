@@ -2,6 +2,7 @@
     font-family: 'Minecraft';
     src: url('https://raw.githubusercontent.com/Minato-mba/Minato-mba.github.io/refs/heads/main/assets/fonts/minecraft.otf') format('opentype');
 }
+
 .preview-canvas {
     background-image: url('https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/textures/ui/panorama_0.png');
     background-size: cover;
@@ -10,7 +11,7 @@
     position: relative;
     height: 100%;
     width: 100%;
-    min-height: 300px; 
+    min-height: 300px;
     font-family: 'Minecraft', 'Inter', sans-serif;
     overflow: hidden;
     border-radius: 6px;
@@ -31,9 +32,9 @@
 
 .preview-canvas .component-container {
     background-color: transparent;
-    
+
     position: absolute;
-    width: 176px; 
+    width: 176px;
     left: 0;
 }
 
@@ -49,7 +50,9 @@
 .preview-canvas .inventory-label {
     color: #9FA3AF;
     size: small;
-}.preview-canvas .debug-grid {
+}
+
+.preview-canvas .debug-grid {
     position: absolute;
     top: 0;
     left: 0;
@@ -65,9 +68,11 @@
     right: 0;
     width: 7px;
     height: 100%;
-    background-color: rgba(255,0,0,0.3);
+    background-color: rgba(255, 0, 0, 0.3);
     z-index: 100;
-}.preview-component {
+}
+
+.preview-component {
     position: absolute;
     pointer-events: none;
 }
@@ -85,7 +90,7 @@
     background-color: #8b8b8b;
 }
 
-.preview-canvas .inventory-cell, 
+.preview-canvas .inventory-cell,
 .preview-canvas .hotbar-cell {
     width: 18px;
     height: 18px;

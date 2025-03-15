@@ -1,4 +1,41 @@
+const imageManager = {
+    uploadedImages: {},
 
+    generateImageName: function (filename) {
+        const baseName = filename.replace(/\.[^/.]+$/, ''); const sanitizedName = baseName.replace(/[^a-z0-9_]/gi, '_').toLowerCase();
+        const uniqueId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        return `custom_${sanitizedName}_${uniqueId}`;
+    },
+
+    storeImage: function (file, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageName = this.generateImageName(file.name);
+            const imagePath = `user_uploaded:${imageName}`;
+            this.uploadedImages[imagePath] = {
+                data: e.target.result,
+                type: file.type,
+                originalName: file.name
+            };
+            callback(imagePath);
+        };
+        reader.readAsDataURL(file);
+    },
+
+    getImageUrl: function (path) {
+        if (!path) return '';
+
+        if (path.startsWith('user_uploaded:')) {
+            return this.uploadedImages[path]?.data || '';
+        }
+
+        return `../assets/${path.replace('textures', 'images')}.png`;
+    },
+
+    isUploadedImage: function (path) {
+        return path.startsWith('user_uploaded:');
+    }
+};
 
 const componentTypes = {
     container_item: {
@@ -34,7 +71,7 @@ const componentTypes = {
             };
         }
     },
-    
+
     container_item_with_picture: {
         name: 'Container Item with Picture',
         defaultWidth: 18,
@@ -45,19 +82,29 @@ const componentTypes = {
         },
         template: '#container-item-with-picture-properties',
         render: (component) => {
-            return `<div class="editor-component container-item-with-picture" 
+            const isUploaded = imageManager.isUploadedImage(component.properties.picture);
+            const bgImage = isUploaded ?
+                `background-image: url('${imageManager.getImageUrl(component.properties.picture)}');` : '';
+
+            return `<div class="editor-component container-item-with-picture ${isUploaded ? 'custom-picture' : ''}" 
                         data-id="${component.id}" 
                         data-type="container_item_with_picture" 
                         data-collection-index="${component.properties.collection_index}"
                         data-picture="${component.properties.picture}"
                         style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;">
+                        ${isUploaded ? '<div class="custom-picture-content" style="' + bgImage + '"></div>' : ''}
                     </div>`;
         },
         renderPreview: (component) => {
-            return `<div class="preview-component container-item-with-picture" 
+            const isUploaded = imageManager.isUploadedImage(component.properties.picture);
+            const bgImage = isUploaded ?
+                `background-image: url('${imageManager.getImageUrl(component.properties.picture)}');` : '';
+
+            return `<div class="preview-component container-item-with-picture ${isUploaded ? 'custom-picture' : ''}" 
                         data-collection-index="${component.properties.collection_index}"
                         data-picture="${component.properties.picture}"
                         style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;">
+                        ${isUploaded ? '<div class="custom-picture-content" style="' + bgImage + '"></div>' : ''}
                     </div>`;
         },
         generateJSON: (component) => {
@@ -72,7 +119,7 @@ const componentTypes = {
             };
         }
     },
-    
+
     progress_bar: {
         name: 'Progress Bar',
         defaultWidth: 22,
@@ -110,7 +157,7 @@ const componentTypes = {
             };
         }
     },
-    
+
     on_off_item: {
         name: 'on_off Item',
         defaultWidth: 16,
@@ -150,7 +197,7 @@ const componentTypes = {
             };
         }
     },
-    
+
     pot: {
         name: 'uninteractable slot',
         defaultWidth: 26,
@@ -184,7 +231,7 @@ const componentTypes = {
             };
         }
     },
-    
+
     container_type: {
         name: 'Container Type',
         defaultWidth: 18,
@@ -222,7 +269,7 @@ const componentTypes = {
             };
         }
     },
-    
+
     image: {
         name: 'Image',
         defaultWidth: 32,
@@ -233,17 +280,27 @@ const componentTypes = {
         },
         template: '#image-properties',
         render: (component) => {
-            return `<div class="editor-component image" 
+            const isUploaded = imageManager.isUploadedImage(component.properties.texture);
+            const bgImage = isUploaded ?
+                `background-image: url('${imageManager.getImageUrl(component.properties.texture)}');` :
+                '';
+
+            return `<div class="editor-component image ${isUploaded ? 'custom-image' : ''}" 
                         data-id="${component.id}" 
                         data-type="image" 
                         data-texture="${component.properties.texture}"
-                        style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;opacity:${component.properties.alpha};">
+                        style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;opacity:${component.properties.alpha};${bgImage}">
                     </div>`;
         },
         renderPreview: (component) => {
-            return `<div class="preview-component image" 
+            const isUploaded = imageManager.isUploadedImage(component.properties.texture);
+            const bgImage = isUploaded ?
+                `background-image: url('${imageManager.getImageUrl(component.properties.texture)}');` :
+                '';
+
+            return `<div class="preview-component image ${isUploaded ? 'custom-image' : ''}" 
                         data-texture="${component.properties.texture}"
-                        style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;opacity:${component.properties.alpha};">
+                        style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;opacity:${component.properties.alpha};${bgImage}">
                     </div>`;
         },
         generateJSON: (component) => {
@@ -258,7 +315,7 @@ const componentTypes = {
             };
         }
     },
-    
+
     label: {
         name: 'Label',
         defaultWidth: 80,
@@ -290,28 +347,32 @@ const componentTypes = {
                 text: component.properties.text,
                 color: component.properties.color,
                 x: component.x,
-                y: component.y
+                y: component.x
             };
         }
     }
-};function getNextCollectionIndex(components) {
+};
+
+function getNextCollectionIndex(components) {
     let maxIndex = -1;
-    
+
     components.forEach(component => {
-        if (component.properties && 
-            'collection_index' in component.properties && 
+        if (component.properties &&
+            'collection_index' in component.properties &&
             component.properties.collection_index > maxIndex) {
             maxIndex = component.properties.collection_index;
         }
     });
-    
+
     return maxIndex + 1;
-}function createComponent(type, x = 0, y = 0) {
+}
+
+function createComponent(type, x = 0, y = 0) {
     if (!componentTypes[type]) {
         console.error(`Unknown component type: ${type}`);
         return null;
     }
-    
+
     const componentType = componentTypes[type];
     const component = {
         id: util.generateUniqueId(),
@@ -322,14 +383,14 @@ const componentTypes = {
         height: componentType.defaultHeight,
         properties: { ...componentType.defaultProps }
     };
-    const needsIndex = ['container_item', 'container_item_with_picture', 'progress_bar', 
-                        'on_off_item', 'pot', 'container_type'].includes(type);
-                        
+    const needsIndex = ['container_item', 'container_item_with_picture', 'progress_bar',
+        'on_off_item', 'pot', 'container_type'].includes(type);
+
     if (needsIndex) {
         const currentComponents = editor.getComponents();
         component.properties.collection_index = getNextCollectionIndex(currentComponents);
         console.log(`Assigned index ${component.properties.collection_index} to ${type}`);
     }
-    
+
     return component;
 }

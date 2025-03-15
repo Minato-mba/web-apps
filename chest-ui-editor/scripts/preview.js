@@ -1,55 +1,55 @@
 
 
 const preview = {
-    
-    init: function() {
+
+    init: function () {
         this.previewContainer = document.getElementById('preview-component-container');
     },
-    updatePreview: function(components) {
-        
+    updatePreview: function (components) {
+
         this.previewContainer.innerHTML = '';
-        
-        
+
+
         components.forEach(component => {
             const componentType = componentTypes[component.type];
             if (!componentType) return;
-            
+
             const previewHtml = componentType.renderPreview(component);
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = previewHtml;
-            
-            
+
+
             const previewElement = tempDiv.firstElementChild;
             this.previewContainer.appendChild(previewElement);
         });
     },
-    updateComponent: function(component) {
-        
-        
+    updateComponent: function (component) {
+
+
         const componentType = componentTypes[component.type];
         if (!componentType) return;
-        
-        
-        
+
+
+
         const currentComponents = editor.getComponents();
         this.updatePreview(currentComponents);
     },
-    generateJSON: function() {
+    generateJSON: function () {
         const components = editor.getComponents();
         const controls = [];
-        
-        
+
+
         const sortedComponents = [...components].sort((a, b) => {
             if (a.type === 'label' || a.type === 'image') return -1;
             if (b.type === 'label' || b.type === 'image') return 1;
             return a.properties.collection_index - b.properties.collection_index;
         });
-        
-        
+
+
         sortedComponents.forEach(component => {
             const componentType = componentTypes[component.type];
             if (!componentType) return;
-            
+
             if (component.type === 'label') {
                 controls.push({
                     "name": {
@@ -61,7 +61,7 @@ const preview = {
                         "offset": [component.x, component.y]
                     }
                 });
-            } 
+            }
             else if (component.type === 'image') {
                 const imageId = `image_${controls.length}`;
                 controls.push({
@@ -80,8 +80,8 @@ const preview = {
             else if (component.type === 'progress_bar') {
                 const index = component.properties.collection_index;
                 const controlName = `item${index}@chest.progress_bar`;
-                
-                
+
+
                 const progressControl = {
                     [controlName]: {
                         "collection_index": index,
@@ -100,24 +100,24 @@ const preview = {
                         ]
                     }
                 };
-                
-                
+
+
                 for (let i = 0; i <= 9; i++) {
                     progressControl[controlName].controls.push({
-                        [`progress${i+1}@image_template`]: {
+                        [`progress${i + 1}@image_template`]: {
                             "$texture": `textures/ui/progress_bar/progress_bar${i}`,
                             "$binding_text": i,
                             "layer": 3
                         }
                     });
                 }
-                
+
                 controls.push(progressControl);
             }
             else if (component.type === 'on_off_item') {
                 const index = component.properties.collection_index;
                 const controlName = `item${index}@chest.on_off_item`;
-                
+
                 controls.push({
                     [controlName]: {
                         "collection_index": index,
@@ -147,7 +147,7 @@ const preview = {
             else if (component.type === 'pot') {
                 const index = component.properties.collection_index;
                 const controlName = `item${index}@chest.pot`;
-                
+
                 controls.push({
                     [controlName]: {
                         "collection_index": index,
@@ -160,7 +160,7 @@ const preview = {
             else if (component.type === 'container_type') {
                 const index = component.properties.collection_index;
                 const controlName = `item${index}@chest.container_type`;
-                
+
                 const containerControl = {
                     [controlName]: {
                         "collection_index": index,
@@ -170,8 +170,8 @@ const preview = {
                         "controls": []
                     }
                 };
-                
-                
+
+
                 for (let i = 0; i <= 9; i++) {
                     containerControl[controlName].controls.push({
                         [`container_type${i}@image_template`]: {
@@ -181,13 +181,13 @@ const preview = {
                         }
                     });
                 }
-                
+
                 controls.push(containerControl);
             }
             else if (component.type === 'container_item_with_picture') {
                 const index = component.properties.collection_index;
                 const controlName = `item${index}@chest.container_item_with_picture`;
-                
+
                 controls.push({
                     [controlName]: {
                         "collection_index": index,
@@ -198,10 +198,10 @@ const preview = {
                     }
                 });
             }
-            else { 
+            else {
                 const index = component.properties.collection_index;
                 const controlName = `item${index}@chest.container_item`;
-                
+
                 const control = {
                     [controlName]: {
                         "collection_index": index,
@@ -210,21 +210,21 @@ const preview = {
                         "offset": [component.x, component.y]
                     }
                 };
-                
-                
-                if (component.width !== componentTypes[component.type].defaultWidth || 
+
+
+                if (component.width !== componentTypes[component.type].defaultWidth ||
                     component.height !== componentTypes[component.type].defaultHeight) {
                     control[controlName]["$cell_image_size"] = [component.width, component.height];
                 }
-                
+
                 controls.push(control);
             }
         });
-        
-        
+
+
         const json = {
             "namespace": "chest",
-            
+
             "small_chest_screen@common.inventory_screen_common": {
                 "$close_on_player_hurt|default": true,
                 "$use_custom_pocket_toast|default": false,
@@ -248,7 +248,7 @@ const preview = {
                     }
                 ]
             },
-            
+
             "custom": {
                 "type": "panel",
                 "controls": [
@@ -262,11 +262,11 @@ const preview = {
                                         "type": "panel",
                                         "layer": 5,
                                         "controls": [
-                                            { 
-                                                "small_chest_custom_panel_top_half@chest.small_chest_custom_panel_top_half": {} 
+                                            {
+                                                "small_chest_custom_panel_top_half@chest.small_chest_custom_panel_top_half": {}
                                             },
                                             {
-                                                "inventory_panel_bottom_half_with_label@common.inventory_panel_bottom_half_with_label": {} 
+                                                "inventory_panel_bottom_half_with_label@common.inventory_panel_bottom_half_with_label": {}
                                             },
                                             { "hotbar_grid@common.hotbar_grid_template": {} },
                                             {
@@ -289,7 +289,7 @@ const preview = {
                     }
                 ]
             },
-            
+
             "small_chest_custom_panel_top_half": {
                 "type": "panel",
                 "size": ["100%", "50%"],
@@ -301,7 +301,7 @@ const preview = {
                     { "small_chest_custom_panel@chest.small_chest_custom_panel": {} }
                 ]
             },
-            
+
             "small_chest_custom_panel": {
                 "type": "collection_panel",
                 "size": [162, 54],
@@ -312,8 +312,8 @@ const preview = {
                 "$dark_border_toggle_hover_color": [1.0, 1.0, 1.0],
                 "controls": controls
             },
-            
-            
+
+
             "image_template": {
                 "type": "image",
                 "texture": "$texture",
@@ -331,14 +331,14 @@ const preview = {
                 ]
             }
         };
-        
-        
+
+
         this.addComponentDefinitions(json, components);
-        
+
         return json;
     },
-    addComponentDefinitions: function(json, components) {
-        
+    addComponentDefinitions: function (json, components) {
+
         if (components.some(c => c.type === 'container_item')) {
             json.container_item = {
                 "type": "input_panel",
@@ -356,7 +356,7 @@ const preview = {
                 "$item_renderer_offset|default": [0, 0],
                 "$background_images|default": "common.cell_image_panel",
                 "$background_image_control_name|default": "bg",
-                
+
                 "$focus_id|default": "",
                 "$focus_override_down|default": "",
                 "$focus_override_up|default": "",
@@ -370,7 +370,7 @@ const preview = {
                 "focus_enabled": true,
                 "focus_wrap_enabled": false,
                 "focus_magnet_enabled": true,
-                
+
                 "controls": [
                     {
                         "item_cell": {
@@ -454,8 +454,8 @@ const preview = {
                 ]
             };
         }
-        
-        
+
+
         if (components.some(c => c.type === 'container_item_with_picture')) {
             json.container_item_with_picture = {
                 "type": "input_panel",
@@ -474,7 +474,7 @@ const preview = {
                 "$item_renderer_offset|default": [0, 0],
                 "$background_images|default": "common.cell_image_panel",
                 "$background_image_control_name|default": "bg",
-                
+
                 "$focus_id|default": "",
                 "$focus_override_down|default": "",
                 "$focus_override_up|default": "",
@@ -488,7 +488,7 @@ const preview = {
                 "focus_enabled": true,
                 "focus_wrap_enabled": false,
                 "focus_magnet_enabled": true,
-                
+
                 "controls": [
                     {
                         "item_cell": {
@@ -568,8 +568,8 @@ const preview = {
                 ]
             };
         }
-        
-        
+
+
         if (components.some(c => c.type === 'progress_bar')) {
             json.progress_bar = {
                 "type": "input_panel",
@@ -585,7 +585,7 @@ const preview = {
                 "$item_renderer_panel_size|default": [22, 15],
                 "$item_renderer_size|default": [22, 15],
                 "$item_renderer_offset|default": [0, 0],
-                
+
                 "controls": [
                     {
                         "item_cell": {
@@ -617,8 +617,8 @@ const preview = {
                 ]
             };
         }
-        
-        
+
+
         if (components.some(c => c.type === 'on_off_item')) {
             json.on_off_item = {
                 "type": "input_panel",
@@ -634,7 +634,7 @@ const preview = {
                 "$item_renderer_panel_size|default": [16, 14],
                 "$item_renderer_size|default": [16, 14],
                 "$item_renderer_offset|default": [0, 0],
-                
+
                 "controls": [
                     {
                         "item_cell": {
@@ -666,8 +666,8 @@ const preview = {
                 ]
             };
         }
-        
-        
+
+
         if (components.some(c => c.type === 'pot')) {
             json.pot = {
                 "type": "input_panel",
@@ -683,7 +683,7 @@ const preview = {
                 "$item_renderer_panel_size|default": [26, 30],
                 "$item_renderer_size|default": [16, 16],
                 "$item_renderer_offset|default": [0, 3],
-                
+
                 "controls": [
                     {
                         "default": {
@@ -739,8 +739,8 @@ const preview = {
                 ]
             };
         }
-        
-        
+
+
         if (components.some(c => c.type === 'container_type')) {
             json.container_type = {
                 "type": "input_panel",
@@ -758,7 +758,7 @@ const preview = {
                 "$item_renderer_offset|default": [0, 0],
                 "$background_images|default": "common.cell_image_panel",
                 "$background_image_control_name|default": "bg",
-                
+
                 "$focus_id|default": "",
                 "$focus_override_down|default": "",
                 "$focus_override_up|default": "",
@@ -772,7 +772,7 @@ const preview = {
                 "focus_enabled": true,
                 "focus_wrap_enabled": false,
                 "focus_magnet_enabled": true,
-                
+
                 "controls": [
                     {
                         "item_cell": {

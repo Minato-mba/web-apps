@@ -83,11 +83,11 @@ body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-.toggle-switch input:checked + .toggle-slider {
+.toggle-switch input:checked+.toggle-slider {
     background-color: var(--mc-accent);
 }
 
-.toggle-switch input:checked + .toggle-slider:before {
+.toggle-switch input:checked+.toggle-slider:before {
     transform: translateX(18px);
 }
 
@@ -101,7 +101,7 @@ body {
     background-color: var(--mc-button-hover);
 }
 
-.toggle-switch input:checked:hover + .toggle-slider {
+.toggle-switch input:checked:hover+.toggle-slider {
     background-color: #8a4fe0;
 }
 
@@ -126,7 +126,10 @@ body {
     box-shadow: var(--ui-shadow);
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
     color: var(--mc-text);
     text-shadow: 1px 1px var(--mc-shadow);
 }
@@ -135,7 +138,8 @@ h1 {
     font-size: var(--mc-font-size-title);
 }
 
-h2, h3 {
+h2,
+h3 {
     font-size: var(--mc-font-size-header);
 }
 
@@ -290,20 +294,20 @@ button:active {
     overflow-x: hidden;
 }
 
-.sidebar > .panel:first-child {
-    flex: 0 0 auto; 
-    max-height: 260px; 
+.sidebar>.panel:first-child {
+    flex: 0 0 auto;
+    max-height: 260px;
 }
 
 .components-list-panel {
-    flex: 0 0 auto; 
-    max-height: 150px; 
+    flex: 0 0 auto;
+    max-height: 150px;
 }
 
 .properties-panel {
-    flex: 1 1 auto; 
-    min-height: 200px; 
-    overflow: hidden; 
+    flex: 1 1 auto;
+    min-height: 200px;
+    overflow: hidden;
 }
 
 .component-list {
@@ -312,7 +316,7 @@ button:active {
     gap: 8px;
     margin-top: 8px;
     overflow-y: auto;
-    max-height: 200px;  
+    max-height: 200px;
     padding: 8px;
 }
 
@@ -360,18 +364,20 @@ button:active {
     flex: 1;
     overflow-y: auto;
     height: 100%;
-    padding-right: 4px; 
+    padding-right: 4px;
     max-height: 400px;
 }
 
-.editor-area, .preview-area {
+.editor-area,
+.preview-area {
     flex: 1;
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-.editor-canvas, .preview-canvas {
+.editor-canvas,
+.preview-canvas {
     flex: 1;
     background-color: transparent;
     position: relative;
@@ -448,12 +454,14 @@ button:active {
     padding: 0 7px 0 7px;
 }
 
-.inventory-row, .hotbar-row {
+.inventory-row,
+.hotbar-row {
     display: flex;
     gap: 0px;
 }
 
-.inventory-cell, .hotbar-cell {
+.inventory-cell,
+.hotbar-cell {
     width: 18px;
     height: 18px;
     border-top: 1px solid #373737;
@@ -469,7 +477,7 @@ button:active {
     padding: 0 7px;
 }
 
-.preview-canvas .inventory-cell, 
+.preview-canvas .inventory-cell,
 .preview-canvas .hotbar-cell {
     width: 18px;
     height: 18px;
@@ -538,10 +546,12 @@ button:active {
     height: 100%;
     background-size: 18px 18px;
     background-image: linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
-                      linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+        linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
 }
 
-input[type="number"], input[type="text"], select {
+input[type="number"],
+input[type="text"],
+select {
     background-color: var(--mc-dark-bg);
     border: 2px solid var(--mc-border);
     color: var(--mc-text);
@@ -549,10 +559,10 @@ input[type="number"], input[type="text"], select {
     width: 100%;
 }
 
-input[type="number"], 
-input[type="text"], 
+input[type="number"],
+input[type="text"],
 input[type="range"],
-select, 
+select,
 textarea {
     background-color: var(--mc-dark-bg);
     border: 1px solid var(--mc-border);
@@ -595,11 +605,11 @@ input[type="range"]::-webkit-slider-thumb {
     font-size: var(--mc-font-size-small);
 }
 
-.property-group, 
+.property-group,
 .component-list-container,
 .component-container,
 .preview-canvas,
-.chest-panel{
+.chest-panel {
     background-color: transparent;
 }
 
@@ -607,7 +617,7 @@ input[type="range"]::-webkit-slider-thumb {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
-dialog, 
+dialog,
 .dialog {
     background-color: var(--mc-panel-bg);
     border: 1px solid var(--mc-border);
@@ -647,7 +657,7 @@ dialog,
     font-size: var(--mc-font-size-small);
 }
 
-.component-list, 
+.component-list,
 .component-list-container,
 .template-list {
     background-color: rgba(0, 0, 0, 0.2);
@@ -664,7 +674,7 @@ dialog,
 }
 
 .component-list-container {
-    max-height: 120px; 
+    max-height: 120px;
     overflow-y: auto;
     margin-top: 8px;
 }
@@ -789,12 +799,12 @@ dialog,
     .sidebar {
         max-height: calc(100vh - 200px);
     }
-    
-    .component-palette-panel, 
+
+    .component-palette-panel,
     .components-list-panel {
         max-height: 180px;
     }
-    
+
     .properties-panel {
         min-height: 200px;
         flex-shrink: 0;
