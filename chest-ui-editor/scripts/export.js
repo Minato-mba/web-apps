@@ -29,7 +29,7 @@ const exporter = {
         findTextures(json);
         return texturePaths;
     },
-    
+
     generatePlaceholderTexture: function (path) {
         return new Promise(async (resolve) => {
             try {
@@ -95,18 +95,18 @@ const exporter = {
             });
         });
     },
-    
+
     createResourcePackZip: async function (json) {
         const zip = new JSZip();
         const resourcePack = zip.folder("ChestUI_ResourcePack");
         const jsonForExport = JSON.parse(JSON.stringify(json));
         const texturePaths = this.extractTexturePaths(jsonForExport);
-        
 
-                const manifestJson = this.generateManifestJson();
+
+        const manifestJson = this.generateManifestJson();
         resourcePack.file("manifest.json", JSON.stringify(manifestJson, null, 2));
 
-                for (const path of [...texturePaths]) {
+        for (const path of [...texturePaths]) {
             if (path.startsWith('user_uploaded:')) {
                 if (imageManager.uploadedImages[path]) {
                     const imageData = imageManager.uploadedImages[path].data;
@@ -135,20 +135,20 @@ const exporter = {
             }
         }
 
-                resourcePack.file("ui/chest_screen.json", JSON.stringify(jsonForExport, null, 2));
+        resourcePack.file("ui/chest_screen.json", JSON.stringify(jsonForExport, null, 2));
 
-                for (const path of texturePaths) {
+        for (const path of texturePaths) {
             if (!path.startsWith('user_uploaded:') && path.startsWith('textures/')) {
-                                if (path.startsWith('textures/ui/custom/custom_')) {
+                if (path.startsWith('textures/ui/custom/custom_')) {
                     const userUploadedPath = 'user_uploaded:' + path.replace('textures/ui/custom/', '');
                     if (imageManager.uploadedImages[userUploadedPath]) {
                         continue;
                     }
                 }
 
-                                const textureResult = await this.generatePlaceholderTexture(path);
+                const textureResult = await this.generatePlaceholderTexture(path);
 
-                                const pathParts = path.split('/');
+                const pathParts = path.split('/');
                 const filename = pathParts.pop();
                 let currentPath = resourcePack;
 
@@ -166,7 +166,7 @@ const exporter = {
 
         return zip.generateAsync({ type: "blob" });
     },
-    
+
     generateManifestJson: function () {
         return {
             "format_version": 2,
@@ -186,7 +186,7 @@ const exporter = {
             ]
         };
     },
-    
+
     updateImagePath: function (json, oldPath, newPath) {
         const updatePath = (obj) => {
             if (!obj || typeof obj !== 'object') return;
@@ -214,7 +214,7 @@ const exporter = {
 
         updatePath(json);
     },
-    
+
     generateUUID: function () {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             const r = Math.random() * 16 | 0,
@@ -222,25 +222,25 @@ const exporter = {
             return v.toString(16);
         });
     },
-    
+
     exportProject: async function () {
         try {
-                        const exportButton = document.getElementById('export-json');
+            const exportButton = document.getElementById('export-json');
             const originalText = exportButton.innerHTML;
             exportButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span class="button-text">Processing...</span>';
             exportButton.disabled = true;
 
-                        const json = preview.generateJSON();
+            const json = preview.generateJSON();
 
-                        const zipBlob = await this.createResourcePackZip(json);
+            const zipBlob = await this.createResourcePackZip(json);
 
-                        const a = document.createElement('a');
+            const a = document.createElement('a');
             a.href = URL.createObjectURL(zipBlob);
             a.download = "ChestUI_ResourcePack.zip";
             document.body.appendChild(a);
             a.click();
 
-                        setTimeout(() => {
+            setTimeout(() => {
                 document.body.removeChild(a);
                 URL.revokeObjectURL(a.href);
                 exportButton.innerHTML = originalText;
@@ -251,7 +251,7 @@ const exporter = {
             console.error("Error exporting project:", error);
             alert("Error creating resource pack: " + error.message);
 
-                        document.getElementById('export-json').innerHTML = '<i class="fas fa-file-export"></i><span class="button-text">Export</span>';
+            document.getElementById('export-json').innerHTML = '<i class="fas fa-file-export"></i><span class="button-text">Export</span>';
             document.getElementById('export-json').disabled = false;
         }
     }

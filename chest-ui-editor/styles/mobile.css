@@ -590,3 +590,128 @@
     display: flex;
     gap: 8px;
 }
+
+.mobile-components-list-drawer {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(26, 29, 36, 0.97);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    max-height: 70vh;
+    overflow-y: auto;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding-bottom: 60px;
+}
+
+.mobile-components-list-drawer.open {
+    transform: translateY(0);
+    display: block;
+}
+
+.mobile-components-list-container {
+    padding: 8px;
+}
+
+.mobile-component-list-item {
+    background-color: rgba(52, 58, 70, 0.9);
+    margin-bottom: 8px;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-component-list-item.selected {
+    background-color: var(--mc-accent);
+}
+
+.mobile-component-list-item .item-details {
+    flex: 1;
+}
+
+.mobile-component-list-item .component-type {
+    font-weight: bold;
+    font-size: 14px;
+    display: block;
+}
+
+.mobile-component-list-item .component-info {
+    color: #cccccc;
+    font-size: 12px;
+    display: block;
+}
+
+.mobile-component-list-item .component-position {
+    color: #999999;
+    font-size: 11px;
+    display: block;
+}
+
+.mobile-component-list-item .item-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.mobile-component-list-item .edit-button,
+.mobile-component-list-item .delete-button,
+.mobile-component-list-item .up-button,
+.mobile-component-list-item .down-button {
+    background: none;
+    border: 1px solid var(--mc-border);
+    border-radius: 4px;
+    color: white;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-component-list-item .edit-button {
+    background-color: var(--mc-accent);
+}
+
+.mobile-component-list-item .delete-button {
+    background-color: var(--mc-danger);
+}
+
+.mobile-component-list-item .up-button,
+.mobile-component-list-item .down-button {
+    background-color: var(--mc-button);
+}
+
+.mobile-component-list-item .up-button:disabled,
+.mobile-component-list-item .down-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mobile-list-button {
+    position: fixed;
+    bottom: 120px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    background-color: var(--mc-button);
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 900;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-list-button.active,
+.mobile-list-button:active {
+    background-color: var(--mc-accent);
+}

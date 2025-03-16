@@ -33,18 +33,9 @@ const preview = {
         this.updatePreview(currentComponents);
     },
     generateJSON: function () {
-        const components = editor.getComponents();
-        const controls = [];
+        const components = editor.getComponents(); const controls = [];
 
-
-        const sortedComponents = [...components].sort((a, b) => {
-            if (a.type === 'label' || a.type === 'image') return -1;
-            if (b.type === 'label' || b.type === 'image') return 1;
-            return a.properties.collection_index - b.properties.collection_index;
-        });
-
-
-        sortedComponents.forEach(component => {
+        components.forEach(component => {
             const componentType = componentTypes[component.type];
             if (!componentType) return;
 
@@ -152,7 +143,8 @@ const preview = {
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
                         "offset": [component.x, component.y],
-                        "$texture": component.properties.texture                      }
+                        "$texture": component.properties.texture
+                    }
                 });
             }
             else if (component.type === 'container_type') {
@@ -686,7 +678,7 @@ const preview = {
                     {
                         "default": {
                             "type": "image",
-                            "texture": "$texture",                              "layer": 0,
+                            "texture": "$texture", "layer": 0,
                             "size": ["100%", "100%"]
                         }
                     },

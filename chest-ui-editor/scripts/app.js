@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-
     propertiesPanel.init();
     editor.init();
     preview.init();
@@ -11,7 +10,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!projectLoaded) {
         templates.loadTemplate('vanilla');
     }
-}); function setupActionButtons() {
+
+    editor.fixComponentZIndices();
+});
+
+function setupActionButtons() {
 
     document.getElementById('new-project').addEventListener('click', () => {
         if (confirm('Start a new project? This will clear all current components.')) {
@@ -55,14 +58,16 @@ document.addEventListener('DOMContentLoaded', function () {
         loadSavedProject();
     });
     document.getElementById('export-json').addEventListener('click', () => {
-                if (typeof exporter !== 'undefined' && exporter.exportProject) {
+        if (typeof exporter !== 'undefined' && exporter.exportProject) {
             exporter.exportProject();
         } else {
             console.error('Exporter module not loaded properly');
             alert('Export functionality is not available. Please refresh the page and try again.');
         }
     });
-} function loadSavedProject() {
+}
+
+function loadSavedProject() {
     try {
         const data = util.loadFromLocalStorage('minecraft_chest_ui_project');
 
@@ -93,6 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
             editor.addComponent(component);
         });
 
+        editor.fixComponentZIndices();
+
         alert('Project loaded successfully!');
         return true;
     } catch (e) {
@@ -100,7 +107,9 @@ document.addEventListener('DOMContentLoaded', function () {
         alert('Error loading project: ' + e.message);
         return false;
     }
-} function setupFoldablePanels() {
+}
+
+function setupFoldablePanels() {
 
     const panels = document.querySelectorAll('.panel');
 

@@ -283,9 +283,16 @@ const editor = {
     addComponent: function (component) {
         if (!component) return;
 
+        if (component.zIndex === undefined) {
+            const maxZIndex = this.components.reduce((max, comp) =>
+                Math.max(max, comp.zIndex || 0), 0);
+
+            component.zIndex = maxZIndex + 10;
+        }
+
         this.components.push(component);
         this.renderComponent(component);
-        preview.updatePreview(this.components);
+        preview.updatePreview(this.getComponents());
         this.updateComponentList();
     },
     renderComponent: function (component) {
@@ -298,6 +305,13 @@ const editor = {
 
 
         const element = tempDiv.firstElementChild;
+
+        if (component.zIndex !== undefined) {
+            element.style.zIndex = component.zIndex;
+        } else {
+            component.zIndex = 0; element.style.zIndex = 0;
+        }
+
         this.canvas.appendChild(element);
 
 
@@ -312,6 +326,10 @@ const editor = {
 
         element.style.left = `${component.x}px`;
         element.style.top = `${component.y}px`;
+
+        if (component.zIndex !== undefined) {
+            element.style.zIndex = component.zIndex;
+        }
 
         preview.updateComponent(component);
 
@@ -404,7 +422,9 @@ const editor = {
         this.updateComponentList();
     },
     getComponents: function () {
-        return [...this.components];
+        return [...this.components].sort((a, b) => {
+            return (a.zIndex || 0) - (b.zIndex || 0);
+        });
     },
     updateComponentList: function () {
         if (!this.componentList) return;
@@ -419,7 +439,11 @@ const editor = {
         }
 
 
-        this.components.forEach((component, index) => {
+        const sortedComponents = [...this.components].sort((a, b) => {
+            return (a.zIndex || 0) - (b.zIndex || 0);
+        });
+
+        sortedComponents.forEach((component, index) => {
             const componentType = componentTypes[component.type];
             if (!componentType) return;
 
@@ -440,8 +464,14 @@ const editor = {
             }
 
             listItem.innerHTML = `
-                <span class="component-type">${componentType.name}</span>
-                <span class="component-info">${displayInfo}</span>
+                <div class="component-info-container">
+                    <span class="component-type">${componentType.name}</span>
+                    <span class="component-info">${displayInfo}</span>
+                </div>
+                <div class="reorder-controls">
+                    <button class="move-up-btn" title="Move Up" ${index === 0 ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
+                    <button class="move-down-btn" title="Move Down" ${index === sortedComponents.length - 1 ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
+                </div>
             `;
 
 
@@ -449,7 +479,74 @@ const editor = {
                 this.selectComponent(component);
             });
 
+            const moveUpBtn = listItem.querySelector('.move-up-btn');
+            const moveDownBtn = listItem.querySelector('.move-down-btn');
+
+            moveUpBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (index > 0) {
+                    this.reorderComponent(component, -1);
+                }
+            });
+
+            moveDownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (index < sortedComponents.length - 1) {
+                    this.reorderComponent(component, 1);
+                }
+            });
+
             this.componentList.appendChild(listItem);
+        });
+    },
+    reorderComponent: function (component, direction) {
+        this.components.forEach((c, index) => {
+            if (c.zIndex === undefined) {
+                c.zIndex = index * 10;
+            }
+        });
+
+        const sortedComponents = [...this.components].sort((a, b) => {
+            return (a.zIndex || 0) - (b.zIndex || 0);
+        });
+
+        const currentIndex = sortedComponents.findIndex(c => c.id === component.id);
+        const targetIndex = currentIndex + direction;
+
+        if (targetIndex < 0 || targetIndex >= sortedComponents.length) {
+            return;
+        }
+
+        sortedComponents.forEach((c, i) => {
+            c.zIndex = i * 10;
+        });
+
+        const targetComponent = sortedComponents[targetIndex];
+        const tempZIndex = component.zIndex;
+        component.zIndex = targetComponent.zIndex;
+        targetComponent.zIndex = tempZIndex;
+
+        const componentElement = this.canvas.querySelector(`[data-id="${component.id}"]`);
+        const targetElement = this.canvas.querySelector(`[data-id="${targetComponent.id}"]`);
+
+        if (componentElement) componentElement.style.zIndex = component.zIndex;
+        if (targetElement) targetElement.style.zIndex = targetComponent.zIndex;
+
+        this.updateComponentList();
+        preview.updatePreview(this.getComponents());
+    },
+    fixComponentZIndices: function () {
+        this.components.forEach((c, index) => {
+            if (c.zIndex === undefined) {
+                c.zIndex = index * 10;
+            }
+        });
+
+        this.components.forEach(component => {
+            const element = this.canvas.querySelector(`[data-id="${component.id}"]`);
+            if (element) {
+                element.style.zIndex = component.zIndex;
+            }
         });
     }
 };

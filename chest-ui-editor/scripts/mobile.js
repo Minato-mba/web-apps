@@ -1,6 +1,6 @@
 const mobile = {
     selectedComponentType: null,
-    selectedComponent: null, 
+    selectedComponent: null,
     init: function () {
         const showComponentsBtn = document.getElementById('show-components');
         const showEditorBtn = document.getElementById('show-editor');
@@ -15,6 +15,7 @@ const mobile = {
         this.createFloatingComponentPanel();
         this.createFloatingTemplatesPanel();
         this.createFloatingPropertiesPanel();
+        this.createComponentsListPanel();
         this.createPropertiesButton();
 
         showComponentsBtn.addEventListener('click', function () {
@@ -329,7 +330,7 @@ const mobile = {
         drawerHeader.innerHTML = '<span>Properties</span>';
         drawer.appendChild(drawerHeader);
 
-        
+
         const deleteButton = document.createElement('button');
         deleteButton.className = 'drawer-delete-button';
         deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
@@ -369,7 +370,7 @@ const mobile = {
             originalSelectComponent.call(editor, component);
 
             if (window.innerWidth < 768) {
-                mobile.selectedComponent = component; 
+                mobile.selectedComponent = component;
                 if (mobile.propertiesButton) {
                     mobile.propertiesButton.style.display = 'none';
                 }
@@ -502,17 +503,17 @@ const mobile = {
             });
         }
 
-                if ((component.type === 'image' && component.properties.texture) || 
+        if ((component.type === 'image' && component.properties.texture) ||
             (component.type === 'container_item_with_picture' && component.properties.picture) ||
             (component.type === 'pot' && component.properties.texture)) {
-            
+
             const propName = component.type === 'container_item_with_picture' ? 'picture' : 'texture';
             const propValue = component.properties[propName];
-            
+
             if (imageManager.isUploadedImage(propValue)) {
                 const previewContainer = container.querySelector('.image-preview-container');
                 const imagePreview = container.querySelector('.custom-image-preview');
-                
+
                 if (previewContainer && imagePreview) {
                     previewContainer.style.display = 'block';
                     imagePreview.style.backgroundImage = `url('${imageManager.getImageUrl(propValue)}')`;
@@ -521,7 +522,7 @@ const mobile = {
                     imagePreview.style.backgroundPosition = 'center';
                     imagePreview.style.height = '100px';
                 }
-                
+
                 const textureInput = container.querySelector(`[data-property="${propName}"]`);
                 if (textureInput && !component.properties.userEditedTexturePath) {
                     const imageName = propValue.replace('user_uploaded:', '');
@@ -531,31 +532,31 @@ const mobile = {
                 }
             }
         }
-        
-                this.addMobileUploadButton(container, component, 'texture');
+
+        this.addMobileUploadButton(container, component, 'texture');
         this.addMobileUploadButton(container, component, 'picture');
     },
 
-        addMobileUploadButton: function(container, component, propertyName) {
+    addMobileUploadButton: function (container, component, propertyName) {
         if (!component.properties || !(propertyName in component.properties)) return;
-    
+
         const propInput = container.querySelector(`[data-property="${propertyName}"]`);
         if (!propInput) return;
-    
+
         const inputContainer = propInput.closest('.property');
         if (!inputContainer) return;
-        
-                if (inputContainer.querySelector('.upload-image-btn')) return;
-        
-                const uploadContainer = document.createElement('div');
+
+        if (inputContainer.querySelector('.upload-image-btn')) return;
+
+        const uploadContainer = document.createElement('div');
         uploadContainer.className = 'image-upload-container';
         uploadContainer.innerHTML = `
             <button type="button" class="upload-image-btn">Upload Custom ${propertyName === 'texture' ? 'Image' : 'Picture'}</button>
             <input type="file" class="image-upload" accept="image/*" style="display:none">
         `;
         inputContainer.appendChild(uploadContainer);
-        
-                if (!inputContainer.querySelector('.image-preview-container')) {
+
+        if (!inputContainer.querySelector('.image-preview-container')) {
             const previewContainer = document.createElement('div');
             previewContainer.className = 'image-preview-container';
             previewContainer.style.display = 'none';
@@ -620,46 +621,46 @@ const mobile = {
             });
         });
 
-                const uploadBtns = container.querySelectorAll('.upload-image-btn');
+        const uploadBtns = container.querySelectorAll('.upload-image-btn');
         uploadBtns.forEach(uploadBtn => {
             const inputContainer = uploadBtn.closest('.property');
             if (!inputContainer) return;
-            
+
             const uploadInput = inputContainer.querySelector('.image-upload');
             if (!uploadInput) return;
-            
-                        uploadBtn.addEventListener('click', () => {
+
+            uploadBtn.addEventListener('click', () => {
                 uploadInput.click();
             });
-            
-                        uploadInput.addEventListener('change', (e) => {
-                                if (!this.selectedComponent || !e.target.files.length) return;
-                
+
+            uploadInput.addEventListener('change', (e) => {
+                if (!this.selectedComponent || !e.target.files.length) return;
+
                 const file = e.target.files[0];
                 if (!file.type.startsWith('image/')) {
                     alert('Please select an image file.');
                     return;
                 }
-                
-                                const propertyInput = inputContainer.querySelector('[data-property]');
+
+                const propertyInput = inputContainer.querySelector('[data-property]');
                 if (!propertyInput) return;
-                
+
                 const propName = propertyInput.getAttribute('data-property');
                 if (!propName) return;
-                
-                                imageManager.storeImage(file, (imagePath) => {
-                                        const imageName = imagePath.replace('user_uploaded:', '');
+
+                imageManager.storeImage(file, (imagePath) => {
+                    const imageName = imagePath.replace('user_uploaded:', '');
                     const minecraftPath = `textures/ui/custom/${imageName}`;
-                    
+
                     propertyInput.value = minecraftPath;
                     propertyInput.setAttribute('data-original-path', imagePath);
-                    
-                                        this.selectedComponent.properties[propName] = imagePath;
+
+                    this.selectedComponent.properties[propName] = imagePath;
                     this.selectedComponent.properties.userEditedTexturePath = false;
-                    
-                                        const previewContainer = inputContainer.querySelector('.image-preview-container');
+
+                    const previewContainer = inputContainer.querySelector('.image-preview-container');
                     const imagePreview = previewContainer?.querySelector('.custom-image-preview');
-                    
+
                     if (previewContainer && imagePreview) {
                         previewContainer.style.display = 'block';
                         imagePreview.style.backgroundImage = `url('${imageManager.getImageUrl(imagePath)}')`;
@@ -668,10 +669,135 @@ const mobile = {
                         imagePreview.style.backgroundPosition = 'center';
                         imagePreview.style.height = '100px';
                     }
-                    
-                                        editor.updateComponent(this.selectedComponent);
+
+                    editor.updateComponent(this.selectedComponent);
                 });
             });
+        });
+    },
+
+    createComponentsListPanel: function () {
+        const drawer = document.createElement('div');
+        drawer.id = 'mobile-components-list-drawer';
+        drawer.className = 'mobile-components-list-drawer';
+
+        const drawerHeader = document.createElement('div');
+        drawerHeader.className = 'drawer-header';
+        drawerHeader.innerHTML = '<span>Component List</span>';
+        drawer.appendChild(drawerHeader);
+
+        const listContainer = document.createElement('div');
+        listContainer.id = 'mobile-components-list-container';
+        listContainer.className = 'mobile-components-list-container';
+        drawer.appendChild(listContainer);
+
+        const closeButton = document.createElement('button');
+        closeButton.className = 'drawer-close-button';
+        closeButton.innerHTML = 'Done';
+        closeButton.addEventListener('click', function () {
+            drawer.classList.remove('open');
+
+            const showListBtn = document.getElementById('mobile-list-button');
+            if (showListBtn) {
+                showListBtn.classList.remove('active');
+            }
+        });
+        drawerHeader.appendChild(closeButton);
+
+        document.querySelector('.app-container').appendChild(drawer);
+
+        const listButton = document.createElement('button');
+        listButton.id = 'mobile-list-button';
+        listButton.className = 'mobile-list-button';
+        listButton.innerHTML = '<i class="fas fa-list"></i>';
+        listButton.addEventListener('click', () => {
+            this.updateMobileComponentsList();
+            drawer.classList.add('open');
+            listButton.classList.add('active');
+        });
+        document.querySelector('.app-container').appendChild(listButton);
+    },
+
+    updateMobileComponentsList: function () {
+        const container = document.getElementById('mobile-components-list-container');
+        if (!container) return;
+
+        const components = editor.getComponents();
+        if (components.length === 0) {
+            container.innerHTML = '<p class="no-components">No components added</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+
+        components.forEach((component, index) => {
+            const componentType = componentTypes[component.type];
+            if (!componentType) return;
+
+            const listItem = document.createElement('div');
+            listItem.className = 'mobile-component-list-item';
+            if (editor.selectedComponent && editor.selectedComponent.id === component.id) {
+                listItem.classList.add('selected');
+            }
+
+            let displayInfo = '';
+            if (component.type === 'label') {
+                displayInfo = `"${component.properties.text.substring(0, 15)}"`;
+                if (component.properties.text.length > 15) displayInfo += '...';
+            } else if (component.properties.collection_index !== undefined) {
+                displayInfo = `Index: ${component.properties.collection_index}`;
+            }
+
+            listItem.innerHTML = `
+                <div class="item-details">
+                    <span class="component-type">${componentType.name}</span>
+                    <span class="component-info">${displayInfo}</span>
+                    <span class="component-position">x:${component.x}, y:${component.y}</span>
+                </div>
+                <div class="item-actions">
+                    <button class="up-button" ${index === 0 ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
+                    <button class="down-button" ${index === components.length - 1 ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
+                    <button class="edit-button"><i class="fas fa-edit"></i></button>
+                    <button class="delete-button"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+
+            const upButton = listItem.querySelector('.up-button');
+            const downButton = listItem.querySelector('.down-button');
+            const editButton = listItem.querySelector('.edit-button');
+            const deleteButton = listItem.querySelector('.delete-button');
+
+            upButton.addEventListener('click', () => {
+                if (index > 0) {
+                    editor.reorderComponent(component, -1);
+                    this.updateMobileComponentsList();
+                }
+            });
+
+            downButton.addEventListener('click', () => {
+                if (index < components.length - 1) {
+                    editor.reorderComponent(component, 1);
+                    this.updateMobileComponentsList();
+                }
+            });
+
+            editButton.addEventListener('click', () => {
+                editor.selectComponent(component);
+                if (this.propertiesDrawer) {
+                    this.propertiesDrawer.classList.add('open');
+                }
+                document.getElementById('mobile-components-list-drawer').classList.remove('open');
+                document.getElementById('mobile-list-button').classList.remove('active');
+            });
+
+            deleteButton.addEventListener('click', () => {
+                if (confirm(`Delete this ${componentType.name}?`)) {
+                    editor.removeComponent(component);
+                    this.updateMobileComponentsList();
+                }
+            });
+
+            container.appendChild(listItem);
         });
     },
 
@@ -681,6 +807,8 @@ const mobile = {
         const componentDrawer = document.getElementById('mobile-component-drawer');
         const templateDrawer = document.getElementById('mobile-templates-drawer');
         const propertiesDrawer = document.getElementById('mobile-properties-drawer');
+        const componentsListDrawer = document.getElementById('mobile-components-list-drawer');
+        const listButton = document.getElementById('mobile-list-button');
 
         if (isMobile) {
             mobileNav.style.display = 'flex';
@@ -689,6 +817,8 @@ const mobile = {
             if (componentDrawer) componentDrawer.style.display = 'block';
             if (templateDrawer) templateDrawer.style.display = 'block';
             if (propertiesDrawer) propertiesDrawer.style.display = 'block';
+            if (componentsListDrawer) componentsListDrawer.style.display = 'block';
+            if (listButton) listButton.style.display = 'block';
 
             document.querySelector('.sidebar').style.display = 'none';
             document.querySelector('.editor-area').style.display = 'block';
@@ -709,6 +839,8 @@ const mobile = {
             if (componentDrawer) componentDrawer.style.display = 'none';
             if (templateDrawer) templateDrawer.style.display = 'none';
             if (propertiesDrawer) propertiesDrawer.style.display = 'none';
+            if (componentsListDrawer) componentsListDrawer.style.display = 'none';
+            if (listButton) listButton.style.display = 'none';
 
             document.querySelector('.sidebar').style.display = 'block';
             document.querySelector('.editor-area').style.display = 'block';

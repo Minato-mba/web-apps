@@ -682,11 +682,55 @@ dialog,
 .component-list-item {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 4px 8px;
     margin-bottom: 2px;
     background-color: var(--mc-dark-bg);
     border: 1px solid var(--mc-border);
     cursor: pointer;
+}
+
+.component-info-container {
+    flex: 1;
+    overflow: hidden;
+}
+
+.reorder-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.move-up-btn,
+.move-down-btn {
+    background: none;
+    border: none;
+    color: var(--mc-text);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 12px;
+    background-color: var(--mc-button);
+    border-radius: 3px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.move-up-btn:hover,
+.move-down-btn:hover {
+    background-color: var(--mc-button-hover);
+}
+
+.move-up-btn:disabled,
+.move-down-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.move-up-btn i,
+.move-down-btn i {
+    font-size: 10px;
 }
 
 .component-list-item:hover {

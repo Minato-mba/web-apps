@@ -204,13 +204,14 @@ const componentTypes = {
         defaultHeight: 30,
         defaultProps: {
             collection_index: 0,
-            texture: 'textures/ui/pot/pot'          },
+            texture: 'textures/ui/pot/pot'
+        },
         template: '#pot-properties',
         render: (component) => {
             const isUploaded = imageManager.isUploadedImage(component.properties.texture);
-            const bgImage = isUploaded ? 
+            const bgImage = isUploaded ?
                 `background-image: url('${imageManager.getImageUrl(component.properties.texture)}');` : '';
-                
+
             return `<div class="editor-component pot ${isUploaded ? 'custom-texture' : ''}" 
                         data-id="${component.id}" 
                         data-type="pot" 
@@ -222,9 +223,9 @@ const componentTypes = {
         },
         renderPreview: (component) => {
             const isUploaded = imageManager.isUploadedImage(component.properties.texture);
-            const bgImage = isUploaded ? 
+            const bgImage = isUploaded ?
                 `background-image: url('${imageManager.getImageUrl(component.properties.texture)}');` : '';
-                
+
             return `<div class="preview-component pot ${isUploaded ? 'custom-texture' : ''}" 
                         data-collection-index="${component.properties.collection_index}"
                         data-texture="${component.properties.texture}"
@@ -236,7 +237,7 @@ const componentTypes = {
             return {
                 type: "pot",
                 collection_index: component.properties.collection_index,
-                texture: component.properties.texture,                  x: component.x,
+                texture: component.properties.texture, x: component.x,
                 y: component.y,
                 width: component.width,
                 height: component.height
