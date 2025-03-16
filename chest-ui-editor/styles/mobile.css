@@ -549,3 +549,44 @@
     border-radius: 4px;
     margin-top: 5px;
 }
+
+.drawer-delete-button {
+    background-color: var(--mc-danger);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.drawer-delete-button i {
+    font-size: 14px;
+}
+
+.drawer-delete-button:active {
+    transform: scale(0.95);
+    opacity: 0.9;
+}
+
+/* Adjust the drawer header to fit both buttons */
+.mobile-properties-drawer .drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+}
+
+.mobile-properties-drawer .drawer-header span {
+    flex: 1;
+    text-align: center;
+}
+
+.mobile-properties-drawer .drawer-header .drawer-buttons {
+    display: flex;
+    gap: 8px;
+}

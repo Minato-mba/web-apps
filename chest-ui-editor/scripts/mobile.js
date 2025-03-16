@@ -329,6 +329,21 @@ const mobile = {
         drawerHeader.innerHTML = '<span>Properties</span>';
         drawer.appendChild(drawerHeader);
 
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'drawer-delete-button';
+        deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
+        deleteButton.addEventListener('click', () => {
+            if (this.selectedComponent && confirm('Are you sure you want to delete this component?')) {
+                editor.removeComponent(this.selectedComponent);
+                drawer.classList.remove('open');
+                if (this.propertiesButton) {
+                    this.propertiesButton.style.display = 'none';
+                }
+            }
+        });
+        drawerHeader.appendChild(deleteButton);
+
         const propertiesContainer = document.createElement('div');
         propertiesContainer.id = 'mobile-properties-container';
         propertiesContainer.className = 'mobile-properties-container';
