@@ -203,28 +203,40 @@ const componentTypes = {
         defaultWidth: 26,
         defaultHeight: 30,
         defaultProps: {
-            collection_index: 0
-        },
+            collection_index: 0,
+            texture: 'textures/ui/pot/pot'          },
         template: '#pot-properties',
         render: (component) => {
-            return `<div class="editor-component pot" 
+            const isUploaded = imageManager.isUploadedImage(component.properties.texture);
+            const bgImage = isUploaded ? 
+                `background-image: url('${imageManager.getImageUrl(component.properties.texture)}');` : '';
+                
+            return `<div class="editor-component pot ${isUploaded ? 'custom-texture' : ''}" 
                         data-id="${component.id}" 
                         data-type="pot" 
                         data-collection-index="${component.properties.collection_index}"
+                        data-texture="${component.properties.texture}"
                         style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;">
+                        ${isUploaded ? '<div class="custom-texture-content" style="' + bgImage + '"></div>' : ''}
                     </div>`;
         },
         renderPreview: (component) => {
-            return `<div class="preview-component pot" 
+            const isUploaded = imageManager.isUploadedImage(component.properties.texture);
+            const bgImage = isUploaded ? 
+                `background-image: url('${imageManager.getImageUrl(component.properties.texture)}');` : '';
+                
+            return `<div class="preview-component pot ${isUploaded ? 'custom-texture' : ''}" 
                         data-collection-index="${component.properties.collection_index}"
+                        data-texture="${component.properties.texture}"
                         style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;">
+                        ${isUploaded ? '<div class="custom-texture-content" style="' + bgImage + '"></div>' : ''}
                     </div>`;
         },
         generateJSON: (component) => {
             return {
                 type: "pot",
                 collection_index: component.properties.collection_index,
-                x: component.x,
+                texture: component.properties.texture,                  x: component.x,
                 y: component.y,
                 width: component.width,
                 height: component.height
@@ -389,7 +401,6 @@ function createComponent(type, x = 0, y = 0) {
     if (needsIndex) {
         const currentComponents = editor.getComponents();
         component.properties.collection_index = getNextCollectionIndex(currentComponents);
-        console.log(`Assigned index ${component.properties.collection_index} to ${type}`);
     }
 
     return component;

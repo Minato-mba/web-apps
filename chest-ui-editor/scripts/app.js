@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!projectLoaded) {
         templates.loadTemplate('vanilla');
     }
-    console.log('Minecraft Bedrock Chest UI Editor loaded');
 }); function setupActionButtons() {
 
     document.getElementById('new-project').addEventListener('click', () => {
@@ -46,7 +45,6 @@ document.addEventListener('DOMContentLoaded', function () {
             };
 
             util.saveToLocalStorage('minecraft_chest_ui_project', data);
-            console.log('Project saved successfully with', cleanComponents.length, 'components');
             alert('Project saved!');
         } catch (e) {
             console.error('Error while saving project:', e);
@@ -57,7 +55,12 @@ document.addEventListener('DOMContentLoaded', function () {
         loadSavedProject();
     });
     document.getElementById('export-json').addEventListener('click', () => {
-        exporter.exportProject();
+                if (typeof exporter !== 'undefined' && exporter.exportProject) {
+            exporter.exportProject();
+        } else {
+            console.error('Exporter module not loaded properly');
+            alert('Export functionality is not available. Please refresh the page and try again.');
+        }
     });
 } function loadSavedProject() {
     try {
@@ -65,11 +68,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!data || !Array.isArray(data.components)) return false;
 
-        console.log('Loading saved project with', data.components.length, 'components');
 
         if (data.uploadedImages) {
             imageManager.uploadedImages = data.uploadedImages;
-            console.log('Restored', Object.keys(data.uploadedImages).length, 'uploaded images');
         }
 
         editor.clearComponents();
@@ -131,7 +132,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 panel.classList.contains('folded')
             );
 
-            console.log(`Panel ${panelId} folded:`, panel.classList.contains('folded'));
         };
 
 

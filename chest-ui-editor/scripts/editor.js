@@ -252,11 +252,9 @@ const editor = {
         };
 
         const onTouchEnd = e => {
-            console.log("onTouchEnd");
 
             if (!draggedComponent) return;
 
-            console.log("draggedComponent", draggedComponent);
 
 
             e.preventDefault();

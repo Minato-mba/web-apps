@@ -73,7 +73,6 @@ const util = {
             }
 
             const parsed = JSON.parse(data);
-            console.log(`Loaded data from localStorage: ${key}`, parsed);
             return parsed;
         } catch (e) {
             console.error('Error loading from local storage:', e);

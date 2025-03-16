@@ -1,5 +1,3 @@
-
-
 const preview = {
 
     init: function () {
@@ -153,8 +151,8 @@ const preview = {
                         "collection_index": index,
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
-                        "offset": [component.x, component.y]
-                    }
+                        "offset": [component.x, component.y],
+                        "$texture": component.properties.texture                      }
                 });
             }
             else if (component.type === 'container_type') {
@@ -688,8 +686,7 @@ const preview = {
                     {
                         "default": {
                             "type": "image",
-                            "texture": "textures/ui/pot/pot",
-                            "layer": 0,
+                            "texture": "$texture",                              "layer": 0,
                             "size": ["100%", "100%"]
                         }
                     },

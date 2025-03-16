@@ -1,6 +1,6 @@
 const mobile = {
     selectedComponentType: null,
-
+    selectedComponent: null, 
     init: function () {
         const showComponentsBtn = document.getElementById('show-components');
         const showEditorBtn = document.getElementById('show-editor');
@@ -269,12 +269,10 @@ const mobile = {
         }, 300);
 
         if (templateName) {
-            console.log('Mobile template selection:', templateName);
 
             if (window.templates && typeof window.templates.loadTemplate === 'function') {
                 try {
                     window.templates.loadTemplate(templateName);
-                    console.log('Template loaded successfully');
 
                     const drawer = document.getElementById('mobile-templates-drawer');
                     if (drawer) {
@@ -290,7 +288,6 @@ const mobile = {
 
                     const originalTemplate = document.querySelector(`.template-selector-panel .template-item[data-template="${templateName}"]`);
                     if (originalTemplate) {
-                        console.log('Triggering click on original template item');
                         originalTemplate.click();
                     }
                 }
@@ -299,7 +296,6 @@ const mobile = {
 
                 const originalTemplate = document.querySelector(`.template-selector-panel .template-item[data-template="${templateName}"]`);
                 if (originalTemplate) {
-                    console.log('Triggering click on original template item');
                     originalTemplate.click();
                 }
             }
@@ -358,12 +354,12 @@ const mobile = {
             originalSelectComponent.call(editor, component);
 
             if (window.innerWidth < 768) {
+                mobile.selectedComponent = component; 
                 if (mobile.propertiesButton) {
                     mobile.propertiesButton.style.display = 'none';
                 }
 
                 if (component) {
-                    console.log('Component selected on mobile, showing properties button');
 
                     if (mobile.propertiesButton) {
                         mobile.propertiesButton.style.display = 'flex';
@@ -490,6 +486,70 @@ const mobile = {
                 }
             });
         }
+
+                if ((component.type === 'image' && component.properties.texture) || 
+            (component.type === 'container_item_with_picture' && component.properties.picture) ||
+            (component.type === 'pot' && component.properties.texture)) {
+            
+            const propName = component.type === 'container_item_with_picture' ? 'picture' : 'texture';
+            const propValue = component.properties[propName];
+            
+            if (imageManager.isUploadedImage(propValue)) {
+                const previewContainer = container.querySelector('.image-preview-container');
+                const imagePreview = container.querySelector('.custom-image-preview');
+                
+                if (previewContainer && imagePreview) {
+                    previewContainer.style.display = 'block';
+                    imagePreview.style.backgroundImage = `url('${imageManager.getImageUrl(propValue)}')`;
+                    imagePreview.style.backgroundSize = 'contain';
+                    imagePreview.style.backgroundRepeat = 'no-repeat';
+                    imagePreview.style.backgroundPosition = 'center';
+                    imagePreview.style.height = '100px';
+                }
+                
+                const textureInput = container.querySelector(`[data-property="${propName}"]`);
+                if (textureInput && !component.properties.userEditedTexturePath) {
+                    const imageName = propValue.replace('user_uploaded:', '');
+                    const minecraftPath = `textures/ui/custom/${imageName}`;
+                    textureInput.value = minecraftPath;
+                    textureInput.setAttribute('data-original-path', propValue);
+                }
+            }
+        }
+        
+                this.addMobileUploadButton(container, component, 'texture');
+        this.addMobileUploadButton(container, component, 'picture');
+    },
+
+        addMobileUploadButton: function(container, component, propertyName) {
+        if (!component.properties || !(propertyName in component.properties)) return;
+    
+        const propInput = container.querySelector(`[data-property="${propertyName}"]`);
+        if (!propInput) return;
+    
+        const inputContainer = propInput.closest('.property');
+        if (!inputContainer) return;
+        
+                if (inputContainer.querySelector('.upload-image-btn')) return;
+        
+                const uploadContainer = document.createElement('div');
+        uploadContainer.className = 'image-upload-container';
+        uploadContainer.innerHTML = `
+            <button type="button" class="upload-image-btn">Upload Custom ${propertyName === 'texture' ? 'Image' : 'Picture'}</button>
+            <input type="file" class="image-upload" accept="image/*" style="display:none">
+        `;
+        inputContainer.appendChild(uploadContainer);
+        
+                if (!inputContainer.querySelector('.image-preview-container')) {
+            const previewContainer = document.createElement('div');
+            previewContainer.className = 'image-preview-container';
+            previewContainer.style.display = 'none';
+            previewContainer.innerHTML = `
+                <p>Custom ${propertyName === 'texture' ? 'image' : 'picture'}:</p>
+                <div class="custom-image-preview"></div>
+            `;
+            inputContainer.appendChild(previewContainer);
+        }
     },
 
     setupPropertyEventListeners: function (container) {
@@ -542,6 +602,60 @@ const mobile = {
                 if (desktopOption) {
                     desktopOption.click();
                 }
+            });
+        });
+
+                const uploadBtns = container.querySelectorAll('.upload-image-btn');
+        uploadBtns.forEach(uploadBtn => {
+            const inputContainer = uploadBtn.closest('.property');
+            if (!inputContainer) return;
+            
+            const uploadInput = inputContainer.querySelector('.image-upload');
+            if (!uploadInput) return;
+            
+                        uploadBtn.addEventListener('click', () => {
+                uploadInput.click();
+            });
+            
+                        uploadInput.addEventListener('change', (e) => {
+                                if (!this.selectedComponent || !e.target.files.length) return;
+                
+                const file = e.target.files[0];
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file.');
+                    return;
+                }
+                
+                                const propertyInput = inputContainer.querySelector('[data-property]');
+                if (!propertyInput) return;
+                
+                const propName = propertyInput.getAttribute('data-property');
+                if (!propName) return;
+                
+                                imageManager.storeImage(file, (imagePath) => {
+                                        const imageName = imagePath.replace('user_uploaded:', '');
+                    const minecraftPath = `textures/ui/custom/${imageName}`;
+                    
+                    propertyInput.value = minecraftPath;
+                    propertyInput.setAttribute('data-original-path', imagePath);
+                    
+                                        this.selectedComponent.properties[propName] = imagePath;
+                    this.selectedComponent.properties.userEditedTexturePath = false;
+                    
+                                        const previewContainer = inputContainer.querySelector('.image-preview-container');
+                    const imagePreview = previewContainer?.querySelector('.custom-image-preview');
+                    
+                    if (previewContainer && imagePreview) {
+                        previewContainer.style.display = 'block';
+                        imagePreview.style.backgroundImage = `url('${imageManager.getImageUrl(imagePath)}')`;
+                        imagePreview.style.backgroundSize = 'contain';
+                        imagePreview.style.backgroundRepeat = 'no-repeat';
+                        imagePreview.style.backgroundPosition = 'center';
+                        imagePreview.style.height = '100px';
+                    }
+                    
+                                        editor.updateComponent(this.selectedComponent);
+                });
             });
         });
     },
