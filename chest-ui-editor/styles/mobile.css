@@ -573,7 +573,6 @@
     opacity: 0.9;
 }
 
-/* Adjust the drawer header to fit both buttons */
 .mobile-properties-drawer .drawer-header {
     display: flex;
     justify-content: space-between;
@@ -714,4 +713,19 @@
 .mobile-list-button.active,
 .mobile-list-button:active {
     background-color: var(--mc-accent);
+}
+
+.mobile-view .editor-canvas .chest-panel,
+.mobile-view .preview-canvas .chest-panel {
+    margin: 0;
+}
+
+.mobile-view .editor-canvas,
+.mobile-view .preview-canvas {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    overflow: auto;
+    min-height: 250px;
 }

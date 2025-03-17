@@ -20,11 +20,12 @@
 
 .chest-panel-background {
     background-color: rgba(16, 18, 22, 0.7);
-    height: 100%;
+    height: 500%;
     width: 100%;
     position: absolute;
-    top: 0;
+    top: -200%;
     left: 0;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;

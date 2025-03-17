@@ -15,7 +15,7 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://minato-mba.github.io/web-apps/chest-ui-editor">
-    <meta property="og:title" content="Chest UI Editor">
+    <meta property="og:title" content="Chest UI Editor  (Bedrock Edition Only)">
     <meta property="og:description"
         content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
     <meta property="og:image" content="assets/images/preview.png">
@@ -23,7 +23,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://minato-mba.github.io/web-apps/chest-ui-editor">
-    <meta name="twitter:title" content="Chest UI Editor">
+    <meta name="twitter:title" content="Chest UI Editor  (Bedrock Edition Only)">
     <meta name="twitter:description"
         content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
     <meta name="twitter:image" content="assets/images/preview.png">
@@ -46,7 +46,7 @@
 <body>
     <div class="app-container">
         <div class="header">
-            <h1>Chest UI Editor</h1>
+            <h1>Chest UI Editor (Bedrock Edition Only)</h1>
             <div class="actions">
                 <button id="new-project" class="action-button" title="New Project"><i class="fas fa-file"></i><span
                         class="button-text">New</span></button>
@@ -222,7 +222,9 @@
                 <div class="panel">
                     <div class="panel-header">
                         <h3>Live Preview</h3>
-                        <button class="fold-button" title="Toggle panel">▼</button>
+                        <div class="preview-controls-container">
+                            <button class="fold-button" title="Toggle panel">▼</button>
+                        </div>
                     </div>
                     <div class="panel-content">
                         <div class="preview-container">

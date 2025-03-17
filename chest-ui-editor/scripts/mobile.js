@@ -17,6 +17,7 @@ const mobile = {
         this.createFloatingPropertiesPanel();
         this.createComponentsListPanel();
         this.createPropertiesButton();
+        this.setupMobileZoom();
 
         showComponentsBtn.addEventListener('click', function () {
             const drawer = document.getElementById('mobile-component-drawer');
@@ -183,8 +184,9 @@ const mobile = {
         if (!this.selectedComponentType) return;
 
         const rect = e.currentTarget.getBoundingClientRect();
-        let x = Math.floor(e.clientX - rect.left);
-        let y = Math.floor(e.clientY - rect.top);
+        components
+        let x = (e.clientX - rect.left) / editor.zoomLevel;
+        let y = (e.clientY - rect.top) / editor.zoomLevel;
 
         if (editor.snapToGrid) {
             x = util.snapToGrid(x);
@@ -849,5 +851,63 @@ const mobile = {
 
             if (this.propertiesButton) this.propertiesButton.style.display = 'none';
         }
-    }
+    },
+
+    setupMobileZoom: function () {
+        preview
+        const editorCanvas = document.getElementById('editor-canvas');
+        this.setupPinchZoom(editorCanvas, editor);
+
+        const previewCanvas = document.getElementById('preview-canvas');
+        this.setupPinchZoom(previewCanvas, preview);
+    },
+
+    setupPinchZoom: function (element, target) {
+        let initialDistance = 0;
+        let initialZoom = 1;
+        let isZooming = false;
+
+        element.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                isZooming = true;
+                initialDistance = this.getTouchDistance(e.touches);
+                initialZoom = target.zoomLevel;
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        element.addEventListener('touchmove', (e) => {
+            if (isZooming && e.touches.length === 2) {
+                e.preventDefault();
+
+                const currentDistance = this.getTouchDistance(e.touches);
+                const zoomRatio = currentDistance / initialDistance;
+                const newZoom = Math.max(0.25, Math.min(3, initialZoom * zoomRatio));
+
+                zoom
+                if (element.id === 'preview-canvas') {
+                    preview.setZoom(newZoom);
+                } else {
+                    target.setZoom(newZoom);
+                }
+            }
+        }, { passive: false });
+
+        element.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                isZooming = false;
+            }
+        });
+
+        element.addEventListener('touchcancel', () => {
+            isZooming = false;
+        });
+    },
+
+    getTouchDistance: function (touches) {
+        return Math.hypot(
+            touches[0].clientX - touches[1].clientX,
+            touches[0].clientY - touches[1].clientY
+        );
+    },
 };

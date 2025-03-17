@@ -1,37 +1,36 @@
 const editor = {
-
     components: [],
     selectedComponent: null,
     snapToGrid: false,
+    zoomLevel: 1,
+
     init: function () {
         this.canvas = document.getElementById('component-container');
         this.componentList = document.getElementById('component-list-container');
+        this.editorCanvas = document.getElementById('editor-canvas');
         this.setupEventListeners();
         this.setupCanvasDragDrop();
         this.setupComponentDragging();
         this.updateComponentList();
+        this.setupZoom();
     },
-    setupEventListeners: function () {
 
+    setupEventListeners: function () {
         const toggleGridButton = document.getElementById('toggle-grid');
         toggleGridButton.addEventListener('click', () => {
             this.canvas.parentElement.classList.toggle('grid-on');
         });
-
 
         const snapToGridCheckbox = document.getElementById('snap-to-grid');
         snapToGridCheckbox.addEventListener('change', e => {
             this.snapToGrid = e.target.checked;
         });
 
-
         this.canvas.addEventListener('click', e => {
             if (e.target === this.canvas) {
-
                 this.selectComponent(null);
             }
         });
-
 
         document.addEventListener('keydown', e => {
             const isEditingField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) ||
@@ -42,9 +41,17 @@ const editor = {
                 this.removeComponent(this.selectedComponent);
             }
         });
-    },
-    setupCanvasDragDrop: function () {
 
+        this.editorCanvas.addEventListener('wheel', e => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                this.adjustZoom(delta);
+            }
+        });
+    },
+
+    setupCanvasDragDrop: function () {
         this.canvas.addEventListener('dragover', e => {
             e.preventDefault();
         });
@@ -56,8 +63,8 @@ const editor = {
             if (!type) return;
 
             const rect = this.canvas.getBoundingClientRect();
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
+            let x = (e.clientX - rect.left) / this.zoomLevel;
+            let y = (e.clientY - rect.top) / this.zoomLevel;
 
             if (this.snapToGrid) {
                 x = util.snapToGrid(x);
@@ -100,8 +107,8 @@ const editor = {
             if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
                 touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
 
-                let x = touch.clientX - rect.left;
-                let y = touch.clientY - rect.top;
+                let x = (touch.clientX - rect.left) / this.zoomLevel;
+                let y = (touch.clientY - rect.top) / this.zoomLevel;
 
                 if (this.snapToGrid) {
                     x = util.snapToGrid(x);
@@ -111,7 +118,6 @@ const editor = {
                 const component = createComponent(this.currentTouchComponent.type, x, y);
                 this.addComponent(component);
                 this.selectComponent(component);
-
             }
 
             this.currentTouchComponent.element.classList.remove('touch-dragging');
@@ -201,20 +207,16 @@ const editor = {
 
             e.preventDefault();
 
-
-            let newX = offsetX + (e.clientX - startX);
-            let newY = offsetY + (e.clientY - startY);
-
+            let newX = offsetX + (e.clientX - startX) / this.zoomLevel;
+            let newY = offsetY + (e.clientY - startY) / this.zoomLevel;
 
             if (this.snapToGrid) {
                 newX = util.snapToGrid(newX);
                 newY = util.snapToGrid(newY);
             }
 
-
-            draggedComponent.x = newX
-            draggedComponent.y = newY
-
+            draggedComponent.x = newX;
+            draggedComponent.y = newY;
 
             this.updateComponentPosition(draggedComponent);
         };
@@ -223,7 +225,6 @@ const editor = {
             if (!draggedComponent) return;
 
             draggedComponent = null;
-
 
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
@@ -237,8 +238,8 @@ const editor = {
 
             const touch = e.touches[0];
 
-            let newX = offsetX + (touch.clientX - startX);
-            let newY = offsetY + (touch.clientY - startY);
+            let newX = offsetX + (touch.clientX - startX) / this.zoomLevel;
+            let newY = offsetY + (touch.clientY - startY) / this.zoomLevel;
 
             if (this.snapToGrid) {
                 newX = util.snapToGrid(newX);
@@ -252,10 +253,7 @@ const editor = {
         };
 
         const onTouchEnd = e => {
-
             if (!draggedComponent) return;
-
-
 
             e.preventDefault();
             e.stopPropagation();
@@ -303,7 +301,6 @@ const editor = {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
 
-
         const element = tempDiv.firstElementChild;
 
         if (component.zIndex !== undefined) {
@@ -313,7 +310,6 @@ const editor = {
         }
 
         this.canvas.appendChild(element);
-
 
         element.addEventListener('click', e => {
             e.stopPropagation();
@@ -333,7 +329,6 @@ const editor = {
 
         preview.updateComponent(component);
 
-
         if (this.selectedComponent && this.selectedComponent.id === component.id) {
             const xInput = document.querySelector('[data-property="x"]');
             const yInput = document.querySelector('[data-property="y"]');
@@ -346,41 +341,32 @@ const editor = {
         const element = this.canvas.querySelector(`[data-id="${component.id}"]`);
         if (!element) return;
 
-
         element.parentNode.removeChild(element);
 
-
         this.renderComponent(component);
-
 
         preview.updateComponent(component);
     },
     selectComponent: function (component) {
-
         const prevSelected = this.canvas.querySelector('.editor-component.selected');
         if (prevSelected) {
             prevSelected.classList.remove('selected');
         }
-
 
         const prevSelectedListItem = this.componentList.querySelector('.component-list-item.selected');
         if (prevSelectedListItem) {
             prevSelectedListItem.classList.remove('selected');
         }
 
-
         this.selectedComponent = component;
 
         if (component) {
-
             const element = this.canvas.querySelector(`[data-id="${component.id}"]`);
             if (element) {
                 element.classList.add('selected');
 
-
                 element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
-
 
             const listItem = this.componentList.querySelector(`[data-id="${component.id}"]`);
             if (listItem) {
@@ -389,27 +375,22 @@ const editor = {
             }
         }
 
-
         propertiesPanel.showPropertiesFor(component);
     },
     removeComponent: function (component) {
-
         const index = this.components.findIndex(c => c.id === component.id);
         if (index !== -1) {
             this.components.splice(index, 1);
         }
-
 
         const element = this.canvas.querySelector(`[data-id="${component.id}"]`);
         if (element) {
             element.parentNode.removeChild(element);
         }
 
-
         if (this.selectedComponent && this.selectedComponent.id === component.id) {
             this.selectComponent(null);
         }
-
 
         preview.updatePreview(this.components);
         this.updateComponentList();
@@ -429,15 +410,12 @@ const editor = {
     updateComponentList: function () {
         if (!this.componentList) return;
 
-
         this.componentList.innerHTML = '';
-
 
         if (this.components.length === 0) {
             this.componentList.innerHTML = '<p class="no-components">No components added</p>';
             return;
         }
-
 
         const sortedComponents = [...this.components].sort((a, b) => {
             return (a.zIndex || 0) - (b.zIndex || 0);
@@ -453,7 +431,6 @@ const editor = {
                 listItem.classList.add('selected');
             }
             listItem.setAttribute('data-id', component.id);
-
 
             let displayInfo = '';
             if (component.type === 'label') {
@@ -473,7 +450,6 @@ const editor = {
                     <button class="move-down-btn" title="Move Down" ${index === sortedComponents.length - 1 ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
                 </div>
             `;
-
 
             listItem.addEventListener('click', () => {
                 this.selectComponent(component);
@@ -548,5 +524,53 @@ const editor = {
                 element.style.zIndex = component.zIndex;
             }
         });
+    },
+    setupZoom: function () {
+        const zoomControls = document.createElement('div');
+        zoomControls.className = 'zoom-controls';
+        zoomControls.innerHTML = `
+            <button id="editor-zoom-out" class="zoom-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+            <span id="editor-zoom-level" class="zoom-level">100%</span>
+            <button id="editor-zoom-in" class="zoom-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+            <button id="editor-zoom-reset" class="zoom-btn" title="Reset Zoom"><i class="fas fa-sync-alt"></i></button>
+        `;
+
+        const headerControls = document.querySelector('.editor-area .panel-header .editor-controls-container');
+        if (headerControls) {
+            headerControls.prepend(zoomControls);
+        }
+
+        document.getElementById('editor-zoom-in').addEventListener('click', () => this.adjustZoom(0.1));
+        document.getElementById('editor-zoom-out').addEventListener('click', () => this.adjustZoom(-0.1));
+        document.getElementById('editor-zoom-reset').addEventListener('click', () => this.setZoom(1));
+    },
+
+    setZoom: function (level) {
+        this.zoomLevel = level;
+        this.applyZoom();
+        this.updateZoomDisplay();
+    },
+
+    adjustZoom: function (delta) {
+        const newZoom = Math.max(0.25, Math.min(3, this.zoomLevel + delta));
+        this.setZoom(newZoom);
+    },
+
+    applyZoom: function () {
+        const chestPanel = this.editorCanvas.querySelector('.chest-panel');
+        if (chestPanel) {
+            chestPanel.style.transform = `scale(${this.zoomLevel})`;
+            chestPanel.style.transformOrigin = 'top center';
+
+            this.editorCanvas.style.padding = this.zoomLevel > 1 ?
+                `${20 * this.zoomLevel}px` : '20px';
+        }
+    },
+
+    updateZoomDisplay: function () {
+        const display = document.getElementById('editor-zoom-level');
+        if (display) {
+            display.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+        }
     }
 };

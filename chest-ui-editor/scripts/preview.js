@@ -1,12 +1,14 @@
 const preview = {
+    zoomLevel: 1,
 
     init: function () {
         this.previewContainer = document.getElementById('preview-component-container');
+        this.previewCanvas = document.getElementById('preview-canvas');
+        this.setupZoom();
     },
+
     updatePreview: function (components) {
-
         this.previewContainer.innerHTML = '';
-
 
         components.forEach(component => {
             const componentType = componentTypes[component.type];
@@ -16,22 +18,19 @@ const preview = {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = previewHtml;
 
-
             const previewElement = tempDiv.firstElementChild;
             this.previewContainer.appendChild(previewElement);
         });
     },
+
     updateComponent: function (component) {
-
-
         const componentType = componentTypes[component.type];
         if (!componentType) return;
-
-
 
         const currentComponents = editor.getComponents();
         this.updatePreview(currentComponents);
     },
+
     generateJSON: function () {
         const components = editor.getComponents(); const controls = [];
 
@@ -70,7 +69,6 @@ const preview = {
                 const index = component.properties.collection_index;
                 const controlName = `item${index}@chest.progress_bar`;
 
-
                 const progressControl = {
                     [controlName]: {
                         "collection_index": index,
@@ -89,7 +87,6 @@ const preview = {
                         ]
                     }
                 };
-
 
                 for (let i = 0; i <= 9; i++) {
                     progressControl[controlName].controls.push({
@@ -161,7 +158,6 @@ const preview = {
                     }
                 };
 
-
                 for (let i = 0; i <= 9; i++) {
                     containerControl[controlName].controls.push({
                         [`container_type${i}@image_template`]: {
@@ -201,7 +197,6 @@ const preview = {
                     }
                 };
 
-
                 if (component.width !== componentTypes[component.type].defaultWidth ||
                     component.height !== componentTypes[component.type].defaultHeight) {
                     control[controlName]["$cell_image_size"] = [component.width, component.height];
@@ -210,7 +205,6 @@ const preview = {
                 controls.push(control);
             }
         });
-
 
         const json = {
             "namespace": "chest",
@@ -303,7 +297,6 @@ const preview = {
                 "controls": controls
             },
 
-
             "image_template": {
                 "type": "image",
                 "texture": "$texture",
@@ -322,13 +315,12 @@ const preview = {
             }
         };
 
-
         this.addComponentDefinitions(json, components);
 
         return json;
     },
-    addComponentDefinitions: function (json, components) {
 
+    addComponentDefinitions: function (json, components) {
         if (components.some(c => c.type === 'container_item')) {
             json.container_item = {
                 "type": "input_panel",
@@ -445,7 +437,6 @@ const preview = {
             };
         }
 
-
         if (components.some(c => c.type === 'container_item_with_picture')) {
             json.container_item_with_picture = {
                 "type": "input_panel",
@@ -559,7 +550,6 @@ const preview = {
             };
         }
 
-
         if (components.some(c => c.type === 'progress_bar')) {
             json.progress_bar = {
                 "type": "input_panel",
@@ -608,7 +598,6 @@ const preview = {
             };
         }
 
-
         if (components.some(c => c.type === 'on_off_item')) {
             json.on_off_item = {
                 "type": "input_panel",
@@ -656,7 +645,6 @@ const preview = {
                 ]
             };
         }
-
 
         if (components.some(c => c.type === 'pot')) {
             json.pot = {
@@ -728,7 +716,6 @@ const preview = {
                 ]
             };
         }
-
 
         if (components.some(c => c.type === 'container_type')) {
             json.container_type = {
@@ -865,6 +852,79 @@ const preview = {
                     }
                 ]
             };
+        }
+    },
+
+    setupZoom: function () {
+        const zoomControls = document.createElement('div');
+        zoomControls.className = 'zoom-controls';
+        zoomControls.innerHTML = `
+            <button id="preview-zoom-out" class="zoom-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+            <span id="preview-zoom-level" class="zoom-level">100%</span>
+            <button id="preview-zoom-in" class="zoom-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+            <button id="preview-zoom-reset" class="zoom-btn" title="Reset Zoom"><i class="fas fa-sync-alt"></i></button>
+        `;
+
+        const controlsContainer = document.querySelector('.preview-area .panel-header .preview-controls-container');
+        if (controlsContainer) {
+            const foldButton = controlsContainer.querySelector('.fold-button');
+            if (foldButton) {
+                controlsContainer.insertBefore(zoomControls, foldButton);
+            } else {
+                controlsContainer.appendChild(zoomControls);
+            }
+        } else {
+            const headerControls = document.querySelector('.preview-area .panel-header');
+            if (headerControls) {
+                headerControls.appendChild(zoomControls);
+            }
+        }
+
+        document.getElementById('preview-zoom-in').addEventListener('click', () => this.adjustZoom(0.1));
+        document.getElementById('preview-zoom-out').addEventListener('click', () => this.adjustZoom(-0.1));
+        document.getElementById('preview-zoom-reset').addEventListener('click', () => this.setZoom(1));
+
+        this.previewCanvas.addEventListener('wheel', e => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                this.adjustZoom(delta);
+            }
+        });
+    },
+
+    setZoom: function (level) {
+        this.zoomLevel = level;
+        this.applyZoom();
+        this.updateZoomDisplay();
+    },
+
+    adjustZoom: function (delta) {
+        const newZoom = Math.max(0.25, Math.min(3, this.zoomLevel + delta));
+        this.setZoom(newZoom);
+    },
+
+    applyZoom: function () {
+        const chestPanelContainer = this.previewCanvas.querySelector('.chest-panel-background');
+        const chestPanel = this.previewCanvas.querySelector('.chest-panel');
+
+        if (chestPanel) {
+            if (chestPanelContainer) {
+                chestPanelContainer.style.transform = '';
+            }
+
+            chestPanel.style.transform = `scale(${this.zoomLevel})`;
+            chestPanel.style.transformOrigin = 'top center';
+
+            this.previewCanvas.style.padding = this.zoomLevel > 1 ?
+                `${20 * this.zoomLevel}px` : '20px';
+        }
+    },
+
+    updateZoomDisplay: function () {
+        const display = document.getElementById('preview-zoom-level');
+        if (display) {
+            display.textContent = `${Math.round(this.zoomLevel * 100)}%`;
         }
     }
 };

@@ -262,7 +262,6 @@
     position: relative;
 }
 
-/* Add custom texture support for the pot component */
 .editor-component.pot.custom-texture::after,
 .preview-component.pot.custom-texture::after {
     display: none;
