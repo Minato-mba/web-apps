@@ -184,7 +184,6 @@ const mobile = {
         if (!this.selectedComponentType) return;
 
         const rect = e.currentTarget.getBoundingClientRect();
-        components
         let x = (e.clientX - rect.left) / editor.zoomLevel;
         let y = (e.clientY - rect.top) / editor.zoomLevel;
 
@@ -854,7 +853,6 @@ const mobile = {
     },
 
     setupMobileZoom: function () {
-        preview
         const editorCanvas = document.getElementById('editor-canvas');
         this.setupPinchZoom(editorCanvas, editor);
 
@@ -884,7 +882,6 @@ const mobile = {
                 const zoomRatio = currentDistance / initialDistance;
                 const newZoom = Math.max(0.25, Math.min(3, initialZoom * zoomRatio));
 
-                zoom
                 if (element.id === 'preview-canvas') {
                     preview.setZoom(newZoom);
                 } else {
