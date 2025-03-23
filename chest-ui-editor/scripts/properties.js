@@ -291,13 +291,28 @@ const propertiesPanel = {
             }
 
             if (uploadBtn) {
-                uploadBtn.addEventListener('click', () => {
+
+                if (uploadBtn._clickHandler) {
+                    uploadBtn.removeEventListener('click', uploadBtn._clickHandler);
+                }
+
+
+                uploadBtn._clickHandler = function () {
                     uploadInput.click();
-                });
+                };
+
+
+                uploadBtn.addEventListener('click', uploadBtn._clickHandler);
             }
 
             if (uploadInput) {
-                uploadInput.addEventListener('change', (e) => {
+
+                if (uploadInput._changeHandler) {
+                    uploadInput.removeEventListener('change', uploadInput._changeHandler);
+                }
+
+
+                uploadInput._changeHandler = function (e) {
                     if (e.target.files.length > 0) {
                         const file = e.target.files[0];
                         if (!file.type.startsWith('image/')) {
@@ -306,16 +321,13 @@ const propertiesPanel = {
                         }
 
                         imageManager.storeImage(file, (imagePath) => {
-                            if (textureInput) {
-                                const imageName = imagePath.replace('user_uploaded:', '');
-                                const minecraftPath = `textures/ui/custom/${imageName}`;
+                            const imageName = imagePath.replace('user_uploaded:', '');
+                            const minecraftPath = `textures/ui/custom/${imageName}`;
 
-                                textureInput.value = minecraftPath;
-                                textureInput.setAttribute('data-original-path', imagePath);
+                            textureInput.value = minecraftPath;
+                            textureInput.setAttribute('data-original-path', imagePath);
 
-                                component.properties.userEditedTexturePath = false;
-                            }
-
+                            component.properties.userEditedTexturePath = false;
                             component.properties.texture = imagePath;
 
                             if (previewContainer && imagePreview) {
@@ -330,15 +342,28 @@ const propertiesPanel = {
                             editor.updateComponent(component);
                         });
                     }
-                });
-            }
-        }
+                };
 
-        this.setupTextureUpload(fragment, component, 'texture');
-        this.setupTextureUpload(fragment, component, 'picture');
+
+                uploadInput.addEventListener('change', uploadInput._changeHandler);
+
+
+                uploadInput._hasChangeHandler = true;
+            }
+
+
+            this.setupTextureUpload(fragment, component, 'picture');
+        } else {
+
+            this.setupTextureUpload(fragment, component, 'texture');
+            this.setupTextureUpload(fragment, component, 'picture');
+        }
     },
 
     setupTextureUpload: function (fragment, component, propertyName) {
+
+        if (component.type === 'image' && propertyName === 'texture') return;
+
         if (!component.properties || !(propertyName in component.properties)) return;
 
         const textureInput = fragment.querySelector(`[data-property="${propertyName}"]`);
@@ -421,13 +446,23 @@ const propertiesPanel = {
             editor.updateComponent(component);
         });
 
-        if (uploadBtn) {
-            uploadBtn.addEventListener('click', () => {
-                uploadInput.click();
-            });
+
+        if (uploadBtn._clickHandler) {
+            uploadBtn.removeEventListener('click', uploadBtn._clickHandler);
         }
 
-        if (uploadInput) {
+
+        uploadBtn._clickHandler = function () {
+            uploadInput.click();
+        };
+
+
+        uploadBtn.addEventListener('click', uploadBtn._clickHandler);
+
+
+        if (!uploadInput._hasChangeHandler) {
+            uploadInput._hasChangeHandler = true;
+
             uploadInput.addEventListener('change', (e) => {
                 if (e.target.files.length > 0) {
                     const file = e.target.files[0];
