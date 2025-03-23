@@ -66,7 +66,8 @@ const preview = {
                 });
             }
             else if (component.type === 'progress_bar') {
-                const index = component.properties.collection_index;
+                
+                const index = Number(component.properties.collection_index);
                 const controlName = `item${index}@chest.progress_bar`;
 
                 const progressControl = {
@@ -101,7 +102,8 @@ const preview = {
                 controls.push(progressControl);
             }
             else if (component.type === 'on_off_item') {
-                const index = component.properties.collection_index;
+                
+                const index = Number(component.properties.collection_index);
                 const controlName = `item${index}@chest.on_off_item`;
 
                 controls.push({
@@ -131,7 +133,8 @@ const preview = {
                 });
             }
             else if (component.type === 'pot') {
-                const index = component.properties.collection_index;
+                
+                const index = Number(component.properties.collection_index);
                 const controlName = `item${index}@chest.pot`;
 
                 controls.push({
@@ -145,7 +148,8 @@ const preview = {
                 });
             }
             else if (component.type === 'container_type') {
-                const index = component.properties.collection_index;
+                
+                const index = Number(component.properties.collection_index);
                 const controlName = `item${index}@chest.container_type`;
 
                 const containerControl = {
@@ -171,7 +175,8 @@ const preview = {
                 controls.push(containerControl);
             }
             else if (component.type === 'container_item_with_picture') {
-                const index = component.properties.collection_index;
+                
+                const index = Number(component.properties.collection_index);
                 const controlName = `item${index}@chest.container_item_with_picture`;
 
                 controls.push({
@@ -185,7 +190,8 @@ const preview = {
                 });
             }
             else {
-                const index = component.properties.collection_index;
+                
+                const index = Number(component.properties.collection_index);
                 const controlName = `item${index}@chest.container_item`;
 
                 const control = {
