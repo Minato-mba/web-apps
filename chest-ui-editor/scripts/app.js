@@ -12,6 +12,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     editor.fixComponentZIndices();
+
+    document.getElementById('import-zip').addEventListener('click', function() {
+        importZipProject();
+    });
 });
 
 function setupActionButtons() {

@@ -102,6 +102,12 @@ const exporter = {
         const jsonForExport = JSON.parse(JSON.stringify(json));
         const texturePaths = this.extractTexturePaths(jsonForExport);
 
+        const componentsData = {
+            components: editor.getComponents(),
+            version: '1.0.2',
+            timestamp: Date.now()
+        };
+        zip.file("chest_ui_data.json", JSON.stringify(componentsData, null, 2));
 
         const manifestJson = this.generateManifestJson();
         resourcePack.file("manifest.json", JSON.stringify(manifestJson, null, 2));
@@ -256,3 +262,49 @@ const exporter = {
         }
     }
 };
+
+function importZipProject() {
+    util.importZipFile(async (data, imageFiles) => {
+        try {
+            if (imageFiles && imageFiles.length > 0) {
+                await Promise.all(imageFiles.map(item => {
+                    return new Promise((resolve) => {
+                        imageManager.storeImage(item.file, (storedPath) => {
+                            resolve();
+                        }, item.path);
+                    });
+                }));
+            }
+
+            editor.clearComponents();
+
+            if (data.components && Array.isArray(data.components)) {
+                data.components.forEach(comp => {
+                    const component = createComponent(
+                        comp.type,
+                        comp.x,
+                        comp.y,
+                        comp.width,
+                        comp.height,
+                        comp.properties
+                    );
+
+                    if (comp.id) {
+                        component.id = comp.id;
+                    }
+
+                    if (comp.zIndex !== undefined) {
+                        component.zIndex = comp.zIndex;
+                    }
+
+                    editor.addComponent(component);
+                });
+            }
+
+            alert('Project imported successfully!');
+        } catch (err) {
+            console.error('Error importing project:', err);
+            alert('Error importing project: ' + err.message);
+        }
+    });
+}

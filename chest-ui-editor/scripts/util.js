@@ -1,5 +1,3 @@
-
-
 const util = {
 
     generateUniqueId: () => {
@@ -116,6 +114,64 @@ const util = {
                 }
             };
             reader.readAsText(file);
+        };
+
+        input.click();
+    },
+    importZipFile: (onLoad) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.zip';
+
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                const zipData = await file.arrayBuffer();
+                const zip = await JSZip.loadAsync(zipData);
+
+                const jsonFile = zip.file("chest_ui_data.json");
+                if (!jsonFile) {
+                    alert('Invalid ZIP file: Missing UI data (chest_ui_data.json not found)');
+                    return;
+                }
+
+                const jsonContent = await jsonFile.async("string");
+                const data = JSON.parse(jsonContent);
+
+                const imagePromises = [];
+                const imageFiles = [];
+
+                let imageFolder = zip.folder("images");
+
+                if (!imageFolder || Object.keys(imageFolder.files).length === 0) {
+                    imageFolder = zip.folder("ChestUI_ResourcePack/textures/ui/custom");
+                }
+
+                if (imageFolder) {
+                    imageFolder.forEach((relativePath, zipEntry) => {
+                        if (!zipEntry.dir) {
+                            const promise = zipEntry.async("blob").then(blob => {
+                                const imageName = relativePath.split('/').pop();
+                                const imageFile = new File([blob], imageName, { type: blob.type || 'image/png' });
+                                imageFiles.push({
+                                    file: imageFile,
+                                    path: 'user_uploaded:' + imageName
+                                });
+                            });
+                            imagePromises.push(promise);
+                        }
+                    });
+                }
+
+                await Promise.all(imagePromises);
+
+                onLoad(data, imageFiles);
+            } catch (error) {
+                console.error('Error importing ZIP file:', error);
+                alert('Error importing ZIP file: ' + error.message);
+            }
         };
 
         input.click();
