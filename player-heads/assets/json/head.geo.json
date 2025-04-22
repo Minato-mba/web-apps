@@ -1,0 +1,99 @@
+{
+	"format_version": "1.21.20",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.head",
+				"texture_width": 64,
+				"texture_height": 16,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "head",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "up_0",
+					"parent": "head",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-4, 0.5, -4], "size": [8, 8, 8], "uv": [0, 0]},
+						{"origin": [-4, 0.5, -4], "size": [8, 8, 8], "inflate": 0.5, "uv": [32, 0]}
+					]
+				},
+				{
+					"name": "up_22_5",
+					"parent": "head",
+					"pivot": [0, 0, 0],
+					"rotation": [0, 22.5, 0],
+					"cubes": [
+						{"origin": [-4, 0.5, -4], "size": [8, 8, 8], "uv": [0, 0]},
+						{"origin": [-4, 0.5, -4], "size": [8, 8, 8], "inflate": 0.5, "uv": [32, 0]}
+					]
+				},
+				{
+					"name": "up_45",
+					"parent": "head",
+					"pivot": [0, 0, 0],
+					"rotation": [0, 45, 0],
+					"cubes": [
+						{"origin": [-4, 0.5, -4], "size": [8, 8, 8], "uv": [0, 0]},
+						{"origin": [-4, 0.5, -4], "size": [8, 8, 8], "inflate": 0.5, "uv": [32, 0]}
+					]
+				},
+				{
+					"name": "up_67_5",
+					"parent": "head",
+					"pivot": [0, 0, 0],
+					"rotation": [0, 67.5, 0],
+					"cubes": [
+						{"origin": [-4, 0.5, -4], "size": [8, 8, 8], "uv": [0, 0]},
+						{"origin": [-4, 0.5, -4], "size": [8, 8, 8], "inflate": 0.5, "uv": [32, 0]}
+					]
+				},
+				{
+					"name": "side",
+					"parent": "head",
+					"pivot": [0, 5, 8],
+					"rotation": [90, 0, 0],
+					"cubes": [
+						{"origin": [-4, 4, 5.48], "size": [8, 8, 8], "pivot": [0, 8, 11], "rotation": [-90, 0, 0], "uv": [0, 0]},
+						{"origin": [-4, 4, 5.48], "size": [8, 8, 8], "inflate": 0.5, "pivot": [0, 8, 11], "rotation": [-90, 0, 0], "uv": [32, 0]}
+					]
+				}
+			],
+			"item_display_transforms": {
+			  "gui": {
+				"rotation": [20, -135, 0]
+			  },
+			  "fixed": {
+				"scale": [1.1, 1.1, 1.1],
+				"translation": [0, 0, -4]
+			  },
+			  "ground": {
+				"scale": [0.5, 0.5, 0.5],
+				"translation": [0, 1, -2]
+			  },
+			  "firstperson_righthand": {
+				"translation": [0, 3, 0],
+				"rotation": [0, 30, 0]
+			  },
+			  "firstperson_lefthand": {
+				"translation": [0, 3, 0],
+				"rotation": [0, 30, 0]
+			  },
+			  "thirdperson_righthand": {
+				"translation": [-1.5, 1.5, 0],
+				"rotation": [70, 45, 0]
+			  },
+			  "thirdperson_lefthand": {
+				"translation": [-1.5, 1.5, 0],
+				"rotation": [70, 45, 0]
+			  }
+			}
+		}
+	]
+}

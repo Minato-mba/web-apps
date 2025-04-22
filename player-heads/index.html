@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Heads Generator</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        .head .outer .width-ratio-0-25 {
+            background-size: 1360px 340px;
+        }
+
+        .head .outer .width-ratio-0-5 {
+            background-size: 1360px 680px;
+        }
+
+        .head {
+            perspective: 1000px;
+            perspective-origin: 50% 0;
+            height: 200px;
+            width: 200px;
+            position: relative;
+            transform: scale(calc(var(--size, 100) / 240));
+            transition: transform 0.3s ease;
+            margin: 0 auto;
+        }
+
+        .head:hover {
+            animation-play-state: paused;
+            transform: scale(calc(var(--size, 100) / 240 + 0.05));
+            filter: drop-shadow(0 0 0 white) drop-shadow(2px 0 0 white) drop-shadow(-2px 0 0 white) drop-shadow(0 2px 0 white) drop-shadow(0 -2px 0 white) drop-shadow(2px 2px 0 white) drop-shadow(-2px -2px 0 white) drop-shadow(-2px 2px 0 white) drop-shadow(2px -2px 0 white);
+            transition: transform 0.3s ease;
+        }
+
+        .faces {
+            margin-top: 20px;
+            margin-left: 40px;
+            width: 170px;
+            height: 170px;
+            position: absolute;
+            transform-style: preserve-3d;
+            animation: spin 5s linear infinite;
+            transition: transform 0.5s ease;
+        }
+
+        .faces:hover {
+            animation-play-state: paused;
+            transform: scale(1.2);
+        }
+
+        .head .inner {
+            width: 160px;
+            height: 160px;
+            background-size: 1280px 1280px;
+            top: 5px;
+            left: 5px;
+        }
+
+        .head .inner.width-ratio-0-25 {
+            background-size: 1280px 320px;
+        }
+
+        .head .inner.width-ratio-0-5 {
+            background-size: 1280px 640px;
+        }
+
+        .head .outer {
+            width: 170px;
+            height: 170px;
+            background-size: 1360px 1360px;
+        }
+
+        .head .outer.width-ratio-0-25 {
+            background-size: 1360px 340px;
+        }
+
+        .head .outer.width-ratio-0-5 {
+            background-size: 1360px 680px;
+        }
+
+        .faces>div {
+            position: absolute;
+            background-repeat: no-repeat;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -o-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            -ms-interpolation-mode: nearest-neighbor;
+            image-rendering: pixelated;
+        }
+
+        .inner.front {
+            transform: rotateY(0deg) translateZ(80px);
+            background-position: -160px -160px;
+        }
+
+        .inner.back {
+            transform: rotateY(180deg) translateZ(80px);
+            background-position: -480px -160px;
+            filter: brightness(0.6);
+        }
+
+        .inner.right {
+            transform: rotateY(90deg) translateZ(80px);
+            background-position: -320px -160px;
+            filter: brightness(0.8);
+        }
+
+        .inner.left {
+            transform: rotateY(-90deg) translateZ(80px);
+            background-position: 0px -160px;
+            filter: brightness(0.8);
+        }
+
+        .inner.top {
+            transform: rotateX(90deg) translateZ(80px);
+            background-position: -160px 0px;
+            filter: brightness(0.7);
+        }
+
+        .inner.bottom {
+            transform: rotateX(-90deg) translateZ(80px) scaleY(-1);
+            background-position: -320px 0px;
+            filter: brightness(0.7);
+        }
+
+        .outer.front {
+            transform: rotateY(0deg) translateZ(85px);
+            background-position: -850px -170px;
+        }
+
+        .outer.back {
+            transform: rotateY(180deg) translateZ(85px);
+            background-position: -1190px -170px;
+            filter: brightness(0.6);
+        }
+
+        .outer.right {
+            transform: rotateY(90deg) translateZ(85px);
+            background-position: -1020px -170px;
+            filter: brightness(0.8);
+        }
+
+        .outer.left {
+            transform: rotateY(-90deg) translateZ(85px);
+            background-position: -680px -170px;
+            filter: brightness(0.8);
+        }
+
+        .outer.top {
+            transform: rotateX(90deg) translateZ(85px);
+            background-position: -850px 0px;
+            filter: brightness(0.7);
+        }
+
+        .outer.bottom {
+            transform: rotateX(-90deg) translateZ(85px) scaleY(-1);
+            background-position: -1020px 0px;
+            filter: brightness(0.7);
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotateY(0deg);
+            }
+
+            to {
+                transform: rotateY(360deg);
+            }
+        }
+
+        .preview-container .head-preview .head,
+        .preview-container .new-head .head,
+        .preview-container .current-head .head {
+            margin: 0 -60px;
+        }
+
+        .head-preview .head,
+        .new-head .head,
+        .current-head .head {
+            --size: 150;
+        }
+
+        @media (max-width: 768px) {
+
+            .head-preview .head,
+            .new-head .head,
+            .current-head .head {
+                --size: 100;
+            }
+
+            .head {
+                height: 120px;
+                width: 120px;
+            }
+
+            .preview-container .head-preview .head,
+            .preview-container .new-head .head,
+            .preview-container .current-head .head {
+                margin: 0 -10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Player Heads Generator</h1>
+        </header>
+
+        <main>
+            <div id="welcome-screen" class="screen">
+                <div class="buttons-container">
+                    <button id="create-pack-btn" class="button primary">Create Pack</button>
+                    <button id="load-pack-btn" class="button secondary">Load Pack</button>
+                </div>
+            </div>
+
+            <div id="pack-editor" class="screen hidden">
+                <div class="sidebar">
+                    <div class="pack-info">
+                        <h2 id="pack-name-display">Pack Name</h2>
+                        <p id="heads-count">Heads: 0</p>
+                    </div>
+                    <div class="sidebar-buttons">
+                        <button id="add-head-btn" class="button primary">
+                            <span class="material-symbols-outlined">add</span>
+                            Add Head
+                        </button>
+                        <button id="generate-pack-btn" class="button primary">
+                            <span class="material-symbols-outlined">archive</span>
+                            Generate Pack
+                        </button>
+                        <button id="save-pack-btn" class="button secondary">
+                            <span class="material-symbols-outlined">save</span>
+                            Save Pack
+                        </button>
+                        <button id="delete-pack-btn" class="button destructive">
+                            <span class="material-symbols-outlined">delete</span>
+                            Delete Pack
+                        </button>
+                        <button id="back-to-menu-btn" class="button secondary">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                            Back to Menu
+                        </button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="heads-list-header">
+                        <h2>Player Heads</h2>
+                        <div class="search-container">
+                            <input type="text" id="search-heads" placeholder="Search heads...">
+                        </div>
+                    </div>
+                    <div id="heads-container" class="heads-container">
+                        <!-- Heads will be listed here -->
+                        <div class="no-heads-message">
+                            <p>No heads in this pack yet. Click "Add Head" to get started.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modals -->
+            <div id="create-pack-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">x</span>
+                    <h2>Create New Pack</h2>
+                    <div class="modal-body">
+
+                        <form id="create-pack-form">
+                            <div class="form-group">
+                                <label for="pack-name">Pack Name:</label>
+                                <input type="text" id="pack-name" name="pack-name" maxlength="32"
+                                    placeholder="My Player Heads" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="button secondary">Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="add-head-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">x</span>
+                    <h2>Add New Head</h2>
+                    <div class="modal-body">
+
+                        <form id="add-head-form">
+                            <div class="form-group">
+                                <label for="head-name">Head Name:</label>
+                                <input type="text" id="head-name" name="head-name" maxlength="16"
+                                    placeholder="Player name">
+                            </div>
+                            <div class="form-group">
+                                <label>Player Skin (PNG only):</label>
+                                <input type="file" id="skin-file" name="skin-file" accept=".png" style="display: none;">
+                                <label for="skin-file" class="file-input-label">
+                                    <button type="button" class="button secondary file-select-btn">
+                                        <span class="material-symbols-outlined">upload_file</span>
+                                        Choose Skin File
+                                    </button>
+                                </label>
+                            </div>
+                            <div class="preview-container">
+                                <div class="skin-preview">
+                                    <h3>Skin Preview</h3>
+                                    <canvas id="skin-preview-canvas" width="225" height="225"></canvas>
+                                </div>
+                                <div class="head-preview">
+                                    <h3>Head Preview</h3>
+                                    <div class="head">
+                                        <div class="faces" id="head-preview-faces">
+                                            <div class="inner back"></div>
+                                            <div class="inner right"></div>
+                                            <div class="inner top"></div>
+                                            <div class="inner bottom"></div>
+                                            <div class="inner front"></div>
+                                            <div class="inner left"></div>
+                                            <div class="outer back"></div>
+                                            <div class="outer right"></div>
+                                            <div class="outer top"></div>
+                                            <div class="outer bottom"></div>
+                                            <div class="outer front"></div>
+                                            <div class="outer left"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="button secondary">Add Head</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="edit-head-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">x</span>
+                    <h2>Edit Head</h2>
+
+                    <div class="modal-body">
+
+                        <form id="edit-head-form">
+                            <input type="hidden" id="edit-head-name" name="edit-head-name">
+                            <div class="form-group">
+                                <label>New Player Skin (PNG only):</label>
+                                <input type="file" id="edit-skin-file" name="edit-skin-file" accept=".png"
+                                    style="display: none;">
+                                <label for="edit-skin-file" class="file-input-label">
+                                    <button type="button" class="button secondary file-select-btn">
+                                        <span class="material-symbols-outlined">upload_file</span>
+                                        Choose Skin File
+                                    </button>
+                                </label>
+                            </div>
+                            <div class="preview-container">
+                                <div class="current-head">
+                                    <h3>Current Head</h3>
+                                    <div class="head">
+                                        <div class="faces" id="current-head-faces">
+                                            <div class="inner back width-ratio-0-25"></div>
+                                            <div class="inner right width-ratio-0-25"></div>
+                                            <div class="inner top width-ratio-0-25"></div>
+                                            <div class="inner bottom width-ratio-0-25"></div>
+                                            <div class="inner front width-ratio-0-25"></div>
+                                            <div class="inner left width-ratio-0-25"></div>
+                                            <div class="outer back width-ratio-0-25"></div>
+                                            <div class="outer right width-ratio-0-25"></div>
+                                            <div class="outer top width-ratio-0-25"></div>
+                                            <div class="outer bottom width-ratio-0-25"></div>
+                                            <div class="outer front width-ratio-0-25"></div>
+                                            <div class="outer left width-ratio-0-25"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="new-head">
+                                    <h3>New Head</h3>
+                                    <div class="head">
+                                        <div class="faces" id="new-head-faces">
+                                            <div class="inner back"></div>
+                                            <div class="inner right"></div>
+                                            <div class="inner top"></div>
+                                            <div class="inner bottom"></div>
+                                            <div class="inner front"></div>
+                                            <div class="inner left"></div>
+                                            <div class="outer back"></div>
+                                            <div class="outer right"></div>
+                                            <div class="outer top"></div>
+                                            <div class="outer bottom"></div>
+                                            <div class="outer front"></div>
+                                            <div class="outer left"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="edit-buttons">
+                                <button type="submit" class="button secondary">Update</button>
+                                <button type="button" id="delete-head-btn" class="button danger">Delete</button>
+                            </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="load-pack-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">x</span>
+                    <h2>Load Pack</h2>
+                    <div class="modal-body">
+
+                        <div id="saved-packs-list" class="saved-packs-list">
+                            <!-- Saved packs will be listed here -->
+                        </div>
+                        <div class="import-pack modal-footer">
+                            <h3>Import From File</h3>
+                            <input type="file" id="import-pack-file" accept=".json" style="display: none;">
+                            <label for="import-pack-file" class="file-input-label">
+                                <button type="button" class="button secondary file-select-btn">
+                                    <span class="material-symbols-outlined">upload_file</span>
+                                    Choose Pack File
+                                </button>
+                            </label>
+                            <button id="import-pack-btn" class="button secondary">Import</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="confirm-modal" class="modal">
+                <div class="modal-content">
+                    <h2 id="confirm-title">Confirm Action</h2>
+
+                    <div class="modal-body">
+
+                        <p id="confirm-message">Are you sure you want to proceed?</p>
+                        <div class="confirm-buttons">
+                            <button id="confirm-cancel" class="button secondary">Cancel</button>
+                            <button id="confirm-ok" class="button danger">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="generate-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">x</span>
+                    <h2>Generate Add-on</h2>
+
+                    <div class="modal-body">
+
+                        <form id="generate-form">
+                            <div class="form-group">
+                                <label for="addon-name">Add-on Name:</label>
+                                <input type="text" id="addon-name" name="addon-name" maxlength="32" required>
+                            </div>
+                            <div class="pack-preview">
+                                <h3>Add-on Preview</h3>
+                                <canvas id="pack-icon-preview" width="225" height="225"></canvas>
+                                <p id="preview-head-count">Heads: 0</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="button secondary">Generate Add-on</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Created by minato4743</p>
+            <div class="links">
+                <a href="https://www.youtube.com/@MinecraftBedrockArabic" target="_blank">YouTube</a>
+                <a href="https://paypal.me/mbarabic" target="_blank">Donate</a>
+            </div>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/ui.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            UI.initialize();
+        });
+    </script>
+</body>
+
+</html>

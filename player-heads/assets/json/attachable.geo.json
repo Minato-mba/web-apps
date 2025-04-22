@@ -1,0 +1,31 @@
+{
+	"format_version": "1.21.20",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.attachable_head",
+				"texture_width": 64,
+				"texture_height": 16,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "head",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "side",
+					"parent": "head",
+					"pivot": [-1, 4.9, 1.08],
+					"rotation": [90, 0, 0],
+					"cubes": [
+						{"origin": [-4, -0.1, -4], "size": [8, 8, 8], "inflate": 0.55, "pivot": [-1, 4.9, 1.08], "rotation": [-90, 0, 0], "uv": [0, 0]},
+						{"origin": [-4, -0.1, -4], "size": [8, 8, 8], "inflate": 0.8, "pivot": [-1, 4.9, 1.08], "rotation": [-90, 0, 0], "uv": [32, 0]}
+					]
+				}
+			]
+		}
+	]
+}
