@@ -175,7 +175,7 @@ const Utils = {
         }
 
         try {
-            const iconUrl = `../assets/images/pack_icon${iconIndex}.png`;
+            const iconUrl = `./assets/images/pack_icon${iconIndex}.png`;
             const iconImage = await this.loadImage(iconUrl);
             ctx.drawImage(iconImage, 0, 0, 225, 225);
         } catch (error) {
@@ -566,8 +566,8 @@ const Utils = {
 
         zip.file(`player_head_bp/item_catalog/crafting_item_catalog.json`, JSON.stringify(itemCatalog));
 
-        const headGeoJson = await this.fetchJSON('../assets/json/head.geo.json');
-        const attachableHeadGeoJson = await this.fetchJSON('../assets/json/attachable.geo.json');
+        const headGeoJson = await this.fetchJSON('./assets/json/head.geo.json');
+        const attachableHeadGeoJson = await this.fetchJSON('./assets/json/attachable.geo.json');
 
         zip.file(`player_head_rp/models/blocks/head.geo.json`, JSON.stringify(headGeoJson));
         zip.file(`player_head_rp/models/blocks/attachable.geo.json`, JSON.stringify(attachableHeadGeoJson));
