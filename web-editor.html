@@ -664,6 +664,12 @@
         currentVersion: "1.21.50",
         typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/vanilla-data@${version}/lib/index.d.ts`,
       },
+      {
+        name: "@minecraft/debug-utilities",
+        selectorId: "minecraft-debug-utilities",
+        currentVersion: "1.0.0-beta.1.21.70-stable",
+        typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/debug-utilities@${version}/lib/index.d.ts`,
+      },
     ];
 
     const defaultCode = `// Minecraft scripting with full autocomplete capabilities\nimport { world, ItemStack } from '@minecraft/server';\nimport { ActionFormData } from '@minecraft/server-ui';\n\nworld.beforeEvents.itemUse.subscribe((event) => {\n    const { source, itemStack } = event;\n    if (itemStack.typeId !== "minecraft:stick") return;\n    new ActionFormData()\n        .title("Special Offer!")\n        .body("Do you want a free diamond?")\n        .button("Yes!")\n        .button("No")\n        .show(source)\n        .then(({ selection }) => {\n            if (selection !== 0) return;\n            source.getComponent("minecraft:inventory")?.container?.addItem(new ItemStack("minecraft:diamond", 1));\n            source.sendMessage("You received a free diamond!");\n        })\n});`;
