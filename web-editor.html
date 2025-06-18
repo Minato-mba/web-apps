@@ -554,6 +554,7 @@
             <option value="gruvbox">Gruvbox</option>
           </select></label>
         <label><input type="checkbox" id="autoClosingBrackets" checked /> Auto Closing Brackets</label>
+        <label><input type="checkbox" id="customSelectWidget" /> Enable Custom Select Widget (Mobile)</label>
         <label>Auto-Save Interval (seconds)
           <input type="number" id="autoSaveInterval" min="5" value="30" class="toolbar-input" checked />
         </label>
@@ -845,6 +846,7 @@
         autoSaveInterval: document.getElementById("autoSaveInterval"),
         autoSaveEnabled: document.getElementById("autoSaveEnabled"),
         language: document.getElementById("language"),
+        customSelectWidget: document.getElementById("customSelectWidget"),
       };
     }
 
@@ -860,6 +862,7 @@
         storedAutoSaveInterval: localStorage.getItem("autoSaveInterval"),
         storedAutoSaveEnabled: localStorage.getItem("autoSaveEnabled"),
         storedLanguage: localStorage.getItem("language"),
+        storedCustomSelectWidget: localStorage.getItem("customSelectWidget"),
       };
     }
     function showSettings() {
@@ -909,7 +912,19 @@
     }
 
     function saveSetting() {
-      const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets } = getSettingElements();
+      const { 
+        miniMap, 
+        wordWrap, 
+        fontSize, 
+        lineNumbers, 
+        renderWhitespace, 
+        theme, 
+        autoClosingBrackets, 
+        autoSaveInterval, 
+        autoSaveEnabled, 
+        language, 
+        customSelectWidget 
+      } = getSettingElements();
 
       localStorage.setItem("minimap", miniMap.checked);
       localStorage.setItem("wordWrap", wordWrap.checked);
@@ -921,10 +936,11 @@
       localStorage.setItem("autoSaveInterval", autoSaveInterval.value);
       localStorage.setItem("autoSaveEnabled", autoSaveEnabled.checked);
       localStorage.setItem("language", language.value);
+      localStorage.setItem("customSelectWidget", customSelectWidget.checked);
     }
 
     function loadSetting() {
-      const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language } = getSettingElements();
+      const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language, customSelectWidget } = getSettingElements();
       const {
         storedMinimap,
         storedWordWrap,
@@ -936,6 +952,7 @@
         storedAutoSaveInterval,
         storedAutoSaveEnabled,
         storedLanguage,
+        storedCustomSelectWidget,
       } = getStoredSettings();
       miniMap.checked = storedMinimap ? storedMinimap === "true" : false;
       wordWrap.checked = storedWordWrap ? storedWordWrap === "true" : false;
@@ -947,6 +964,7 @@
       autoSaveInterval.value = storedAutoSaveInterval || 30;
       autoSaveEnabled.checked = storedAutoSaveEnabled ? storedAutoSaveEnabled === "true" : true;
       language.value = storedLanguage || "javascript";
+      customSelectWidget.checked = storedCustomSelectWidget ? storedCustomSelectWidget === "true" : false;
     }
 
     async function initializeEditor() {
@@ -1089,6 +1107,7 @@
           storedAutoSaveInterval,
           storedAutoSaveEnabled,
           storedLanguage,
+          storedCustomSelectWidget,
         } = getStoredSettings();
 
         editor = monaco.editor.create(document.getElementById("editor"), {
@@ -1407,14 +1426,23 @@
 
         editor.onDidChangeCursorSelection((e) => {
           if (!isMobile()) return;
+          
+          const customSelectWidgetEnabled = localStorage.getItem("customSelectWidget") === "true";
+          if (!customSelectWidgetEnabled) {
+            if (selectionsContainer) selectionsContainer.classList.add("hidden");
+            const selectorMenu = document.querySelector(".arrow-container");
+            if (selectorMenu) selectorMenu.style.display = "none";
+            return;
+          }
+          
           const selection = e.selection;
           const startPosition = selection.getStartPosition();
           const endPosition = selection.getEndPosition();
 
           if (selection.isEmpty()) {
             const selectorMenu = document.querySelector(".arrow-container");
-            selectorMenu.style.display = "none";
-            selectionsContainer.classList.add("hidden");
+            if (selectorMenu) selectorMenu.style.display = "none";
+            if (selectionsContainer) selectionsContainer.classList.add("hidden");
             editor.focus();
             return;
           }
@@ -1425,7 +1453,7 @@
           const startCoords = editor.getScrolledVisiblePosition(startPosition);
           const endCoords = editor.getScrolledVisiblePosition(endPosition);
 
-          if (startCoords && endCoords) {
+          if (startCoords && endCoords && leftSelector && rightSelector) {
             const editorCoords = editorElement.getBoundingClientRect();
 
             const leftSelectorX = editorCoords.left + startCoords.left - leftLength;
@@ -1437,11 +1465,18 @@
             rightSelector.style.transform = `translateX(${rightSelectorX - 30}px) translateY(${rightSelectorY - 8}px)`;
             globalPoseMenu = leftSelectorY - 50;
           }
-          selectionsContainer.classList.remove("hidden");
-          showContextMenu();
+          
+          if (selectionsContainer) {
+            selectionsContainer.classList.remove("hidden");
+            showContextMenu();
+          }
         });
 
-        initializeSelector();
+        // Only initialize the selector if custom select widget is enabled
+        const customSelectWidgetEnabled = localStorage.getItem("customSelectWidget") === "true";
+        if (isMobile() && customSelectWidgetEnabled) {
+          initializeSelector();
+        }
 
         function showContextMenu() {
           const selectorMenu = document.querySelector(".arrow-container");
