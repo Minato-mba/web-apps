@@ -554,7 +554,6 @@
             <option value="gruvbox">Gruvbox</option>
           </select></label>
         <label><input type="checkbox" id="autoClosingBrackets" checked /> Auto Closing Brackets</label>
-        <label><input type="checkbox" id="customSelectWidget" /> Enable Custom Select Widget (Mobile)</label>
         <label>Auto-Save Interval (seconds)
           <input type="number" id="autoSaveInterval" min="5" value="30" class="toolbar-input" checked />
         </label>
@@ -632,43 +631,43 @@
       {
         name: "@minecraft/server",
         selectorId: "minecraft-server",
-        currentVersion: localStorage.getItem("moduleVersion_minecraft-server") || "1.17.0-beta.1.21.51-stable",
+        currentVersion: "1.17.0-beta.1.21.51-stable",
         typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/server@${version}/index.d.ts`,
       },
       {
         name: "@minecraft/server-ui",
         selectorId: "minecraft-server-ui",
-        currentVersion: localStorage.getItem("moduleVersion_minecraft-server-ui") || "1.3.0",
+        currentVersion: "1.3.0",
         typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/server-ui@${version}/index.d.ts`,
       },
       {
         name: "@minecraft/server-net",
         selectorId: "minecraft-server-net",
-        currentVersion: localStorage.getItem("moduleVersion_minecraft-server-net") || "1.0.0-beta.1.21.51-stable",
+        currentVersion: "1.0.0-beta.1.21.51-stable",
         typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/server-net@${version}/index.d.ts`,
       },
       {
         name: "@minecraft/server-admin",
         selectorId: "minecraft-server-admin",
-        currentVersion: localStorage.getItem("moduleVersion_minecraft-server-admin") || "1.0.0-beta.1.21.51-stable",
+        currentVersion: "1.0.0-beta.1.21.51-stable",
         typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/server-admin@${version}/index.d.ts`,
       },
       {
         name: "@minecraft/math",
         selectorId: "minecraft-math",
-        currentVersion: localStorage.getItem("moduleVersion_minecraft-math") || "2.0.1",
+        currentVersion: "2.0.1",
         typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/math@${version}/dist/minecraft-math.d.ts`,
       },
       {
         name: "@minecraft/vanilla-data",
         selectorId: "minecraft-vanilla-data",
-        currentVersion: localStorage.getItem("moduleVersion_minecraft-vanilla-data") || "1.21.50",
+        currentVersion: "1.21.50",
         typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/vanilla-data@${version}/lib/index.d.ts`,
       },
       {
         name: "@minecraft/debug-utilities",
         selectorId: "minecraft-debug-utilities",
-        currentVersion: localStorage.getItem("moduleVersion_minecraft-debug-utilities") || "1.0.0-beta.1.21.70-stable",
+        currentVersion: "1.0.0-beta.1.21.70-stable",
         typesUrl: (version) => `https://cdn.jsdelivr.net/npm/@minecraft/debug-utilities@${version}/index.d.ts`,
       },
     ];
@@ -757,12 +756,10 @@
         const selectedVersion = document.getElementById(module.selectorId).value;
         console.log(`Updating ${module.name} to version ${selectedVersion}`);
         module.currentVersion = selectedVersion;
-        localStorage.setItem(`moduleVersion_${module.selectorId}`, selectedVersion);
       }
 
       await loadTypeDefinitions();
       closeModal("versionModal");
-      showNotification("Module versions saved successfully");
       editor.setValue(editor.getValue());
 
       hideLoadingBar();
@@ -846,7 +843,6 @@
         autoSaveInterval: document.getElementById("autoSaveInterval"),
         autoSaveEnabled: document.getElementById("autoSaveEnabled"),
         language: document.getElementById("language"),
-        customSelectWidget: document.getElementById("customSelectWidget"),
       };
     }
 
@@ -862,7 +858,6 @@
         storedAutoSaveInterval: localStorage.getItem("autoSaveInterval"),
         storedAutoSaveEnabled: localStorage.getItem("autoSaveEnabled"),
         storedLanguage: localStorage.getItem("language"),
-        storedCustomSelectWidget: localStorage.getItem("customSelectWidget"),
       };
     }
     function showSettings() {
@@ -912,19 +907,7 @@
     }
 
     function saveSetting() {
-      const { 
-        miniMap, 
-        wordWrap, 
-        fontSize, 
-        lineNumbers, 
-        renderWhitespace, 
-        theme, 
-        autoClosingBrackets, 
-        autoSaveInterval, 
-        autoSaveEnabled, 
-        language, 
-        customSelectWidget 
-      } = getSettingElements();
+      const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets } = getSettingElements();
 
       localStorage.setItem("minimap", miniMap.checked);
       localStorage.setItem("wordWrap", wordWrap.checked);
@@ -936,11 +919,10 @@
       localStorage.setItem("autoSaveInterval", autoSaveInterval.value);
       localStorage.setItem("autoSaveEnabled", autoSaveEnabled.checked);
       localStorage.setItem("language", language.value);
-      localStorage.setItem("customSelectWidget", customSelectWidget.checked);
     }
 
     function loadSetting() {
-      const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language, customSelectWidget } = getSettingElements();
+      const { miniMap, wordWrap, fontSize, lineNumbers, renderWhitespace, theme, autoClosingBrackets, language } = getSettingElements();
       const {
         storedMinimap,
         storedWordWrap,
@@ -952,8 +934,8 @@
         storedAutoSaveInterval,
         storedAutoSaveEnabled,
         storedLanguage,
-        storedCustomSelectWidget,
       } = getStoredSettings();
+
       miniMap.checked = storedMinimap ? storedMinimap === "true" : false;
       wordWrap.checked = storedWordWrap ? storedWordWrap === "true" : false;
       fontSize.value = storedFontSize || 13;
@@ -964,7 +946,6 @@
       autoSaveInterval.value = storedAutoSaveInterval || 30;
       autoSaveEnabled.checked = storedAutoSaveEnabled ? storedAutoSaveEnabled === "true" : true;
       language.value = storedLanguage || "javascript";
-      customSelectWidget.checked = storedCustomSelectWidget ? storedCustomSelectWidget === "true" : false;
     }
 
     async function initializeEditor() {
@@ -1107,7 +1088,6 @@
           storedAutoSaveInterval,
           storedAutoSaveEnabled,
           storedLanguage,
-          storedCustomSelectWidget,
         } = getStoredSettings();
 
         editor = monaco.editor.create(document.getElementById("editor"), {
@@ -1426,23 +1406,14 @@
 
         editor.onDidChangeCursorSelection((e) => {
           if (!isMobile()) return;
-          
-          const customSelectWidgetEnabled = localStorage.getItem("customSelectWidget") === "true";
-          if (!customSelectWidgetEnabled) {
-            if (selectionsContainer) selectionsContainer.classList.add("hidden");
-            const selectorMenu = document.querySelector(".arrow-container");
-            if (selectorMenu) selectorMenu.style.display = "none";
-            return;
-          }
-          
           const selection = e.selection;
           const startPosition = selection.getStartPosition();
           const endPosition = selection.getEndPosition();
 
           if (selection.isEmpty()) {
             const selectorMenu = document.querySelector(".arrow-container");
-            if (selectorMenu) selectorMenu.style.display = "none";
-            if (selectionsContainer) selectionsContainer.classList.add("hidden");
+            selectorMenu.style.display = "none";
+            selectionsContainer.classList.add("hidden");
             editor.focus();
             return;
           }
@@ -1453,7 +1424,7 @@
           const startCoords = editor.getScrolledVisiblePosition(startPosition);
           const endCoords = editor.getScrolledVisiblePosition(endPosition);
 
-          if (startCoords && endCoords && leftSelector && rightSelector) {
+          if (startCoords && endCoords) {
             const editorCoords = editorElement.getBoundingClientRect();
 
             const leftSelectorX = editorCoords.left + startCoords.left - leftLength;
@@ -1465,18 +1436,11 @@
             rightSelector.style.transform = `translateX(${rightSelectorX - 30}px) translateY(${rightSelectorY - 8}px)`;
             globalPoseMenu = leftSelectorY - 50;
           }
-          
-          if (selectionsContainer) {
-            selectionsContainer.classList.remove("hidden");
-            showContextMenu();
-          }
+          selectionsContainer.classList.remove("hidden");
+          showContextMenu();
         });
 
-        // Only initialize the selector if custom select widget is enabled
-        const customSelectWidgetEnabled = localStorage.getItem("customSelectWidget") === "true";
-        if (isMobile() && customSelectWidgetEnabled) {
-          initializeSelector();
-        }
+        initializeSelector();
 
         function showContextMenu() {
           const selectorMenu = document.querySelector(".arrow-container");
