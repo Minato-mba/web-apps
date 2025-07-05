@@ -413,27 +413,6 @@
       display: none;
     }
 
-    .selectors {
-      width: 25px;
-      height: 25px;
-      background: #7a77ff;
-      position: absolute;
-      border-radius: 50%;
-      margin-top: 25px;
-      box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-      transition: transform 0.1s ease;
-      z-index: 2000;
-    }
-
-    .right-selector {
-      border-top-left-radius: 0;
-      margin-left: -8px;
-    }
-
-    .left-selector {
-      border-top-right-radius: 0;
-      margin-left: -35px;
-    }
 
     .mnc {
       padding: 10px;
@@ -443,50 +422,6 @@
 
     .hovered {
       background-color: #ccc;
-    }
-
-    .right-arrow-mnc,
-    .left-arrow-mnc {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 20px;
-      height: 20px;
-      background-color: blue;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .right-arrow-mnc {
-      right: 10px;
-    }
-
-    .left-arrow-mnc {
-      left: 10px;
-    }
-
-    .arrow-container {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      display: none;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      padding: 10px;
-      background: var(--bg-color);
-      border: 1px solid var(--button-border);
-      border-radius: 8px;
-      max-width: 300px;
-      margin: auto;
-      z-index: 99999;
-    }
-
-    .left-arrow {
-      grid-row: span 3;
-    }
-
-    .right-arrow {
-      grid-row: span 3;
     }
   </style>
 </head>
@@ -510,20 +445,6 @@
       <button class="toolbar-btn" onclick="showSettings()">⚙️ Settings</button>
       <button class="toolbar-btn" onclick="showVersions()">📦 Modules</button>
       <button class="toolbar-btn" id="compileBtn" onclick="compileTypeScript()">🔄 Compile TS</button>
-    </div>
-    <!-- selection menu -->
-    <div id="arrow-layout" class="arrow-container hidden">
-      <button class="toolbar-btn left-arrow" onclick="selectMove('left')">&#8592;</button>
-      <button class="toolbar-btn up-arrow" onclick="selectMove('up')">&#8593;</button>
-      <button class="toolbar-btn right-arrow" onclick="selectMove('right')">&#8594;</button>
-      <button class="toolbar-btn" onabort="copy()">Copy</button>
-      <button class="toolbar-btn down-arrow" onclick="selectMove('down')">&#8595;</button>
-      <button class="toolbar-btn home-arrow" onclick="selectMove('home')">&#8676;</button>
-      <button class="toolbar-btn" onabort="paste()">Paste</button>
-      <button class="toolbar-btn end-arrow" onclick="selectMove('end')">&#8677;</button>
-      <button class="toolbar-btn" onclick="selectAll()">Select All</button>
-      <button class="toolbar-btn" onclick="formatSelection()">Format</button>
-      <button class="toolbar-btn" onclick="cut()">Cut</button>
     </div>
   </div>
   <div id="editor"></div>
