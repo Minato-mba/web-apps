@@ -3,22 +3,22 @@
   <head>
 
     <!-- Preload images -->
-    <link rel="preload" href="../content/pictures/9slice/input.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/tr.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/white_button.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/white_button_hover.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/white_button_active.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/dark_button.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/dark_button_hover.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/dark_button_active.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/blue_button.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/blue_button_hover.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/blue_button_active.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/red_button.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/red_button_hover.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/red_button_active.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/upload.png" as="image">
-    <link rel="preload" href="../content/pictures/9slice/copy.png" as="image">
+    <link rel="preload" href="./assets/input.png" as="image">
+    <link rel="preload" href="./assets/tr.png" as="image">
+    <link rel="preload" href="./assets/white_button.png" as="image">
+    <link rel="preload" href="./assets/white_button_hover.png" as="image">
+    <link rel="preload" href="./assets/white_button_active.png" as="image">
+    <link rel="preload" href="./assets/dark_button.png" as="image">
+    <link rel="preload" href="./assets/dark_button_hover.png" as="image">
+    <link rel="preload" href="./assets/dark_button_active.png" as="image">
+    <link rel="preload" href="./assets/blue_button.png" as="image">
+    <link rel="preload" href="./assets/blue_button_hover.png" as="image">
+    <link rel="preload" href="./assets/blue_button_active.png" as="image">
+    <link rel="preload" href="./assets/red_button.png" as="image">
+    <link rel="preload" href="./assets/red_button_hover.png" as="image">
+    <link rel="preload" href="./assets/red_button_active.png" as="image">
+    <link rel="preload" href="./assets/upload.png" as="image">
+    <link rel="preload" href="./assets/copy.png" as="image">
     
 
     <meta charset="UTF-8" />
@@ -93,7 +93,7 @@
       }
 
       #zoomIn, #zoomOut {
-        border-image-source: url("../content/pictures/9slice/normal_button.png");
+        border-image-source: url("./assets/normal_button.png");
         border-image-slice: 2 2 4 2 fill;
         border-width: 4px 4px 8px 4px;
         border-style: solid;
@@ -102,7 +102,7 @@
       }
 
       #zoomIn:hover, #zoomOut:hover {
-        border-image-source: url("../content/pictures/9slice/normal_button_hover.png");
+        border-image-source: url("./assets/normal_button_hover.png");
       }
 
       #zoomIn:hover img, #zoomOut:hover img {
@@ -111,7 +111,7 @@
 
 
       #zoomIn:active, #zoomOut:active {
-        border-image-source: url("../content/pictures/9slice/normal_button_active.png");
+        border-image-source: url("./assets/normal_button_active.png");
         border-image-slice: 2 fill;
         border-width: 4px;
         margin-top: 4px;
@@ -151,7 +151,7 @@
         position: relative;
         margin: 5px;
         border-width: 6px 2 2px 2;
-        border-image-source: url("../content/pictures/9slice/input.png");
+        border-image-source: url("./assets/input.png");
         border-image-slice: 3 1 1 1 fill;
         image-rendering: pixelated;
         border-style: solid;
@@ -187,7 +187,7 @@
       }
 
       #left-side {
-        background-image: url("../content/pictures/9slice/tr.png");
+        background-image: url("./assets/tr.png");
         image-rendering: pixelated;
         background-repeat: repeat;
         background-size: 20px 20px;
@@ -237,22 +237,22 @@
 
       #lightModeButton {
         color: #000;
-        border-image-source: url("../content/pictures/9slice/white_button.png");
+        border-image-source: url("./assets/white_button.png");
       }
 
       #lightModeButton:hover {
-        border-image-source: url("../content/pictures/9slice/white_button_hover.png");
+        border-image-source: url("./assets/white_button_hover.png");
       }
 
       #lightModeButton:active {
         margin-top: 4px;
         border-width: 4px 4px 4px 4px;
-        border-image-source: url("../content/pictures/9slice/white_button_active.png");
+        border-image-source: url("./assets/white_button_active.png");
         border-image-slice: 2 2 2 2 fill;
       }
 
       #darkModeButton {
-        border-image-source: url("../content/pictures/9slice/dark_button.png");
+        border-image-source: url("./assets/dark_button.png");
       }
 
       #darkModeButton img, #lightModeButton img {
@@ -267,13 +267,13 @@
       }
 
       #darkModeButton:hover {
-        border-image-source: url("../content/pictures/9slice/dark_button_hover.png");
+        border-image-source: url("./assets/dark_button_hover.png");
       }
 
       #darkModeButton:active {
         margin-top: 4px;
         border-width: 4px 4px 4px 4px;
-        border-image-source: url("../content/pictures/9slice/dark_button_active.png");
+        border-image-source: url("./assets/dark_button_active.png");
         border-image-slice: 2 2 2 2 fill;
       }
 
@@ -284,7 +284,7 @@
       input[type="number"] {
         color: white;
         border-width: 6px 0 2px 0;
-        border-image-source: url("../content/pictures/9slice/input.png");
+        border-image-source: url("./assets/input.png");
         border-image-slice: 3 1 1 1 fill;
         background-color: #333;
         padding: 5px;
@@ -322,21 +322,21 @@
         display: flex;
         gap: 10px;
         justify-content: center;
-        border-image-source: url("../content/pictures/9slice/blue_button.png");
+        border-image-source: url("./assets/blue_button.png");
         padding: 5px;
         cursor: pointer;
       }
 
       #custom-file-upload:hover,
       #copyButton:hover {
-        border-image-source: url("../content/pictures/9slice/blue_button_hover.png");
+        border-image-source: url("./assets/blue_button_hover.png");
       }
 
       #custom-file-upload:active,
       #copyButton:active {
         margin-top: 4px;
         border-width: 4px 4px 4px 4px;
-        border-image-source: url("../content/pictures/9slice/blue_button_active.png");
+        border-image-source: url("./assets/blue_button_active.png");
         border-image-slice: 2 2 2 2 fill;
       }
 
@@ -346,31 +346,31 @@
 
       .increase {
         cursor: pointer;
-        border-image-source: url("../content/pictures/9slice/blue_button.png");
+        border-image-source: url("./assets/blue_button.png");
       }
 
       .decrease {
         cursor: pointer;
-        border-image-source: url("../content/pictures/9slice/red_button.png");
+        border-image-source: url("./assets/red_button.png");
       }
 
       .increase:hover {
-        border-image-source: url("../content/pictures/9slice/blue_button_hover.png");
+        border-image-source: url("./assets/blue_button_hover.png");
       }
 
       .decrease:hover {
-        border-image-source: url("../content/pictures/9slice/red_button_hover.png");
+        border-image-source: url("./assets/red_button_hover.png");
       }
 
       .increase:active {
         margin-top: 4px;
-        border-image-source: url("../content/pictures/9slice/blue_button_active.png");
+        border-image-source: url("./assets/blue_button_active.png");
         border-image-slice: 2 2 2 2 fill;
       }
 
       .decrease:active {
         margin-top: 4px;
-        border-image-source: url("../content/pictures/9slice/red_button_active.png");
+        border-image-source: url("./assets/red_button_active.png");
         border-image-slice: 2 2 2 2 fill;
       }
 
@@ -494,13 +494,13 @@
         <div id="editor">
           <div id="preview">
             <div id="sideBar">
-              <button id="copyButton"><img src="../content/pictures/9slice/copy.png"></button>
-              <label for="textureUpload" id="custom-file-upload"><img src="../content/pictures/9slice/upload.png" alt=/></label>
+              <button id="copyButton"><img src="./assets/copy.png"></button>
+              <label for="textureUpload" id="custom-file-upload"><img src="./assets/upload.png" alt=/></label>
               <input type="file" id="textureUpload" accept="image/*" />
-              <button id="darkModeButton" class="mode-button"><img src="../content/pictures/9slice/dark.png" alt="🌙"></button>
-              <button id="lightModeButton" class="mode-button"><img src="../content/pictures/9slice/light.png" alt="🔆"></button>
-              <button id="zoomIn"><img src="../content/pictures/9slice/zoom_in.png" alt="+"></button>
-              <button id="zoomOut"><img src="../content/pictures/9slice/zoom_out.png" alt="-"></button>
+              <button id="darkModeButton" class="mode-button"><img src="./assets/dark.png" alt="🌙"></button>
+              <button id="lightModeButton" class="mode-button"><img src="./assets/light.png" alt="🔆"></button>
+              <button id="zoomIn"><img src="./assets/zoom_in.png" alt="+"></button>
+              <button id="zoomOut"><img src="./assets/zoom_out.png" alt="-"></button>
               <div id="zoomPercentage">100%</div>
             </div>
             <div class="resizable-canvas-container">
