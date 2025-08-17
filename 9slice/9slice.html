@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <!-- Preload images -->
+    <link rel="preload" href="../content/pictures/9slice/input.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/tr.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/white_button.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/white_button_hover.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/white_button_active.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/dark_button.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/dark_button_hover.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/dark_button_active.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/blue_button.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/blue_button_hover.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/blue_button_active.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/red_button.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/red_button_hover.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/red_button_active.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/upload.png" as="image">
+    <link rel="preload" href="../content/pictures/9slice/copy.png" as="image">
+    
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nine-Slice Viewer</title>
+    <style>
+    @font-face {
+      font-family: Minecraftia;
+      src: url("../content/fonts/minecraft.otf") format("truetype");
+    }
+    @font-face {
+      font-family: MinecraftTen;
+      src: url("../content/fonts/minecraft-ten.ttf") format("truetype");
+    }
+    @font-face {
+      font-family: ar;
+      src: url("../content/fonts/arPix.ttf") format("truetype");
+    }
+      body {
+        font-family: Minecraftia, sans-serif;
+        background-color: #222;
+        color: white;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+      }
+
+      #container {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+      }
+
+      #editor {
+        background-color: rgba(0, 0, 0, 0);
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1;
+      }
+
+      #preview {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1;
+        cursor: se-resize;
+      }
+
+      #sideBar, #light-controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      #light-controls {
+        top: unset;
+        bottom: 10px;
+      }
+
+      #zoomIn, #zoomOut {
+        border-image-source: url("../content/pictures/9slice/normal_button.png");
+        border-image-slice: 2 2 4 2 fill;
+        border-width: 4px 4px 8px 4px;
+        border-style: solid;
+        padding: 2px 4px;
+        cursor: pointer;
+      }
+
+      #zoomIn:hover, #zoomOut:hover {
+        border-image-source: url("../content/pictures/9slice/normal_button_hover.png");
+      }
+
+      #zoomIn:hover img, #zoomOut:hover img {
+        filter: invert(1);
+      }
+
+
+      #zoomIn:active, #zoomOut:active {
+        border-image-source: url("../content/pictures/9slice/normal_button_active.png");
+        border-image-slice: 2 fill;
+        border-width: 4px;
+        margin-top: 4px;
+      }
+
+      #zoomIn img, #zoomOut img {
+        width: 30px;
+        image-rendering: pixelated;
+      }
+
+      #copyButton img, #custom-file-upload img {
+        width: 24px;
+      }
+
+      #custom-file-upload img{
+        width: 24px;
+      }
+
+      #controls {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+        padding: 20px;
+      }
+
+      #controls input[type="number"],
+      #controls input[type="range"] {
+        margin-top: 4px;
+        width: 80%;
+        padding: 5px;
+      }
+
+      #jsonOutput {
+        color: #8bd2d2;
+        padding: 10px;
+        overflow-y: auto;
+        position: relative;
+        margin: 5px;
+        border-width: 6px 2 2px 2;
+        border-image-source: url("../content/pictures/9slice/input.png");
+        border-image-slice: 3 1 1 1 fill;
+        image-rendering: pixelated;
+        border-style: solid;
+
+      }
+
+      #jsonOutput pre {
+        margin: 0;
+        font-family: Minecraftia, sans-serif;
+      }
+
+      canvas {
+        margin-top: 10px;
+        image-rendering: pixelated;
+      }
+
+      .resizable-canvas-container {
+        width: fit-content;
+        height: fit-content;
+      }
+
+      .resizable-canvas-container canvas {
+        resize: both;
+        overflow: auto;
+      }
+
+      #right-side,
+      #left-side {
+        position: relative;
+        flex: 1;
+        box-sizing: border-box;
+        overflow: auto;
+      }
+
+      #left-side {
+        background-image: url("../content/pictures/9slice/tr.png");
+        image-rendering: pixelated;
+        background-repeat: repeat;
+        background-size: 20px 20px;
+        display: flex;
+
+        justify-content: center;
+        align-items: center;
+      }
+      #right-side {
+        background-color: #48494a;
+        border: #1e1e1f 4px solid;
+      }
+
+      #originalImage {
+        image-rendering: pixelated;
+        image-orientation: from-image;
+        height: 50px;
+        max-width: 100%;
+
+        position: absolute;
+        margin: 20px;
+        top: 0;
+        right: 0;
+      }
+
+      .mode-button {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+      }
+
+      #lightModeButton,
+      #darkModeButton,
+      #custom-file-upload,
+      #copyButton,
+      input[type="number"],
+      .increase,
+      .decrease {
+        font-family: Minecraftia, sans-serif;
+        border-width: 4px 4px 8px 4px;
+        border-style: solid;
+        border-image-slice: 2 2 4 2 fill;
+        image-rendering: pixelated;
+      }
+
+      #lightModeButton {
+        color: #000;
+        border-image-source: url("../content/pictures/9slice/white_button.png");
+      }
+
+      #lightModeButton:hover {
+        border-image-source: url("../content/pictures/9slice/white_button_hover.png");
+      }
+
+      #lightModeButton:active {
+        margin-top: 4px;
+        border-width: 4px 4px 4px 4px;
+        border-image-source: url("../content/pictures/9slice/white_button_active.png");
+        border-image-slice: 2 2 2 2 fill;
+      }
+
+      #darkModeButton {
+        border-image-source: url("../content/pictures/9slice/dark_button.png");
+      }
+
+      #darkModeButton img, #lightModeButton img {
+        width: 18px;
+        height: 18px;
+      }
+      #darkModeButton img {
+        filter: invert(0.8);
+      }
+      #lightModeButton img {
+        filter: invert(0.2);
+      }
+
+      #darkModeButton:hover {
+        border-image-source: url("../content/pictures/9slice/dark_button_hover.png");
+      }
+
+      #darkModeButton:active {
+        margin-top: 4px;
+        border-width: 4px 4px 4px 4px;
+        border-image-source: url("../content/pictures/9slice/dark_button_active.png");
+        border-image-slice: 2 2 2 2 fill;
+      }
+
+      #textureUpload {
+        display: none;
+      }
+
+      input[type="number"] {
+        color: white;
+        border-width: 6px 0 2px 0;
+        border-image-source: url("../content/pictures/9slice/input.png");
+        border-image-slice: 3 1 1 1 fill;
+        background-color: #333;
+        padding: 5px;
+        width: 80%;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        appearance: none;
+        margin: 0;
+      }
+
+      /* Custom styles for Firefox */
+      input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+        outline: none;
+      }
+
+      /* Add hover effect for better interaction */
+      input[type="number"]:hover {
+        background-color: #444;
+        border-color: #555;
+      }
+
+      .number-control {
+        padding: 5px;
+        display: flex;
+        flex-direction: row;
+      }
+
+      #custom-file-upload,
+      #copyButton {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        border-image-source: url("../content/pictures/9slice/blue_button.png");
+        padding: 5px;
+        cursor: pointer;
+      }
+
+      #custom-file-upload:hover,
+      #copyButton:hover {
+        border-image-source: url("../content/pictures/9slice/blue_button_hover.png");
+      }
+
+      #custom-file-upload:active,
+      #copyButton:active {
+        margin-top: 4px;
+        border-width: 4px 4px 4px 4px;
+        border-image-source: url("../content/pictures/9slice/blue_button_active.png");
+        border-image-slice: 2 2 2 2 fill;
+      }
+
+      #copyButton:active {
+        margin-top: 4px;
+      }
+
+      .increase {
+        cursor: pointer;
+        border-image-source: url("../content/pictures/9slice/blue_button.png");
+      }
+
+      .decrease {
+        cursor: pointer;
+        border-image-source: url("../content/pictures/9slice/red_button.png");
+      }
+
+      .increase:hover {
+        border-image-source: url("../content/pictures/9slice/blue_button_hover.png");
+      }
+
+      .decrease:hover {
+        border-image-source: url("../content/pictures/9slice/red_button_hover.png");
+      }
+
+      .increase:active {
+        margin-top: 4px;
+        border-image-source: url("../content/pictures/9slice/blue_button_active.png");
+        border-image-slice: 2 2 2 2 fill;
+      }
+
+      .decrease:active {
+        margin-top: 4px;
+        border-image-source: url("../content/pictures/9slice/red_button_active.png");
+        border-image-slice: 2 2 2 2 fill;
+      }
+
+      @media screen and (max-aspect-ratio: 1/1) {
+        /* Split horizontally if the height of the screen is more than the width */
+        #container {
+          flex-direction: column;
+        }
+        #right-side,
+        #left-side {
+          width: 100%;
+          height: 50%;
+        }
+      }
+
+      #notification {
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #ffffff;
+        background-color: #2e6be5;
+        padding: 5px 10px 5px 10px;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: clip;
+      }
+
+      #zoomPercentage {
+        
+        color: white;
+        mix-blend-mode: difference;
+        font-size: large;
+      }
+      
+      #left-side-sidebar {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
+    </style>
+    <script src="https://cdn.rawgit.com/exif-js/exif-js/master/exif.js"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6790880772028234"
+     crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="notification" style="display: none">JSON copied to clipboard!</div>
+    <div id="container">
+      <div id="right-side">
+        <div id="jsonOutput">
+          <pre id="jsonConfig">
+{
+  "nineslice_size": [2,2,2,4],
+  "base_size": [16,16]
+}
+            </pre
+          >
+        </div>
+        <div id="controls">
+          <div>
+            <label for="sliceLeft">Left:</label>
+            <div class="number-control">
+              <button class="decrease"></button
+              ><input type="number" id="sliceLeft" value="2" /><button
+                class="increase"
+              ></button>
+            </div>
+          </div>
+          <div>
+            <label for="sliceTop">Top:</label>
+            <div class="number-control">
+              <button class="decrease"></button
+              ><input type="number" id="sliceTop" value="2" /><button
+                class="increase"
+              ></button>
+            </div>
+          </div>
+          <div>
+            <label for="sliceRight">Right:</label>
+            <div class="number-control">
+              <button class="decrease"></button
+              ><input type="number" id="sliceRight" value="2" /><button
+                class="increase"
+              ></button>
+            </div>
+          </div>
+          <div>
+            <label for="sliceBottom">Bottom:</label>
+            <div class="number-control">
+              <button class="decrease"></button
+              ><input type="number" id="sliceBottom" value="4" /><button
+                class="increase"
+              ></button>
+            </div>
+          </div>
+          <div>
+            <label for="scaledWidth">Width:</label>
+            <div class="number-control">
+              <button class="decrease"></button
+              ><input type="number" id="scaledWidth" value="50" /><button
+                class="increase"
+              ></button>
+            </div>
+          </div>
+          <div>
+            <label for="scaledHeight">Height:</label>
+            <div class="number-control">
+              <button class="decrease"></button
+              ><input type="number" id="scaledHeight" value="50" /><button
+                class="increase"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="left-side">
+        <div id="editor">
+          <div id="preview">
+            <div id="sideBar">
+              <button id="copyButton"><img src="../content/pictures/9slice/copy.png"></button>
+              <label for="textureUpload" id="custom-file-upload"><img src="../content/pictures/9slice/upload.png" alt=/></label>
+              <input type="file" id="textureUpload" accept="image/*" />
+              <button id="darkModeButton" class="mode-button"><img src="../content/pictures/9slice/dark.png" alt="🌙"></button>
+              <button id="lightModeButton" class="mode-button"><img src="../content/pictures/9slice/light.png" alt="🔆"></button>
+              <button id="zoomIn"><img src="../content/pictures/9slice/zoom_in.png" alt="+"></button>
+              <button id="zoomOut"><img src="../content/pictures/9slice/zoom_out.png" alt="-"></button>
+              <div id="zoomPercentage">100%</div>
+            </div>
+            <div class="resizable-canvas-container">
+              <canvas id="scaledCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+        <img id="originalImage" src="" />
+      </div>
+    </div>
+    <script>
+      const defaultValues = {
+        sliceLeft: "2",
+        sliceTop: "2",
+        sliceRight: "2",
+        sliceBottom: "4",
+        scaledWidth: "50",
+        scaledHeight: "50",
+        zoomSlider: "1",
+      };
+
+      function resetForm() {
+        for (const [id, value] of Object.entries(defaultValues)) {
+          const input = document.getElementById(id);
+          if (input) {
+            input.value = value;
+          }
+        }
+      }
+      document.addEventListener("DOMContentLoaded", () => {
+        resetForm();
+        update();
+      });
+
+      const textureUpload = document.getElementById("textureUpload");
+      const sliceLeft = document.getElementById("sliceLeft");
+      const sliceTop = document.getElementById("sliceTop");
+      const sliceRight = document.getElementById("sliceRight");
+      const sliceBottom = document.getElementById("sliceBottom");
+      const scaledWidth = document.getElementById("scaledWidth");
+      const scaledHeight = document.getElementById("scaledHeight");
+      const originalImage = document.getElementById("originalImage");
+      const scaledCanvas = document.getElementById("scaledCanvas");
+      const jsonConfig = document.getElementById("jsonConfig");
+      const zoomSlider = document.getElementById("zoomSlider");
+      const copyButton = document.getElementById("copyButton");
+      const darkModeButton = document.getElementById("darkModeButton");
+      const lightModeButton = document.getElementById("lightModeButton");
+
+      const zoomIn = document.getElementById("zoomIn");
+      const zoomOut = document.getElementById("zoomOut");
+      const zoomPercentage = document.getElementById("zoomPercentage");
+
+      zoomIn.addEventListener("click", () => {
+        const value = Number(scaledCanvas.style.transform == "" ? "1" : scaledCanvas.style.transform.match(/scale\((.*?)\)/)[1]);        
+        scaledCanvas.style.transform = `scale(${value + 0.1})`;
+
+        zoomPercentage.textContent = `${Math.round(Number(scaledCanvas.style.transform == "" ? "1" : scaledCanvas.style.transform.match(/scale\((.*?)\)/)[1]) * 100)}%`;
+      })
+
+      zoomOut.addEventListener("click", () => {
+        const value = Number(scaledCanvas.style.transform == "" ? "1" : scaledCanvas.style.transform.match(/scale\((.*?)\)/)[1]);
+        if (value <= 0.2) return;
+        scaledCanvas.style.transform = `scale(${value - 0.1})`;
+
+        zoomPercentage.textContent = `${Math.round(Number(scaledCanvas.style.transform == "" ? "1" : scaledCanvas.style.transform.match(/scale\((.*?)\)/)[1]) * 100)}%`;
+      })
+
+      const editor = document.getElementById("editor");
+
+      const scaledContext = scaledCanvas.getContext("2d");
+
+      let image = new Image();
+
+      textureUpload.addEventListener("change", handleImageUpload);
+      sliceLeft.addEventListener("input", update);
+      sliceTop.addEventListener("input", update);
+      sliceRight.addEventListener("input", update);
+      sliceBottom.addEventListener("input", update);
+      scaledWidth.addEventListener("input", update);
+      scaledHeight.addEventListener("input", update);
+      copyButton.addEventListener("click", () => {
+        const jsonText = jsonConfig.textContent;
+
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(jsonText).then(
+            () => {
+              showNotification("JSON copied to clipboard!");
+            },
+            () => {
+              fallbackCopyTextToClipboard(jsonText);
+            }
+          );
+        } else {
+          fallbackCopyTextToClipboard(jsonText);
+        }
+      });
+
+      function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand("copy");
+          showNotification("JSON copied to clipboard!");
+        } catch (err) {
+          showNotification("Failed to copy JSON.");
+        }
+        document.body.removeChild(textArea);
+      }
+
+      function showNotification(message) {
+        const notification = document.getElementById("notification");
+        notification.textContent = message;
+        notification.style.display = "block";
+        notification.style.opacity = "1";
+        setTimeout(() => {
+          notification.style.opacity = "0";
+          setTimeout(() => {
+            notification.style.display = "none";
+          }, 500); // Match the transition duration
+        }, 2000); // Display for 2 seconds
+      }
+
+      darkModeButton.addEventListener("click", () => {
+        const opacity = Number(
+          editor.style.backgroundColor.split(",")[3]?.replace(")", "") ?? 0
+        );
+        if (opacity >= 0.9) return;
+
+        editor.style.backgroundColor = `rgba(0, 0, 0, ${opacity + 0.1})`;
+      });
+
+      lightModeButton.addEventListener("click", () => {
+        const opacity = Number(
+          editor.style.backgroundColor.split(",")[3]?.replace(")", "") ?? 0
+        );
+        if (opacity < 0.1) return;
+        editor.style.backgroundColor = `rgba(0, 0, 0, ${opacity - 0.1})`;
+      });
+
+      function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            image.onload = function () {
+              originalImage.src = e.target.result;
+              update();
+            };
+            image.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function update() {
+        drawSliceLines();
+        const nineslice = {
+          left: parseInt(sliceLeft.value),
+          top: parseInt(sliceTop.value),
+          right: parseInt(sliceRight.value),
+          bottom: parseInt(sliceBottom.value),
+        };
+
+        const baseSize = {
+          width: image.width,
+          height: image.height,
+        };
+
+        const newWidth = parseInt(scaledWidth.value);
+        const newHeight = parseInt(scaledHeight.value);
+        scaledCanvas.width = newWidth;
+        scaledCanvas.height = newHeight;
+
+        scaledContext.clearRect(0, 0, newWidth, newHeight);
+        drawNineSlice(nineslice, baseSize, newWidth, newHeight);
+        updateJsonOutput(nineslice);
+      }
+
+      function updateJsonOutput(nineslice) {
+          const isUniform = nineslice.top === nineslice.left && nineslice.right === nineslice.left && nineslice.bottom === nineslice.left;
+          jsonConfig.textContent = customStringify(
+            {
+              nineslice_size:isUniform ? nineslice.left : [nineslice.left,nineslice.top,nineslice.right,nineslice.bottom],
+              base_size: [image.width, image.height],
+            },
+            null,
+            1
+          );
+      }
+
+      function customStringify(obj) {
+        return JSON.stringify(
+          obj,
+          (key, value) => {
+            if (Array.isArray(value)) {
+              return JSON.stringify(value);
+            }
+            return value;
+          },
+          2
+        )
+          .replace(/"\[/g, "[")
+          .replace(/\]"/g, "]");
+      }
+
+      function drawPixelatedImage(ctx,image,srcX,srcY,srcW,srcH,destX,destY,destW,destH) {
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = destW;
+        tempCanvas.height = destH;
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.imageSmoothingEnabled = false;
+        tempCtx.drawImage(image, srcX, srcY, srcW, srcH, 0, 0, destW, destH);
+        ctx.drawImage(tempCanvas, destX, destY, destW, destH);
+      }
+
+      function drawNineSlice(nineslice, baseSize, newWidth, newHeight) {
+        const left = nineslice.left;
+        const top = nineslice.top;
+        const right = baseSize.width - nineslice.right;
+        const bottom = baseSize.height - nineslice.bottom;
+
+        drawPixelatedImage(scaledContext,image,0,0,left,top,0,0,left,top);
+        drawPixelatedImage(scaledContext,image,right,0,baseSize.width - right,top,newWidth - (baseSize.width - right),0,baseSize.width - right,top); 
+        drawPixelatedImage(scaledContext,image,0,bottom,left,baseSize.height - bottom,0,newHeight - (baseSize.height - bottom),left,baseSize.height - bottom);  bottom-
+        drawPixelatedImage(scaledContext,image,right,bottom,baseSize.width - right,baseSize.height - bottom,newWidth - (baseSize.width - right),newHeight - (baseSize.height - bottom),baseSize.width - right,baseSize.height - bottom); 
+        drawPixelatedImage(scaledContext,image,left,0,right - left,top,left,0,newWidth - (baseSize.width - right + left),top);
+        drawPixelatedImage(scaledContext,image,left,bottom,right - left,baseSize.height - bottom,left,newHeight - (baseSize.height - bottom),newWidth - (baseSize.width - right + left),baseSize.height - bottom);
+        drawPixelatedImage(scaledContext,image,0,top,left,bottom - top,0,top,left,newHeight - (baseSize.height - bottom + top));
+        drawPixelatedImage(scaledContext,image,right,top,baseSize.width - right,bottom - top,newWidth - (baseSize.width - right),top,baseSize.width - right,newHeight - (baseSize.height - bottom + top));  
+        drawPixelatedImage(scaledContext,image,left,top,right - left,bottom - top,left,top,newWidth - (baseSize.width - right + left),newHeight - (baseSize.height - bottom + top));
+      }
+      function handleButtonClick(event, operation) {
+        const numberControlDiv = event.target.parentElement;
+        const inputField = numberControlDiv.querySelector('input[type="number"]');
+        let value = parseInt(inputField.value);
+
+        if (operation === "increase") {value += 1;
+        } else if (operation === "decrease" && value > 0) value -= 1;
+
+        inputField.value = value;
+        update(); // Call the update function to apply the changes
+      }
+
+      document.querySelectorAll(".increase").forEach((button) => {button.addEventListener("click", (event) => {handleButtonClick(event, "increase");});});
+      document.querySelectorAll(".decrease").forEach((button) => {button.addEventListener("click", (event) => {handleButtonClick(event, "decrease");});});
+      document.addEventListener("DOMContentLoaded", () => {
+  const preview = document.getElementById("preview");
+  const rightSide = document.getElementById("right-side");
+  const scaledWidthInput = document.getElementById("scaledWidth");
+  const scaledHeightInput = document.getElementById("scaledHeight");
+
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let initialWidth = 0;
+  let initialHeight = 0;
+
+  function startDrag(event) {
+    isDragging = true;
+
+    // Handle both touch and mouse events
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+    startX = clientX;
+    startY = clientY;
+    initialWidth = parseInt(scaledWidthInput.value, 10);
+    initialHeight = parseInt(scaledHeightInput.value, 10);
+
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("touchmove", drag);
+
+    document.addEventListener("mouseup", stopDrag);
+    document.addEventListener("touchend", stopDrag);
+  }
+
+  function drag(event) {
+    if (!isDragging) return;
+
+    // Handle both touch and mouse events
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+
+    const newWidth = initialWidth + dx;
+    const newHeight = initialHeight + dy;
+
+    scaledWidthInput.value = newWidth;
+    scaledHeightInput.value = newHeight;
+
+    update(); // Call update to adjust the canvas based on the new size
+  }
+
+  function stopDrag() {
+    isDragging = false;
+    document.removeEventListener("mousemove", drag);
+    document.removeEventListener("touchmove", drag);
+    document.removeEventListener("mouseup", stopDrag);
+    document.removeEventListener("touchend", stopDrag);
+  }
+
+  // Add event listeners for both mouse and touch events
+  preview.addEventListener("mousedown", startDrag);
+  preview.addEventListener("touchstart", startDrag);
+});
+
+function drawSliceLines() {
+  // Clear the canvas
+  scaledContext.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+
+  // Draw the uploaded image onto the canvas
+  scaledContext.drawImage(image, 0, 0, scaledCanvas.width, scaledCanvas.height);
+
+  // Get slice values
+  const left = parseInt(sliceLeft.value);
+  const top = parseInt(sliceTop.value);
+  const right = parseInt(sliceRight.value);
+  const bottom = parseInt(sliceBottom.value);
+
+  // Calculate the actual positions in the scaled image
+  const leftPos = (left / image.width) * scaledCanvas.width;
+  const topPos = (top / image.height) * scaledCanvas.height;
+  const rightPos = scaledCanvas.width - (right / image.width) * scaledCanvas.width;
+  const bottomPos = scaledCanvas.height - (bottom / image.height) * scaledCanvas.height;
+
+  // Set the line style
+  scaledContext.strokeStyle = 'red';
+  scaledContext.lineWidth = 2;
+
+  // Draw the slice lines
+  scaledContext.beginPath();
+  scaledContext.moveTo(leftPos, 0);
+  scaledContext.lineTo(leftPos, scaledCanvas.height);
+  scaledContext.moveTo(rightPos, 0);
+  scaledContext.lineTo(rightPos, scaledCanvas.height);
+  scaledContext.moveTo(0, topPos);
+  scaledContext.lineTo(scaledCanvas.width, topPos);
+  scaledContext.moveTo(0, bottomPos);
+  scaledContext.lineTo(scaledCanvas.width, bottomPos);
+  scaledContext.stroke();
+}
+
+    </script>
+  </body>
+</html>
