@@ -1,0 +1,16 @@
+{
+    "title": "clickable signs",
+    "buttons": [
+      {
+        "text": "1.20.60",
+        "link": "https://www.mediafire.com/file/8d937mdtr3ztfkz/1.20.60_clickable_sign.mcaddon/file",
+        "color": "gray-button"
+      },
+      {
+        "text": "1.20.50",
+        "link": "https://www.mediafire.com/file/06hvd45vdcbmf1h/1.20.50_clickable_sign.mcpack/file",
+        "color": "gray-button"
+      }
+    ],
+    "generated-code": false
+}

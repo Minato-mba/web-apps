@@ -1,0 +1,36 @@
+{
+    "title":"Banner Markers",
+    "buttons":[
+        {
+            "text":"1.21+ Stable",
+            "link":"https://www.mediafire.com/file/xlcmnwveijbvhbo/1.21_Banner_Markers_v2.mcaddon/file",
+            "color":"green-button"
+        },
+        {
+            "text":"1.20.70+ Require Beta API",
+            "link":"https://www.mediafire.com/file/nmgspcxlhg8mrr6/1.20.70_Banner_Markers_v1.3.mcaddon/file",
+            "color":"red-button"
+        },
+        {
+            "text":"1.20.60+ Require Beta API",
+            "link":"https://www.mediafire.com/file/x11uftf52kh2g3z/1.20.60_Banner_Markers_v1.3.mcaddon/file",
+            "color":"red-button"
+        },
+        {
+            "text":"1.20.50+ Require Beta API",
+            "link":"https://www.mediafire.com/file/f1jwqjx2cvptqef/1.20.50_Banner_Markers_v1.3.mcaddon/file",
+            "color":"red-button"
+        },
+        {
+            "text":"1.20.40+ Require Beta API",
+            "link":"https://www.mediafire.com/file/2x5m6jqqy2p27rc/1.20.40_Banner_Markers_v1.2.mcaddon/file",
+            "color":"red-button"
+        },
+        {
+            "text":"1.20.30+ Require Beta API",
+            "link":"https://www.mediafire.com/file/odod3zksrzdzyxs/1.20.30_Banner_Markers_v1.1.mcaddon/file",
+            "color":"red-button"
+        }
+    ],
+    "generated-code":true
+}

@@ -1,0 +1,26 @@
+{
+    "title": "Replay Mod",
+    "buttons": [
+      {
+        "text": "1.21 Latest (Beta)",
+        "link": "https://www.mediafire.com/file/joflxp7cbeocs16/1.21_Replay_Mod_0.3V.mcaddon/file",
+        "color": "green-button"
+      },
+      {
+        "text": "1.20.8x (Outdated)",
+        "link": "https://www.mediafire.com/file/4qn826cqaltsf59/1.20.80_Replay_Mod_0.3V_%2528Vector_fix%2529.mcaddon/file",
+        "color": "red-button"
+      },
+      {
+        "text": "1.20.7x (Outdated)",
+        "link": "https://www.mediafire.com/file/mlympgje6jp9qgl/Replay_Mod_0.3V_%2528Vector_fix%2529_.mcaddon/file",
+        "color": "red-button"
+      },
+      {
+        "text": "1.20.6x (Outdated)",
+        "link": "https://www.mediafire.com/file/7pel3xmhwz4dd9i/Replay_Mod_v0.1.mcaddon/file",
+        "color": "red-button"
+      }
+    ],
+    "generated-code": false
+}

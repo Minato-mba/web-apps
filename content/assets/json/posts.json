@@ -1,0 +1,112 @@
+{
+  "mods": [
+    {
+      "title": "Player Heads Add-on",
+      "description": "This add-on allows you to add Player Heads to the game, giving you the ability to customize your game and world.",
+      "link": "https://modbay.org/mods/1976-player-heads-addon.html",
+      "coverImage": "https://modbay.org/uploads/posts/2024-05/player-heads-addon-main-cover.png"
+    },
+    {
+      "title": "Replay Mod [Discontinued]",
+      "description": "This add-on allows you to record in-game actions and replay it later.",
+      "link": "https://modbay.org/mods/1652-replay-mod.html",
+      "coverImage": "https://modbay.org/uploads/posts/2024-03/replay-mod-main-cover.png"
+    },
+    {
+      "title": "Arabic Language Fix [1.20 → 1.21.50]",
+      "description": "This add-on fixes the inverted syntax of the Arabic language within the game. هذا المود (إضافة او ادون) يقوم بإصلاح شكل اللغة العربية المعكوس داخل اللعبة",
+      "link": "https://modbay.org/mods/1253-arabic-language-fix.html",
+      "coverImage": "https://modbay.org/uploads/posts/2023-11/arabic-language-fix-pack-main-cover.jpg"
+    },
+    {
+      "title": "Clickable Signs [1.20.4x | 1.20.6x]",
+      "description": "This addon allows you to make signs clickable. You can also add commands that run when clicking the sign (you can add them only in creative).",
+      "link": "https://modbay.org/mods/1248-clickable-signs.html",
+      "coverImage": "https://modbay.org/uploads/posts/2023-10/clickable-signs-main-cover.png"
+    },
+    {
+      "title": "Banner Markers",
+      "description": "Did you wish that you can place markers in a map? This add-on adds a parity feature from Minecraft: Java Edition. This feature allows you to put markers in your map using banners.",
+      "link": "https://modbay.org/mods/1165-banner-markers.html",
+      "coverImage": "https://modbay.org/uploads/posts/2024-06/banner-markers-1-21-cover.png"
+    }
+  ],
+  "others": [
+    {
+      "title": "Discord-bot-offline-notifier",
+      "description": "",
+      "link": "https://github.com/MinecraftBedrockArabic/Discord-bot-offline-notifier",
+      "coverImage": "https://opengraph.githubassets.com/hash123/MinecraftBedrockArabic/Discord-bot-offline-notifier"
+    },
+    {
+      "title": "Minecraft-Bedrock-Player-heads",
+      "description": "Discord bot that add player heads to a pack",
+      "link": "https://github.com/MinecraftBedrockArabic/Minecraft-Bedrock-Player-heads",
+      "coverImage": "https://opengraph.githubassets.com/hash123/MinecraftBedrockArabic/Minecraft-Bedrock-Player-heads"
+    },
+    {
+      "title": "MinecraftBedrockArabic",
+      "description": "",
+      "link": "https://github.com/MinecraftBedrockArabic/MinecraftBedrockArabic",
+      "coverImage": "https://opengraph.githubassets.com/hash123/MinecraftBedrockArabic/MinecraftBedrockArabic"
+    },
+    {
+      "title": "minecraftbedrockarabic.github.io",
+      "description": "",
+      "link": "https://github.com/MinecraftBedrockArabic/minecraftbedrockarabic.github.io",
+      "coverImage": "https://opengraph.githubassets.com/hash123/MinecraftBedrockArabic/minecraftbedrockarabic.github.io"
+    },
+    {
+      "title": "Modbay-Feed-Discord-bot",
+      "description": "",
+      "link": "https://github.com/MinecraftBedrockArabic/Modbay-Feed-Discord-bot",
+      "coverImage": "https://opengraph.githubassets.com/hash123/MinecraftBedrockArabic/Modbay-Feed-Discord-bot"
+    },
+    {
+      "title": "random",
+      "description": "random scripts i coded",
+      "link": "https://github.com/MinecraftBedrockArabic/random",
+      "coverImage": "https://opengraph.githubassets.com/hash123/MinecraftBedrockArabic/random"
+    },
+    {
+      "title": "Script-API-snippets",
+      "description": "Small scripts snippets written for minecraft bedrock script API.",
+      "link": "https://github.com/MinecraftBedrockArabic/Script-API-snippets",
+      "coverImage": "https://opengraph.githubassets.com/hash123/MinecraftBedrockArabic/Script-API-snippets"
+    }
+  ],
+  "friends": [
+    {
+      "title": "Mevo",
+      "description": "Minecraft Bedrock Add-on Creator.",
+      "link": "https://modbay.org/user/Mevo/",
+      "coverImage": "assets/images/me.jpg"
+    },
+    {
+      "title": "MZ3G",
+      "description": "Minecraft Bedrock Add-on Creator.",
+      "link": "https://modbay.org/user/MZ3G/",
+      "coverImage": "assets/images/mz.jpg"
+    },
+    {
+      "title": "ShadowGem100k",
+      "description": "Minecraft Bedrock Add-on Creator.",
+      "link": "https://modbay.org/user/ShadowGem100k/",
+      "coverImage": "assets/images/sh.jpg"
+    }
+  ],
+  "social": [
+    {
+      "title": "Discord Server",
+      "description": "This is my official Discord Server. It is open for everyone.",
+      "link": "https://discord.gg/6z8ZPUdVTT",
+      "coverImage": "assets/images/dis.jpg"
+    },
+    {
+      "title": "github",
+      "description": "My github account. I am new to GitHub but feel free to check out my projects.",
+      "link": "https://github.com/MinecraftBedrockArabic",
+      "coverImage": "assets/images/git.jpg"
+    }
+  ]
+}
