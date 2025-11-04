@@ -30,11 +30,6 @@ const templates = {
         });
     },
     templates: {
-        
-        empty: function () {
-            // Return empty array for starting from scratch
-            return [];
-        },
 
         vanilla: function () {
             const components = [];
