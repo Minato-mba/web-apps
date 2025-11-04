@@ -31,7 +31,7 @@ const preview = {
         this.updatePreview(currentComponents);
     },
 
-    generateJSON: function () {
+    generateJSON: function (settings = null) {
         const components = editor.getComponents(); const controls = [];
 
         components.forEach(component => {
@@ -46,7 +46,7 @@ const preview = {
                         "color": component.properties.color,
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
-                        "offset": [component.x, component.y]
+                        "offset": [component.x + 1, component.y]
                     }
                 });
             }
@@ -60,7 +60,7 @@ const preview = {
                         "alpha": component.properties.alpha,
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
-                        "offset": [component.x, component.y],
+                        "offset": [component.x + 1, component.y],
                         "size": [component.width, component.height]
                     }
                 });
@@ -75,7 +75,7 @@ const preview = {
                         "collection_index": index,
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
-                        "offset": [component.x, component.y],
+                        "offset": [component.x + 1, component.y],
                         "controls": [
                             {
                                 "default": {
@@ -111,7 +111,7 @@ const preview = {
                         "collection_index": index,
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
-                        "offset": [component.x, component.y],
+                        "offset": [component.x + 1, component.y],
                         "controls": [
                             {
                                 "default": {
@@ -142,7 +142,7 @@ const preview = {
                         "collection_index": index,
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
-                        "offset": [component.x, component.y],
+                        "offset": [component.x + 1, component.y],
                         "$texture": component.properties.texture
                     }
                 });
@@ -157,7 +157,7 @@ const preview = {
                         "collection_index": index,
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
-                        "offset": [component.x, component.y],
+                        "offset": [component.x + 1, component.y],
                         "controls": []
                     }
                 };
@@ -184,7 +184,7 @@ const preview = {
                         "collection_index": index,
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
-                        "offset": [component.x, component.y],
+                        "offset": [component.x + 1, component.y],
                         "$path_to_image": component.properties.picture
                     }
                 });
@@ -199,7 +199,7 @@ const preview = {
                         "collection_index": index,
                         "anchor_from": "top_left",
                         "anchor_to": "top_left",
-                        "offset": [component.x, component.y]
+                        "offset": [component.x + 1, component.y]
                     }
                 };
 
@@ -244,14 +244,16 @@ const preview = {
                 "controls": [
                     {
                         "root_panel@common.root_panel": {
+                            "size": [178, this.getMainPanelHeight(settings)],
                             "layer": 1,
                             "controls": [
                                 { "common_panel@common.common_panel": {} },
                                 {
-                                    "chest_panel": {
-                                        "type": "panel",
-                                        "layer": 5,
-                                        "controls": [
+                            "chest_panel": {
+                                "type": "panel",
+                                "size": ["100%", this.getMainPanelHeight(settings)],
+                                "layer": 5,
+                                "controls": [
                                             {
                                                 "small_chest_custom_panel_top_half@chest.small_chest_custom_panel_top_half": {}
                                             },
@@ -294,7 +296,7 @@ const preview = {
 
             "small_chest_custom_panel": {
                 "type": "collection_panel",
-                "size": [162, 54],
+                "size": [162, this.calculatePanelHeight(settings)],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "$item_collection_name": "container_items",
@@ -324,6 +326,52 @@ const preview = {
         this.addComponentDefinitions(json, components);
 
         return json;
+    },
+
+    getMainPanelHeight: function (settings) {
+        const DEFAULT_MAIN_PANEL_HEIGHT = 166;  // Default total chest panel height
+        
+        if (!settings || !settings.mainPanelHeight) {
+            return DEFAULT_MAIN_PANEL_HEIGHT;
+        }
+        
+        return settings.mainPanelHeight;
+    },
+
+    calculatePanelHeight: function (settings) {
+        const DEFAULT_COLLECTION_PANEL_HEIGHT = 54;  // Default collection panel height
+        
+        if (!settings || !settings.mainPanelHeight) {
+            return DEFAULT_COLLECTION_PANEL_HEIGHT;
+        }
+        
+        // Calculate based on the actual component positions
+        const components = editor.getComponents();
+        let maxY = 0;
+        
+        // Find the maximum Y position + height from all components
+        components.forEach(component => {
+            const componentBottom = component.y + (component.height || 18);
+            if (componentBottom > maxY) {
+                maxY = componentBottom;
+            }
+        });
+        
+        // If there are components, use their maximum extent + some padding
+        if (maxY > 0) {
+            const calculatedHeight = Math.ceil(maxY + 2); // Add 2px padding
+            return Math.max(DEFAULT_COLLECTION_PANEL_HEIGHT, calculatedHeight);
+        }
+        
+        // Otherwise, calculate from settings
+        const INVENTORY_HEIGHT = 92;
+        const TOP_OFFSET = 12;
+        const LABEL_PADDING = 8;
+        const FIXED_OVERHEAD = INVENTORY_HEIGHT + TOP_OFFSET + LABEL_PADDING;
+        
+        const collectionPanelHeight = settings.mainPanelHeight - FIXED_OVERHEAD;
+        
+        return Math.max(DEFAULT_COLLECTION_PANEL_HEIGHT, collectionPanelHeight);
     },
 
     addComponentDefinitions: function (json, components) {

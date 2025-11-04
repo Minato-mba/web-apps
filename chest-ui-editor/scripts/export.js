@@ -96,7 +96,7 @@ const exporter = {
         });
     },
 
-    createResourcePackZip: async function (json) {
+    createResourcePackZip: async function (json, settings = null) {
         const zip = new JSZip();
         const resourcePack = zip.folder("ChestUI_ResourcePack");
         const jsonForExport = JSON.parse(JSON.stringify(json));
@@ -105,7 +105,8 @@ const exporter = {
         const componentsData = {
             components: editor.getComponents(),
             version: '1.0.2',
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            settings: settings  // Include settings in project data for re-import
         };
         zip.file("chest_ui_data.json", JSON.stringify(componentsData, null, 2));
 
@@ -170,7 +171,13 @@ const exporter = {
             }
         }
 
-        return zip.generateAsync({ type: "blob" });
+        return zip.generateAsync({ 
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: {
+                level: 9
+            }
+        });
     },
 
     generateManifestJson: function () {
@@ -236,13 +243,23 @@ const exporter = {
             exportButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span class="button-text">Processing...</span>';
             exportButton.disabled = true;
 
-            const json = preview.generateJSON();
+            // Load settings before generating JSON
+            const settings = util.loadFromLocalStorage('chest_ui_settings') || {
+                mainPanelHeight: 166,
+                mainPanelLayer: 5
+            };
+            
+            const json = preview.generateJSON(settings);
 
-            const zipBlob = await this.createResourcePackZip(json);
+            const zipBlob = await this.createResourcePackZip(json, settings);
+
+            // Create a blob with explicit MIME type for ZIP files
+            const properZipBlob = new Blob([zipBlob], { type: 'application/zip' });
 
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(zipBlob);
+            a.href = URL.createObjectURL(properZipBlob);
             a.download = "ChestUI_ResourcePack.zip";
+            a.setAttribute('download', 'ChestUI_ResourcePack.zip'); // Force download attribute
             document.body.appendChild(a);
             a.click();
 
@@ -299,6 +316,14 @@ function importZipProject() {
 
                     editor.addComponent(component);
                 });
+            }
+
+            // Restore settings if they were saved with the project
+            if (data.settings) {
+                util.saveToLocalStorage('chest_ui_settings', data.settings);
+                if (typeof applySettings === 'function') {
+                    applySettings(data.settings);
+                }
             }
 
             alert('Project imported successfully!');

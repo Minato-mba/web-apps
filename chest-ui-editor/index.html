@@ -49,6 +49,10 @@
         <div class="header">
             <h1>Chest UI Editor (Bedrock Edition Only)</h1>
             <div class="actions">
+                <button id="settings-button" class="action-button" title="Settings"><i class="fas fa-cog"></i><span
+                        class="button-text">Settings</span></button>
+                <button id="reset-button" class="action-button" title="Reset Cache"><i class="fas fa-trash-alt"></i><span
+                        class="button-text">Reset</span></button>
                 <button id="new-project" class="action-button" title="New Project"><i class="fas fa-file"></i><span
                         class="button-text">New</span></button>
                 <button id="load-project" class="action-button" title="Load Project"><i
@@ -57,8 +61,20 @@
                         class="button-text">Import ZIP</span></button>
                 <button id="save-project" class="action-button" title="Save Project"><i class="fas fa-save"></i><span
                         class="button-text">Save</span></button>
-                <button id="export-json" class="action-button" title="Export JSON"><i
-                        class="fas fa-file-export"></i><span class="button-text">Export</span></button>
+                <div class="export-dropdown-container">
+                    <button id="export-json" class="action-button" title="Export Options"><i
+                        class="fas fa-file-export"></i><span class="button-text">Export</span><i class="fas fa-caret-down dropdown-icon"></i></button>
+                    <div id="export-dropdown" class="export-dropdown-menu" style="display: none;">
+                        <div class="export-dropdown-item" data-action="zip">
+                            <i class="fas fa-file-archive"></i>
+                            <span>Export as ZIP</span>
+                        </div>
+                        <div class="export-dropdown-item" data-action="code">
+                            <i class="fas fa-code"></i>
+                            <span>View as Code</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -305,6 +321,10 @@
             </div>
             <div class="panel-content">
                 <div class="template-list">
+                    <div class="template-item" data-template="empty">
+                        <div class="template-preview empty"></div>
+                        <span>Empty</span>
+                    </div>
                     <div class="template-item" data-template="vanilla">
                         <div class="template-preview vanilla"></div>
                         <span>Vanilla Chest</span>
@@ -321,6 +341,81 @@
                         <div class="template-preview altar"></div>
                         <span>Altar</span>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu" style="display: none;">
+        <div class="context-menu-item" id="context-copy">
+            <i class="fas fa-copy"></i> Copy
+        </div>
+        <div class="context-menu-item" id="context-cut">
+            <i class="fas fa-cut"></i> Cut
+        </div>
+        <div class="context-menu-item" id="context-paste" style="display: none;">
+            <i class="fas fa-paste"></i> Paste
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="settings-modal" style="display: none;">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="close-settings" class="close-modal-btn" title="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <h3>Main Panel Configuration</h3>
+                    <div class="setting-item">
+                        <label for="main-panel-height">Main Panel Height (px):</label>
+                        <input type="number" id="main-panel-height" min="100" max="400" value="166" step="1">
+                        <span class="setting-help">Default: 166px (total chest panel height)</span>
+                    </div>
+                    <div class="setting-item">
+                        <label for="main-panel-layer">Main Panel Layer (z-index):</label>
+                        <input type="number" id="main-panel-layer" min="0" max="100" value="5" step="1">
+                        <span class="setting-help">Default: 5 (component container layer)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-settings" class="action-button">
+                    <i class="fas fa-check"></i><span>Apply Settings</span>
+                </button>
+                <button id="cancel-settings" class="action-button">
+                    <i class="fas fa-times"></i><span>Cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Viewer Modal -->
+    <div id="code-viewer-modal" class="settings-modal" style="display: none;">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content code-viewer-content">
+            <div class="modal-header">
+                <h2>Generated JSON UI Code</h2>
+                <button id="close-code-viewer" class="close-modal-btn" title="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="code-viewer-toolbar">
+                    <div class="code-viewer-tabs">
+                        <button class="code-tab active" data-view="full">Full JSON</button>
+                        <button class="code-tab" data-view="custom">Custom Only</button>
+                    </div>
+                    <div class="code-viewer-actions">
+                        <button id="copy-code-btn" class="action-button">
+                            <i class="fas fa-copy"></i><span>Copy to Clipboard</span>
+                        </button>
+                        <span id="copy-status" class="copy-status"></span>
+                    </div>
+                </div>
+                <div class="code-viewer-container">
+                    <pre id="json-code-display" class="json-code"></pre>
                 </div>
             </div>
         </div>

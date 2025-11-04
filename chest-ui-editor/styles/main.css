@@ -399,6 +399,9 @@ button:active {
     margin: 20px auto;
     position: relative;
     text-shadow: none;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
 }
 
 .editor-canvas .chest-panel {
@@ -428,19 +431,25 @@ button:active {
 
 .chest-top-half {
     width: 100%;
-    height: 45%;
-    top: 12px;
+    flex: 1;
     position: relative;
+    margin-top: 12px;
+    min-height: 0;
+    pointer-events: auto;
 }
 
 .component-container {
     width: 176px;
+    height: 100%;
     position: absolute;
+    pointer-events: auto;
 }
 
 .inventory-bottom-half {
-    height: 166px;
-    position: relative;
+    height: 92px;
+    width: 100%;
+    flex-shrink: 0;
+    pointer-events: none;
 }
 
 .inventory-label {
@@ -658,6 +667,70 @@ dialog,
     font-size: var(--mc-font-size-small);
 }
 
+.multi-select-info {
+    padding: 12px;
+    background-color: rgba(77, 157, 224, 0.15);
+    border: 1px solid var(--mc-selection);
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.multi-select-info h4 {
+    margin-bottom: 8px;
+    color: var(--mc-selection);
+}
+
+.multi-select-info p {
+    margin: 4px 0;
+    font-size: var(--mc-font-size-small);
+}
+
+.multi-select-info .help-text {
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+
+.selection-box {
+    position: absolute;
+    border: 2px dashed var(--mc-selection);
+    background-color: rgba(77, 157, 224, 0.1);
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* Context Menu Styles */
+.context-menu {
+    position: fixed;
+    background-color: var(--mc-panel-bg);
+    border: 2px solid var(--mc-border);
+    border-radius: var(--ui-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    min-width: 150px;
+    padding: 4px 0;
+}
+
+.context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--mc-text);
+    font-size: var(--mc-font-size-normal);
+    transition: var(--ui-transition);
+}
+
+.context-menu-item:hover {
+    background-color: var(--mc-button-hover);
+}
+
+.context-menu-item i {
+    width: 16px;
+    text-align: center;
+}
+
 .component-list,
 .component-list-container,
 .template-list {
@@ -740,6 +813,10 @@ dialog,
 
 .component-list-item.selected {
     background-color: var(--mc-selection);
+}
+
+.component-list-item.selecting {
+    background-color: rgba(77, 157, 224, 0.5);
 }
 
 .component-list-item .component-type {
@@ -1223,4 +1300,308 @@ dialog,
 .preview-canvas.zoom-level-3 .chest-panel-background {
     min-height: calc(100% + 400px);
     padding: 120px 60px;
+}
+
+/* Settings Modal Styles */
+.settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1;
+}
+
+.modal-content {
+    position: relative;
+    z-index: 2;
+    background-color: var(--mc-panel-bg);
+    border: 2px solid var(--mc-border);
+    border-radius: var(--ui-radius);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--mc-border);
+    background-color: var(--mc-dark-bg);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: var(--mc-font-size-title);
+    color: var(--mc-text);
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    color: var(--mc-text);
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: var(--ui-transition);
+}
+
+.close-modal-btn:hover {
+    background-color: var(--mc-button-hover);
+    transform: none;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.setting-group {
+    margin-bottom: 20px;
+}
+
+.setting-group h3 {
+    font-size: var(--mc-font-size-header);
+    color: var(--mc-text);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--mc-border);
+}
+
+.setting-item {
+    margin-bottom: 16px;
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: var(--mc-font-size-normal);
+    color: var(--mc-text);
+    font-weight: 600;
+}
+
+.setting-item input[type="number"] {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: var(--mc-dark-bg);
+    border: 1px solid var(--mc-border);
+    border-radius: 4px;
+    color: var(--mc-text);
+    font-size: var(--mc-font-size-normal);
+}
+
+.setting-help {
+    display: block;
+    margin-top: 4px;
+    font-size: var(--mc-font-size-small);
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--mc-border);
+    background-color: var(--mc-dark-bg);
+    justify-content: flex-end;
+}
+
+.modal-footer .action-button {
+    min-width: 120px;
+}
+
+/* Export Dropdown Styles */
+.export-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.export-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background-color: var(--mc-panel-bg);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--ui-radius);
+    box-shadow: var(--ui-shadow);
+    min-width: 180px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.export-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: var(--mc-text);
+    transition: var(--ui-transition);
+    font-size: var(--mc-font-size-normal);
+}
+
+.export-dropdown-item:hover {
+    background-color: var(--mc-button-hover);
+}
+
+.export-dropdown-item:active {
+    background-color: var(--mc-button);
+}
+
+.export-dropdown-item i {
+    width: 16px;
+    text-align: center;
+    color: var(--mc-accent);
+}
+
+.dropdown-icon {
+    margin-left: 4px;
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+/* Code Viewer Modal Styles */
+.code-viewer-content {
+    max-width: 900px;
+    width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.code-viewer-content .modal-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+}
+
+.code-viewer-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background-color: var(--mc-dark-bg);
+    border-bottom: 1px solid var(--mc-border);
+}
+
+.code-viewer-tabs {
+    display: flex;
+    gap: 4px;
+}
+
+.code-tab {
+    padding: 8px 16px;
+    background-color: var(--mc-button);
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: var(--mc-font-size-normal);
+    transition: var(--ui-transition);
+}
+
+.code-tab:hover {
+    background-color: var(--mc-button-hover);
+}
+
+.code-tab.active {
+    background-color: var(--mc-accent);
+    border-color: var(--mc-accent);
+    color: white;
+}
+
+.code-viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.code-viewer-toolbar .action-button {
+    padding: 8px 16px;
+    font-size: var(--mc-font-size-small);
+}
+
+.copy-status {
+    font-size: var(--mc-font-size-small);
+    color: var(--mc-success);
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.copy-status.show {
+    opacity: 1;
+}
+
+.code-viewer-container {
+    flex: 1;
+    overflow: auto;
+    background-color: #1e1e1e;
+    padding: 0;
+}
+
+.json-code {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #d4d4d4;
+    background-color: #1e1e1e;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 2;
+}
+
+/* JSON Syntax Highlighting */
+.json-code .json-key {
+    color: #9cdcfe;
+}
+
+.json-code .json-string {
+    color: #ce9178;
+}
+
+.json-code .json-number {
+    color: #b5cea8;
+}
+
+.json-code .json-boolean {
+    color: #569cd6;
+}
+
+.json-code .json-null {
+    color: #569cd6;
 }

@@ -59,6 +59,11 @@
     background-color: rgba(77, 157, 224, 0.15);
 }
 
+.editor-component.selecting {
+    outline: 2px dashed var(--mc-selection);
+    background-color: rgba(77, 157, 224, 0.2);
+}
+
 .editor-component.container-item {
 
     outline: none;
@@ -69,6 +74,12 @@
 .editor-component.container-item:hover,
 .editor-component.container-item.selected {
     outline: 2px solid var(--mc-selection);
+}
+
+.editor-component.container-item.selecting {
+    outline: 2px dashed var(--mc-selection);
+    background-color: var(--mc-item-slot);
+    border: 2px solid var(--mc-selection);
 }
 
 .editor-component.container-item-with-picture {
@@ -101,6 +112,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.editor-component.container-item-with-picture.selecting {
+    outline: 2px dashed var(--mc-selection);
+    border: 2px solid var(--mc-selection);
 }
 
 .editor-component.container-item-with-picture::after {
@@ -148,6 +164,11 @@
     background-image: url('../assets/images/ui/progress_bar/progress_bar.png');
     background-size: contain;
     background-repeat: no-repeat;
+}
+
+.editor-component.progress-bar.selecting {
+    outline: 2px dashed var(--mc-selection);
+    box-shadow: 0 0 0 2px var(--mc-selection);
 }
 
 .editor-component.progress-bar[data-value="0"] {
@@ -200,6 +221,11 @@
 
 .editor-component.on_off-item.active {
     background-image: url('../assets/images/ui/on_off/on_off_active.png');
+}
+
+.editor-component.on_off-item.selecting {
+    outline: 2px dashed var(--mc-selection);
+    box-shadow: 0 0 0 2px var(--mc-selection);
 }
 
 .editor-component.pot {
@@ -295,6 +321,11 @@
     content: none;
 }
 
+.editor-component.container-type.selecting {
+    outline: 2px dashed var(--mc-selection);
+    border: 2px solid var(--mc-selection);
+}
+
 .editor-component.image {
 
     background-color: rgba(100, 100, 100, 0.15);
@@ -305,6 +336,11 @@
 
 .editor-component.image:hover {
     background-color: rgba(100, 100, 100, 0.3);
+}
+
+.editor-component.image.selecting {
+    outline: 2px dashed var(--mc-selection);
+    background-color: rgba(77, 157, 224, 0.2);
 }
 
 .editor-component.image[data-texture="textures/ui/altar_cross"] {
@@ -334,6 +370,34 @@
 
 .editor-component.label:hover {
     background-color: rgba(100, 100, 100, 0.3);
+}
+
+.editor-component.label.selecting {
+    outline: 2px dashed var(--mc-selection);
+    background-color: rgba(77, 157, 224, 0.2);
+}
+
+.template-preview.empty {
+    background-color: rgba(60, 60, 60, 0.5);
+    opacity: 0.5;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.template-preview.empty::after {
+    content: "Empty";
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+}
+
+.template-preview.empty:hover {
+    opacity: 1;
+    background-color: rgba(80, 80, 80, 0.5);
 }
 
 .template-preview.vanilla {
@@ -397,11 +461,6 @@
     position: absolute;
     height: 76px;
     min-height: 76px;
-}
-
-.inventory-bottom-half {
-    height: 166px;
-    position: relative;
 }
 
 .editor-component.image.custom-image,

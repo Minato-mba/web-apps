@@ -1,8 +1,29 @@
 const propertiesPanel = {
 
     selectedComponent: null,
+    container: null,
     init: function () {
-        this.propertiesContainer = document.getElementById('properties-container');
+        this.container = document.getElementById('properties-container');
+        this.propertiesContainer = this.container;  // Keep backward compatibility
+    },
+    showMultiSelectProperties: function (components) {
+        if (!this.container) return;
+        
+        this.container.innerHTML = '';
+        
+        if (!components || components.length === 0) {
+            this.container.innerHTML = '<p class="no-selection">No component selected</p>';
+            return;
+        }
+
+        const info = document.createElement('div');
+        info.className = 'multi-select-info';
+        info.innerHTML = `
+            <h4>Multiple Components Selected</h4>
+            <p>${components.length} components selected</p>
+            <p class="help-text">Use arrow keys to move all selected components by 1px. Click on canvas to deselect.</p>
+        `;
+        this.container.appendChild(info);
     },
     showPropertiesFor: function (component) {
         this.selectedComponent = component;
