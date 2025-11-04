@@ -277,6 +277,13 @@ button:active {
     padding-bottom: 0;
 }
 
+.properties-panel.folded,
+.components-list-panel.folded,
+.component-palette-panel.folded {
+    min-height: 0;
+    flex: 0 0 auto;
+}
+
 .editor-controls-container,
 .preview-controls-container {
     display: flex;

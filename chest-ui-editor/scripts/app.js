@@ -218,6 +218,7 @@ function applySettings(settings) {
 function setupFoldablePanels() {
 
     const panels = document.querySelectorAll('.panel');
+    const DEBOUNCE_DELAY = 300; // milliseconds
 
     panels.forEach(panel => {
         const header = panel.querySelector('.panel-header');
@@ -236,10 +237,19 @@ function setupFoldablePanels() {
             panel.classList.add('folded');
         }
 
+        // Per-panel debouncing to prevent double-toggle
+        let lastToggleTime = 0;
 
         const toggleFold = (e) => {
             e.preventDefault();
             e.stopPropagation();
+            
+            // Debounce to prevent double-clicking
+            const now = Date.now();
+            if (now - lastToggleTime < DEBOUNCE_DELAY) {
+                return; // Ignore rapid clicks
+            }
+            lastToggleTime = now;
 
             panel.classList.toggle('folded');
             localStorage.setItem(
@@ -254,6 +264,10 @@ function setupFoldablePanels() {
 
 
         header.addEventListener('click', (e) => {
+            // Don't toggle if clicking on the fold button itself (prevents double toggle)
+            if (e.target.classList.contains('fold-button') || e.target.closest('.fold-button')) {
+                return;
+            }
 
             if (e.target === header || e.target.tagName === 'H3') {
                 toggleFold(e);
