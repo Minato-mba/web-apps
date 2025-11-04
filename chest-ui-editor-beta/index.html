@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chest UI Editor</title>
+
+    <!-- Primary Meta Tags -->
+    <meta name="description"
+        content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
+    <meta name="keywords" content="Minecraft, Bedrock, UI Editor, Chest UI, Game Development">
+    <meta name="author" content="minato4743">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://minato-mba.github.io/web-apps/chest-ui-editor">
+    <meta property="og:title" content="Chest UI Editor  (Bedrock Edition Only)">
+    <meta property="og:description"
+        content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
+    <meta property="og:image" content="assets/images/preview.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://minato-mba.github.io/web-apps/chest-ui-editor">
+    <meta name="twitter:title" content="Chest UI Editor  (Bedrock Edition Only)">
+    <meta name="twitter:description"
+        content="Create and edit custom chest UIs for Minecraft Bedrock. Design interactive interfaces with drag-and-drop components.">
+    <meta name="twitter:image" content="assets/images/preview.png">
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="32x32" href="assets/images/favicons/logo32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicons/logo32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicons/logo16.png">
+    <meta name="theme-color" content="#4CAF50">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/preview.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6790880772028234" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>Chest UI Editor (Bedrock Edition Only)</h1>
+            <div class="actions">
+                <button id="settings-button" class="action-button" title="Settings"><i class="fas fa-cog"></i><span
+                        class="button-text">Settings</span></button>
+                <button id="reset-button" class="action-button" title="Reset Cache"><i class="fas fa-trash-alt"></i><span
+                        class="button-text">Reset</span></button>
+                <button id="new-project" class="action-button" title="New Project"><i class="fas fa-file"></i><span
+                        class="button-text">New</span></button>
+                <button id="load-project" class="action-button" title="Load Project"><i
+                        class="fas fa-folder-open"></i><span class="button-text">Load</span></button>
+                <button id="import-zip" class="action-button" title="Import ZIP"><i class="fas fa-file-import"></i><span
+                        class="button-text">Import ZIP</span></button>
+                <button id="save-project" class="action-button" title="Save Project"><i class="fas fa-save"></i><span
+                        class="button-text">Save</span></button>
+                <div class="export-dropdown-container">
+                    <button id="export-json" class="action-button" title="Export Options"><i
+                        class="fas fa-file-export"></i><span class="button-text">Export</span><i class="fas fa-caret-down dropdown-icon"></i></button>
+                    <div id="export-dropdown" class="export-dropdown-menu" style="display: none;">
+                        <div class="export-dropdown-item" data-action="zip">
+                            <i class="fas fa-file-archive"></i>
+                            <span>Export as ZIP</span>
+                        </div>
+                        <div class="export-dropdown-item" data-action="code">
+                            <i class="fas fa-code"></i>
+                            <span>View as Code</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-nav">
+            <button id="show-components" class="mobile-nav-button active"><i class="fas fa-th"></i> Components</button>
+            <button id="show-editor" class="mobile-nav-button"><i class="fas fa-edit"></i> Editor</button>
+            <button id="show-preview" class="mobile-nav-button"><i class="fas fa-eye"></i> Preview</button>
+            <button id="show-templates" class="mobile-nav-button"><i class="fas fa-layer-group"></i> Templates</button>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="panel component-palette-panel">
+                    <div class="panel-header">
+                        <h3>Components</h3>
+                        <button class="fold-button" title="Toggle panel">▼</button>
+                    </div>
+                    <div class="panel-content">
+                        <div class="component-list">
+                            <div class="component-item" data-type="container_item" draggable="true">
+                                <div class="component-icon container-item"></div>
+                                <span>Container Item</span>
+                            </div>
+                            <div class="component-item" data-type="container_item_with_picture" draggable="true">
+                                <div class="component-icon container-item-picture"></div>
+                                <span>Container Item with Picture</span>
+                            </div>
+                            <div class="component-item" data-type="progress_bar" draggable="true">
+                                <div class="component-icon progress-bar"></div>
+                                <span>Progress Bar</span>
+                            </div>
+                            <div class="component-item" data-type="on_off_item" draggable="true">
+                                <div class="component-icon on_off-item"></div>
+                                <span>on_off Item</span>
+                            </div>
+                            <div class="component-item" data-type="pot" draggable="true">
+                                <div class="component-icon pot"></div>
+                                <span>uninteractable slot</span>
+                            </div>
+                            <div class="component-item" data-type="container_type" draggable="true">
+                                <div class="component-icon container-type"></div>
+                                <span>Container Type</span>
+                            </div>
+                            <div class="component-item" data-type="image" draggable="true">
+                                <div class="component-icon image"></div>
+                                <span>Image</span>
+                            </div>
+                            <div class="component-item" data-type="label" draggable="true">
+                                <div class="component-icon label"></div>
+                                <span>Label</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel components-list-panel">
+                    <div class="panel-header">
+                        <h3>Component List</h3>
+                        <button class="fold-button" title="Toggle panel">▼</button>
+                    </div>
+                    <div class="panel-content">
+                        <div id="component-list-container" class="component-list-container">
+                            <p class="no-components">No components added</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel properties-panel">
+                    <div class="panel-header">
+                        <h3>Properties</h3>
+                        <button class="fold-button" title="Toggle panel">▼</button>
+                    </div>
+                    <div class="panel-content">
+                        <div id="properties-container">
+                            <p class="no-selection">No component selected</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-area">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>UI Layout</h3>
+                        <div class="editor-controls-container">
+                            <div class="editor-controls">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggle-grid">
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label">Grid</span>
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="snap-to-grid">
+                                    Snap to Grid
+                                </label>
+                            </div>
+                            <button class="fold-button" title="Toggle panel">▼</button>
+                        </div>
+                    </div>
+                    <div class="panel-content">
+                        <div id="editor-canvas" class="editor-canvas">
+                            <div class="chest-panel">
+                                <button class="chest-close-button">x</button>
+                                <div class="chest-top-half">
+                                    <div id="component-container" class="component-container"></div>
+                                </div>
+                                <div class="inventory-bottom-half">
+                                    <div class="inventory-label">Inventory</div>
+                                    <div class="inventory-grid">
+                                        <!-- 9x3 inventory grid -->
+                                        <div class="inventory-row">
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                        </div>
+                                        <div class="inventory-row">
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                        </div>
+                                        <div class="inventory-row">
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                            <div class="inventory-cell"></div>
+                                        </div>
+                                    </div>
+                                    <div class="hotbar-row">
+                                        <div class="hotbar-cell"></div>
+                                        <div class="hotbar-cell"></div>
+                                        <div class="hotbar-cell"></div>
+                                        <div class="hotbar-cell"></div>
+                                        <div class="hotbar-cell"></div>
+                                        <div class="hotbar-cell"></div>
+                                        <div class="hotbar-cell"></div>
+                                        <div class="hotbar-cell"></div>
+                                        <div class="hotbar-cell"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-area">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Live Preview</h3>
+                        <div class="preview-controls-container">
+                            <button class="fold-button" title="Toggle panel">▼</button>
+                        </div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="preview-container">
+                            <div id="preview-canvas" class="preview-canvas">
+                                <div class="chest-panel-background">
+
+                                    <div class="chest-panel">
+                                        <button class="chest-close-button">x</button>
+                                        <div class="chest-top-half">
+                                            <div id="preview-component-container" class="component-container"></div>
+                                        </div>
+                                        <div class="inventory-bottom-half">
+                                            <div class="inventory-label preview">Inventory</div>
+                                            <div class="inventory-grid">
+                                                <!-- 9x3 inventory grid -->
+                                                <div class="inventory-row">
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                </div>
+                                                <div class="inventory-row">
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                </div>
+                                                <div class="inventory-row">
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                    <div class="inventory-cell"></div>
+                                                </div>
+                                            </div>
+                                            <div class="hotbar-row">
+                                                <div class="hotbar-cell"></div>
+                                                <div class="hotbar-cell"></div>
+                                                <div class="hotbar-cell"></div>
+                                                <div class="hotbar-cell"></div>
+                                                <div class="hotbar-cell"></div>
+                                                <div class="hotbar-cell"></div>
+                                                <div class="hotbar-cell"></div>
+                                                <div class="hotbar-cell"></div>
+                                                <div class="hotbar-cell"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel template-selector-panel">
+            <div class="panel-header">
+                <h3><i class="fas fa-layer-group"></i> Templates</h3>
+                <button class="fold-button" title="Toggle panel">▼</button>
+            </div>
+            <div class="panel-content">
+                <div class="template-list">
+                    <div class="template-item" data-template="empty">
+                        <div class="template-preview empty"></div>
+                        <span>Empty</span>
+                    </div>
+                    <div class="template-item" data-template="vanilla">
+                        <div class="template-preview vanilla"></div>
+                        <span>Vanilla Chest</span>
+                    </div>
+                    <div class="template-item" data-template="Cooking_Pot">
+                        <div class="template-preview cooking-pot"></div>
+                        <span>Cooking Pot</span>
+                    </div>
+                    <div class="template-item" data-template="crafting">
+                        <div class="template-preview crafting"></div>
+                        <span>Crafting UI</span>
+                    </div>
+                    <div class="template-item" data-template="altar">
+                        <div class="template-preview altar"></div>
+                        <span>Altar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu" style="display: none;">
+        <div class="context-menu-item" id="context-copy">
+            <i class="fas fa-copy"></i> Copy
+        </div>
+        <div class="context-menu-item" id="context-cut">
+            <i class="fas fa-cut"></i> Cut
+        </div>
+        <div class="context-menu-item" id="context-paste" style="display: none;">
+            <i class="fas fa-paste"></i> Paste
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="settings-modal" style="display: none;">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="close-settings" class="close-modal-btn" title="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <h3>Main Panel Configuration</h3>
+                    <div class="setting-item">
+                        <label for="main-panel-height">Main Panel Height (px):</label>
+                        <input type="number" id="main-panel-height" min="100" max="400" value="166" step="1">
+                        <span class="setting-help">Default: 166px (total chest panel height)</span>
+                    </div>
+                    <div class="setting-item">
+                        <label for="main-panel-layer">Main Panel Layer (z-index):</label>
+                        <input type="number" id="main-panel-layer" min="0" max="100" value="5" step="1">
+                        <span class="setting-help">Default: 5 (component container layer)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-settings" class="action-button">
+                    <i class="fas fa-check"></i><span>Apply Settings</span>
+                </button>
+                <button id="cancel-settings" class="action-button">
+                    <i class="fas fa-times"></i><span>Cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Viewer Modal -->
+    <div id="code-viewer-modal" class="settings-modal" style="display: none;">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content code-viewer-content">
+            <div class="modal-header">
+                <h2>Generated JSON UI Code</h2>
+                <button id="close-code-viewer" class="close-modal-btn" title="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="code-viewer-toolbar">
+                    <div class="code-viewer-tabs">
+                        <button class="code-tab active" data-view="full">Full JSON</button>
+                        <button class="code-tab" data-view="custom">Custom Only</button>
+                    </div>
+                    <div class="code-viewer-actions">
+                        <button id="copy-code-btn" class="action-button">
+                            <i class="fas fa-copy"></i><span>Copy to Clipboard</span>
+                        </button>
+                        <span id="copy-status" class="copy-status"></span>
+                    </div>
+                </div>
+                <div class="code-viewer-container">
+                    <pre id="json-code-display" class="json-code"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <template id="container-item-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Size</h4>
+            <div class="property">
+                <label>Width:</label>
+                <input type="number" data-property="width" value="18" class="size-input">
+            </div>
+            <div class="property">
+                <label>Height:</label>
+                <input type="number" data-property="height" value="18" class="size-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Item</h4>
+            <div class="property">
+                <label>Collection Index:</label>
+                <input type="number" data-property="collection_index" min="0" class="collection-index-input">
+            </div>
+        </div>
+    </template>
+
+    <template id="container-item-with-picture-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Size</h4>
+            <div class="property">
+                <label>Width:</label>
+                <input type="number" data-property="width" value="18" class="size-input">
+            </div>
+            <div class="property">
+                <label>Height:</label>
+                <input type="number" data-property="height" value="18" class="size-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Item</h4>
+            <div class="property">
+                <label>Collection Index:</label>
+                <input type="number" data-property="collection_index" min="0" class="collection-index-input">
+            </div>
+            <div class="property">
+                <label>Picture:</label>
+                <input type="text" data-property="picture" class="picture-select" value="textures/ui/book_ui">
+            </div>
+        </div>
+    </template>
+
+    <template id="progress-bar-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Settings</h4>
+            <div class="property">
+                <label>Collection Index:</label>
+                <input type="number" data-property="collection_index" min="0" class="collection-index-input">
+            </div>
+            <div class="property">
+                <label>Current Value:</label>
+                <input type="range" data-property="value" min="0" max="9" step="1" value="0" class="progress-value">
+                <span class="value-display">0</span>
+            </div>
+        </div>
+    </template>
+
+    <template id="on_off-item-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Settings</h4>
+            <div class="property">
+                <label>Collection Index:</label>
+                <input type="number" data-property="collection_index" min="0" class="collection-index-input">
+            </div>
+            <div class="property">
+                <label>Active:</label>
+                <input type="checkbox" data-property="active" class="on_off-active">
+            </div>
+        </div>
+    </template>
+
+    <template id="pot-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Settings</h4>
+            <div class="property">
+                <label>Collection Index:</label>
+                <input type="number" data-property="collection_index" min="0" class="collection-index-input">
+            </div>
+            <div class="property">
+                <label>Texture:</label>
+                <input type="text" data-property="texture" class="texture-input" value="textures/ui/pot/pot">
+            </div>
+        </div>
+    </template>
+
+    <template id="container-type-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Settings</h4>
+            <div class="property">
+                <label>Collection Index:</label>
+                <input type="number" data-property="collection_index" min="0" class="collection-index-input">
+            </div>
+            <div class="property">
+                <label>Type:</label>
+                <select data-property="container_type" class="container-type-select">
+                    <option value="0">Type 0</option>
+                    <option value="1">Type 1</option>
+                    <option value="2">Type 2</option>
+                    <option value="3">Type 3</option>
+                    <option value="4">Type 4</option>
+                    <option value="5">Type 5</option>
+                    <option value="6">Type 6</option>
+                    <option value="7">Type 7</option>
+                    <option value="8">Type 8</option>
+                    <option value="9">Type 9</option>
+                </select>
+            </div>
+        </div>
+    </template>
+
+    <template id="image-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Size</h4>
+            <div class="property">
+                <label>Width:</label>
+                <input type="number" data-property="width" value="32" class="size-input">
+            </div>
+            <div class="property">
+                <label>Height:</label>
+                <input type="number" data-property="height" value="32" class="size-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Image</h4>
+            <div class="property">
+                <label>Texture:</label>
+                <input type="text" data-property="texture" class="texture-input" value="textures/ui/altar_cross">
+                <div class="image-upload-container">
+                    <button type="button" class="upload-image-btn">Upload Custom Image</button>
+                    <input type="file" id="image-upload" class="image-upload" accept="image/*" style="display:none">
+                </div>
+                <div class="image-preview-container" style="display:none">
+                    <p>Custom image:</p>
+                    <div class="custom-image-preview"></div>
+                </div>
+            </div>
+            <div class="property">
+                <label>Alpha:</label>
+                <input type="range" data-property="alpha" min="0" max="1" step="0.1" value="1" class="alpha-input">
+                <span class="value-display">1.0</span>
+            </div>
+        </div>
+    </template>
+
+    <template id="label-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Text</h4>
+            <div class="property">
+                <label>Content:</label>
+                <input type="text" data-property="text" class="text-input">
+            </div>
+            <div class="property">
+                <label>Color:</label>
+                <div class="color-picker-controls">
+                    <div class="color-channels">
+                        <div class="property">
+                            <label>R:</label>
+                            <input type="number" data-property="color-r" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
+                        </div>
+                        <div class="property">
+                            <label>G:</label>
+                            <input type="number" data-property="color-g" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
+                        </div>
+                        <div class="property">
+                            <label>B:</label>
+                            <input type="number" data-property="color-b" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
+                        </div>
+                    </div>
+                    <div class="color-preview"></div>
+                </div>
+                <div class="color-picker">
+                    <div class="color-option" data-color="[1.0,1.0,1.0]" style="background-color: #FFFFFF;"></div>
+                    <div class="color-option" data-color="[0.0,0.0,0.0]" style="background-color: #000000;"></div>
+                    <div class="color-option" data-color="[0.25,0.25,0.25]" style="background-color: #404040;"></div>
+                    <div class="color-option" data-color="[1.0,0.0,0.0]" style="background-color: #FF0000;"></div>
+                    <div class="color-option" data-color="[0.0,1.0,0.0]" style="background-color: #00FF00;"></div>
+                    <div class="color-option" data-color="[0.0,0.0,1.0]" style="background-color: #0000FF;"></div>
+                    <div class="color-option" data-color="[1.0,1.0,0.0]" style="background-color: #FFFF00;"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="scripts/util.js"></script>
+    <script src="scripts/components.js"></script>
+    <script src="scripts/properties.js"></script>
+    <script src="scripts/templates.js"></script>
+    <script src="scripts/preview.js"></script>
+    <script src="scripts/editor.js"></script>
+    <script src="scripts/mobile.js"></script>
+    <script src="scripts/export.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+
+</html>
