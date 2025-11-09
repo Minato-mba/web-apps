@@ -321,9 +321,7 @@ function importZipProject() {
             // Restore settings if they were saved with the project
             if (data.settings) {
                 util.saveToLocalStorage('chest_ui_settings', data.settings);
-                if (typeof applySettings === 'function') {
-                    applySettings(data.settings);
-                }
+                util.applySettings(data.settings);
             }
 
             alert('Project imported successfully!');

@@ -175,5 +175,30 @@ const util = {
         };
 
         input.click();
+    },
+    applySettings: function(settings) {
+        // Apply height to the entire chest panel (like main_panel size in fisher_table)
+        const editorChestPanel = document.querySelector('.editor-canvas .chest-panel');
+        const previewChestPanel = document.querySelector('.preview-canvas .chest-panel');
+        
+        if (editorChestPanel) {
+            editorChestPanel.style.height = `${settings.mainPanelHeight}px`;
+        }
+        
+        if (previewChestPanel) {
+            previewChestPanel.style.height = `${settings.mainPanelHeight}px`;
+        }
+    
+        // Apply layer to the component container (where user places components)
+        const editorComponentContainer = document.querySelector('.editor-canvas .component-container');
+        const previewComponentContainer = document.querySelector('.preview-canvas .component-container');
+        
+        if (editorComponentContainer) {
+            editorComponentContainer.style.zIndex = settings.mainPanelLayer;
+        }
+        
+        if (previewComponentContainer) {
+            previewComponentContainer.style.zIndex = settings.mainPanelLayer;
+        }
     }
 };

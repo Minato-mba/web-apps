@@ -1,3 +1,8 @@
+const defaultSettings = {
+    mainPanelHeight: 166,  // Default total chest panel height (vanilla)
+    mainPanelLayer: 5
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     propertiesPanel.init();
     editor.init();
@@ -20,6 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('import-zip').addEventListener('click', function() {
         importZipProject();
     });
+
+    setupCodeViewer();
 });
 
 function setupActionButtons() {
@@ -28,6 +35,17 @@ function setupActionButtons() {
         if (confirm('Reset all saved projects? This will clear all saved data from browser cache.\n\nThis action cannot be undone!')) {
             try {
                 util.saveToLocalStorage('minecraft_chest_ui_project', null);
+                util.saveToLocalStorage('chest_ui_settings', defaultSettings);
+                util.applySettings(defaultSettings);
+
+                // Also update the settings modal if it's open
+                const heightInput = document.getElementById('main-panel-height');
+                const layerInput = document.getElementById('main-panel-layer');
+                if (heightInput && layerInput) {
+                    heightInput.value = defaultSettings.mainPanelHeight;
+                    layerInput.value = defaultSettings.mainPanelLayer;
+                }
+
                 alert('Cache cleared successfully! Saved projects have been removed.');
                 // Optionally reload to show empty state
                 editor.clearComponents();
@@ -41,8 +59,17 @@ function setupActionButtons() {
     document.getElementById('new-project').addEventListener('click', () => {
         if (confirm('Start a new project? This will clear all current components.')) {
             editor.clearComponents();
-
+            util.applySettings(defaultSettings);
+            util.saveToLocalStorage('chest_ui_settings', defaultSettings);
             util.saveToLocalStorage('minecraft_chest_ui_project', null);
+
+            // Also update the settings modal if it's open
+            const heightInput = document.getElementById('main-panel-height');
+            const layerInput = document.getElementById('main-panel-layer');
+            if (heightInput && layerInput) {
+                heightInput.value = defaultSettings.mainPanelHeight;
+                layerInput.value = defaultSettings.mainPanelLayer;
+            }
         }
     });
     document.getElementById('save-project').addEventListener('click', () => {
@@ -62,10 +89,16 @@ function setupActionButtons() {
                 return cleanComponent;
             });
 
+            const settings = util.loadFromLocalStorage('chest_ui_settings') || {
+                mainPanelHeight: 166,
+                mainPanelLayer: 5
+            };
+
             const data = {
                 components: cleanComponents,
                 uploadedImages: imageManager.uploadedImages,
-                version: '1.0.2',
+                settings: settings,
+                version: '1.0.3', // Bump version to indicate new structure
                 timestamp: Date.now()
             };
 
@@ -90,6 +123,11 @@ function loadSavedProject() {
 
         if (!data || !Array.isArray(data.components)) return false;
 
+        // Load and apply settings if they exist in the project data
+        if (data.settings) {
+            util.saveToLocalStorage('chest_ui_settings', data.settings);
+            util.applySettings(data.settings);
+        }
 
         if (data.uploadedImages) {
             imageManager.uploadedImages = data.uploadedImages;
@@ -159,7 +197,7 @@ function setupSettingsModal() {
         };
 
         util.saveToLocalStorage('chest_ui_settings', settings);
-        applySettings(settings);
+        util.applySettings(settings);
         closeModal();
         alert('Settings applied successfully!');
     });
@@ -177,42 +215,11 @@ function openSettingsModal() {
 }
 
 function loadSettings() {
-    const defaultSettings = {
-        mainPanelHeight: 166,  // Default total chest panel height (vanilla)
-        mainPanelLayer: 5
-    };
-    
     const saved = util.loadFromLocalStorage('chest_ui_settings');
     const settings = saved ? { ...defaultSettings, ...saved } : defaultSettings;
     
-    applySettings(settings);
+    util.applySettings(settings);
     return settings;
-}
-
-function applySettings(settings) {
-    // Apply height to the entire chest panel (like main_panel size in fisher_table)
-    const editorChestPanel = document.querySelector('.editor-canvas .chest-panel');
-    const previewChestPanel = document.querySelector('.preview-canvas .chest-panel');
-    
-    if (editorChestPanel) {
-        editorChestPanel.style.height = `${settings.mainPanelHeight}px`;
-    }
-    
-    if (previewChestPanel) {
-        previewChestPanel.style.height = `${settings.mainPanelHeight}px`;
-    }
-
-    // Apply layer to the component container (where user places components)
-    const editorComponentContainer = document.querySelector('.editor-canvas .component-container');
-    const previewComponentContainer = document.querySelector('.preview-canvas .component-container');
-    
-    if (editorComponentContainer) {
-        editorComponentContainer.style.zIndex = settings.mainPanelLayer;
-    }
-    
-    if (previewComponentContainer) {
-        previewComponentContainer.style.zIndex = settings.mainPanelLayer;
-    }
 }
 
 function setupFoldablePanels() {
@@ -466,7 +473,4 @@ function setupCodeViewer() {
     });
 }
 
-// Initialize code viewer on page load
-document.addEventListener('DOMContentLoaded', function () {
-    setupCodeViewer();
-});
+

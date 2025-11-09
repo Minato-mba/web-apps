@@ -36,6 +36,7 @@ const editor = {
         const snapToGridCheckbox = document.getElementById('snap-to-grid');
         snapToGridCheckbox.addEventListener('change', e => {
             this.snapToGrid = e.target.checked;
+            e.target.blur();
         });
 
         // Store click handler flag at module level so selection box can access it
