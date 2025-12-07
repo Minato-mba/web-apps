@@ -373,18 +373,6 @@
         border-image-slice: 2 2 2 2 fill;
       }
 
-      @media screen and (max-aspect-ratio: 1/1) {
-        /* Split horizontally if the height of the screen is more than the width */
-        #container {
-          flex-direction: column;
-        }
-        #right-side,
-        #left-side {
-          width: 100%;
-          height: 50%;
-        }
-      }
-
       #notification {
         position: fixed;
         bottom: 10px;
@@ -413,6 +401,66 @@
         position: absolute;
         right: 0;
         bottom: 0;
+      }
+
+      #drop_zone {
+        position: relative;
+        height: 150px;
+        border: 3px dashed rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+        text-align: center;
+        padding: 20px;
+        margin: 20px;
+        transition: all 0.3s ease;
+        background: rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+      }
+
+      #drop_zone:hover {
+        border-color: rgba(255, 255, 255, 0.6);
+        color: rgba(255, 255, 255, 0.8);
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      .drop_zone_highlight {
+        border-color: rgba(69, 160, 229, 1) !important;
+        background: linear-gradient(135deg, rgba(222, 121, 116, 0.3) 0%, rgba(69, 160, 229, 0.3) 100%) !important;
+        color: white !important;
+        transform: scale(1.05);
+      }
+
+      #drop_zone_icon {
+        width: 60px;
+        height: 60px;
+        opacity: 0.5;
+        transition: opacity 0.3s ease;
+      }
+
+      #drop_zone:hover #drop_zone_icon {
+        opacity: 0.8;
+      }
+
+      @media screen and (max-aspect-ratio: 1/1) {
+        /* Split horizontally if the height of the screen is more than the width */
+        #container {
+          flex-direction: column;
+        }
+        #right-side,
+        #left-side {
+          width: 100%;
+          height: 50%;
+        }
+        /* Hide drop zone on mobile */
+        #drop_zone {
+          display: none;
+        }
       }
     </style>
     <script src="https://cdn.rawgit.com/exif-js/exif-js/master/exif.js"></script>
@@ -487,6 +535,15 @@
               ></button>
             </div>
           </div>
+        </div>
+        <div id="drop_zone">
+          <svg id="drop_zone_icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="16" width="48" height="40" rx="4" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M32 8 L32 32 M24 24 L32 32 L40 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="16" y1="48" x2="48" y2="48" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <div>Drop image here</div>
+          <div style="font-size: 10px; opacity: 0.7;">or click to browse</div>
         </div>
       </div>
       <div id="left-side">
@@ -574,6 +631,52 @@
 
       let image = new Image();
 
+      // Drag and drop functionality
+      const dropZone = document.getElementById("drop_zone");
+
+      function handleFile(file) {
+        if (file && file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            image.onload = function () {
+              originalImage.src = e.target.result;
+              update();
+            };
+            image.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          showNotification("Please drop an image file!");
+        }
+      }
+
+      dropZone.addEventListener("click", () => {
+        textureUpload.click();
+      });
+
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add("drop_zone_highlight");
+      });
+
+      dropZone.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove("drop_zone_highlight");
+      });
+
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove("drop_zone_highlight");
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      });
+
       textureUpload.addEventListener("change", handleImageUpload);
       sliceLeft.addEventListener("input", update);
       sliceTop.addEventListener("input", update);
@@ -645,15 +748,7 @@
       function handleImageUpload(event) {
         const file = event.target.files[0];
         if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            image.onload = function () {
-              originalImage.src = e.target.result;
-              update();
-            };
-            image.src = e.target.result;
-          };
-          reader.readAsDataURL(file);
+          handleFile(file);
         }
       }
 
@@ -726,7 +821,7 @@
 
         drawPixelatedImage(scaledContext,image,0,0,left,top,0,0,left,top);
         drawPixelatedImage(scaledContext,image,right,0,baseSize.width - right,top,newWidth - (baseSize.width - right),0,baseSize.width - right,top); 
-        drawPixelatedImage(scaledContext,image,0,bottom,left,baseSize.height - bottom,0,newHeight - (baseSize.height - bottom),left,baseSize.height - bottom);  bottom-
+        drawPixelatedImage(scaledContext,image,0,bottom,left,baseSize.height - bottom,0,newHeight - (baseSize.height - bottom),left,baseSize.height - bottom);
         drawPixelatedImage(scaledContext,image,right,bottom,baseSize.width - right,baseSize.height - bottom,newWidth - (baseSize.width - right),newHeight - (baseSize.height - bottom),baseSize.width - right,baseSize.height - bottom); 
         drawPixelatedImage(scaledContext,image,left,0,right - left,top,left,0,newWidth - (baseSize.width - right + left),top);
         drawPixelatedImage(scaledContext,image,left,bottom,right - left,baseSize.height - bottom,left,newHeight - (baseSize.height - bottom),newWidth - (baseSize.width - right + left),baseSize.height - bottom);
@@ -846,7 +941,6 @@ function drawSliceLines() {
   scaledContext.lineTo(scaledCanvas.width, bottomPos);
   scaledContext.stroke();
 }
-
     </script>
   </body>
 </html>
