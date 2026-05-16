@@ -688,8 +688,84 @@ const editor = {
     getComponentById: function (id) {
         return this.components.find(c => c.id === id) || null;
     },
+    getTabs: function () {
+        return this.components
+            .filter(component => component.type === 'tab')
+            .sort((a, b) => (Number(a.properties.toggle_index) || 0) - (Number(b.properties.toggle_index) || 0));
+    },
+    getActiveTab: function () {
+        const tabs = this.getTabs();
+        return tabs.find(tab => tab.properties.is_active) || tabs[0] || null;
+    },
+    isComponentVisibleInActiveTab: function (component) {
+        if (!component?.properties?.tab_parent_id) return true;
+        const activeTab = this.getActiveTab();
+        return activeTab ? component.properties.tab_parent_id === activeTab.id : true;
+    },
+    prepareComponentForAdd: function (component) {
+        if (component.type === 'tab') {
+            const existingTabs = this.getTabs();
+            component.properties.toggle_index = getNextToggleIndex(this.components);
+            component.properties.is_active = existingTabs.length === 0;
+
+            if (existingTabs.length > 0) {
+                const lastTab = existingTabs[existingTabs.length - 1];
+                component.x = lastTab.x + lastTab.width + 4;
+                component.y = lastTab.y;
+            } else {
+                component.x = component.x || 0;
+                component.y = component.y || 0;
+            }
+
+            return true;
+        }
+
+        const activeTab = this.getActiveTab();
+        if (activeTab && component.type !== 'tab' && !component.properties?.tab_parent_id) {
+            component.properties = component.properties || {};
+            component.properties.tab_parent_id = activeTab.id;
+        }
+
+        return true;
+    },
+    refreshTabVisibility: function () {
+        const canvas = this.canvas.parentElement;
+        const tabs = this.getTabs();
+
+        if (canvas) {
+            canvas.classList.toggle('has-tabs', tabs.length > 0);
+        }
+
+        this.components.forEach(component => {
+            const element = this.canvas.querySelector(`[data-id="${component.id}"]`);
+            if (!element) return;
+
+            if (component.type === 'tab') {
+                element.classList.toggle('active', !!component.properties.is_active);
+                return;
+            }
+
+            element.style.display = this.isComponentVisibleInActiveTab(component) ? '' : 'none';
+        });
+    },
+    setActiveTab: function (tabId) {
+        const tab = this.getComponentById(tabId);
+        if (!tab || tab.type !== 'tab') return;
+
+        this.components.forEach(component => {
+            if (component.type === 'tab') {
+                component.properties.is_active = component.id === tabId;
+            }
+        });
+
+        this.getTabs().forEach(tabComponent => this.updateComponent(tabComponent));
+        this.refreshTabVisibility();
+        preview.updatePreview(this.getComponents());
+        propertiesPanel.showPropertiesFor(tab);
+    },
     addComponent: function (component) {
         if (!component) return;
+        if (!this.prepareComponentForAdd(component)) return;
 
         if (component.zIndex === undefined) {
             const maxZIndex = this.components.reduce((max, comp) =>
@@ -700,6 +776,7 @@ const editor = {
 
         this.components.push(component);
         this.renderComponent(component);
+        this.refreshTabVisibility();
         preview.updatePreview(this.getComponents());
         this.updateComponentList();
         
@@ -725,6 +802,9 @@ const editor = {
         }
 
         this.canvas.appendChild(element);
+        if (component.type !== 'tab') {
+            element.style.display = this.isComponentVisibleInActiveTab(component) ? '' : 'none';
+        }
 
         // Note: Component selection is now handled in setupComponentDragging
         // Don't add click listener here as it interferes with multi-select
@@ -754,10 +834,29 @@ const editor = {
         const element = this.canvas.querySelector(`[data-id="${component.id}"]`);
         if (!element) return;
 
+        // Check if this component was selected
+        const wasSelected = this.selectedComponent && this.selectedComponent.id === component.id;
+        const wasInMultiSelect = this.selectedComponents.includes(component);
+
         element.parentNode.removeChild(element);
 
         this.renderComponent(component);
 
+        // Restore selection if it was selected
+        if (wasSelected || wasInMultiSelect) {
+            const newElement = this.canvas.querySelector(`[data-id="${component.id}"]`);
+            if (newElement) {
+                newElement.classList.add('selected');
+                if (wasSelected) {
+                    this.selectedComponent = component;
+                }
+                if (!wasInMultiSelect) {
+                    this.selectedComponents = [component];
+                }
+            }
+        }
+
+        this.refreshTabVisibility();
         preview.updateComponent(component);
     },
     toggleComponentSelection: function (component) {
@@ -877,6 +976,10 @@ const editor = {
         this.selectedComponent = component;
 
         if (component) {
+            if (component.type === 'tab') {
+                this.setActiveTab(component.id);
+            }
+
             // Add to multi-select array
             this.selectedComponents.push(component);
 
@@ -896,6 +999,11 @@ const editor = {
         propertiesPanel.showPropertiesFor(component);
     },
     removeComponent: function (component, skipStateSave = false) {
+        if (component.type === 'tab') {
+            const children = this.components.filter(c => c.properties?.tab_parent_id === component.id);
+            children.forEach(child => this.removeComponent(child, true));
+        }
+
         const index = this.components.findIndex(c => c.id === component.id);
         if (index !== -1) {
             this.components.splice(index, 1);
@@ -910,6 +1018,14 @@ const editor = {
             this.selectComponent(null);
         }
 
+        if (component.type === 'tab') {
+            const remainingTabs = this.getTabs();
+            if (remainingTabs.length && !remainingTabs.some(tab => tab.properties.is_active)) {
+                this.setActiveTab(remainingTabs[0].id);
+            }
+        }
+
+        this.refreshTabVisibility();
         preview.updatePreview(this.components);
         this.updateComponentList();
         
@@ -959,7 +1075,7 @@ const editor = {
         }
 
         const sortedComponents = [...this.components].sort((a, b) => {
-            return (a.zIndex || 0) - (b.zIndex || 0);
+            return (b.zIndex || 0) - (a.zIndex || 0);
         });
 
         sortedComponents.forEach((component, index) => {
@@ -977,6 +1093,10 @@ const editor = {
             if (component.type === 'label') {
                 displayInfo = `"${component.properties.text.substring(0, 15)}"`;
                 if (component.properties.text.length > 15) displayInfo += '...';
+            } else if (component.type === 'tab') {
+                displayInfo = component.properties.show_label && component.properties.label_text
+                    ? component.properties.label_text
+                    : `Tab ${component.properties.toggle_index || 1}`;
             } else if (component.properties.collection_index !== undefined) {
                 displayInfo = `Index: ${component.properties.collection_index}`;
             }
@@ -1019,14 +1139,14 @@ const editor = {
             moveUpBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (index > 0) {
-                    this.reorderComponent(component, -1);
+                    this.reorderComponent(component, 1);
                 }
             });
 
             moveDownBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (index < sortedComponents.length - 1) {
-                    this.reorderComponent(component, 1);
+                    this.reorderComponent(component, -1);
                 }
             });
 

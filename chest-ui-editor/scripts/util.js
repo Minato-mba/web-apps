@@ -137,8 +137,14 @@ const util = {
                     return;
                 }
 
-                const jsonContent = await jsonFile.async("string");
-                const data = JSON.parse(jsonContent);
+                const jsonContent = await jsonFile.async('string');
+                let data;
+                try {
+                    data = JSON.parse(jsonContent);
+                } catch (parseError) {
+                    alert('Invalid ZIP file: chest_ui_data.json is not valid JSON.');
+                    return;
+                }
 
                 const imagePromises = [];
                 const imageFiles = [];
@@ -175,5 +181,117 @@ const util = {
         };
 
         input.click();
+    },
+    applySettings: function(settings) {
+        // Validate settings parameter
+        if (!settings || typeof settings !== 'object') {
+            console.error('util.applySettings: Invalid settings parameter:', settings);
+            return;
+        }
+        
+        // Apply height to entire chest panel (like main_panel size in fisher_table)
+        try {
+            const editorChestPanel = document.querySelector('.editor-canvas .chest-panel');
+            const previewChestPanel = document.querySelector('.preview-canvas .chest-panel');
+            
+            console.log('util.applySettings: Applying panel height:', settings.mainPanelHeight);
+            
+            if (editorChestPanel) {
+                editorChestPanel.style.height = `${settings.mainPanelHeight}px`;
+                console.log('util.applySettings: Set editor panel height to:', editorChestPanel.style.height);
+            }
+            
+            if (previewChestPanel) {
+                previewChestPanel.style.height = `${settings.mainPanelHeight}px`;
+                console.log('util.applySettings: Set preview panel height to:', previewChestPanel.style.height);
+            }
+
+            if (typeof editor !== 'undefined' && editor.getTabPanel && typeof preview !== 'undefined') {
+                const tabPanel = editor.getTabPanel();
+                if (tabPanel) {
+                    tabPanel.x = 0;
+                    tabPanel.y = 0;
+                    tabPanel.width = 162;
+                    tabPanel.height = preview.calculatePanelHeight(settings);
+
+                    const tabElement = editor.canvas?.querySelector(`[data-id="${tabPanel.id}"]`);
+                    if (tabElement) {
+                        tabElement.style.left = '0px';
+                        tabElement.style.top = '0px';
+                        tabElement.style.width = `${tabPanel.width}px`;
+                        tabElement.style.height = `${tabPanel.height}px`;
+                    }
+                }
+            }
+            
+            // Apply title offset to both editor and preview
+            const editorTitle = document.getElementById('editor-chest-title');
+            const previewTitle = document.getElementById('preview-chest-title');
+            
+            if (editorTitle && previewTitle && settings.titleOffsetX !== undefined && settings.titleOffsetY !== undefined) {
+                console.log('util.applySettings: Applying title offsets:', {
+                    titleOffsetX: settings.titleOffsetX,
+                    titleOffsetY: settings.titleOffsetY
+                });
+                
+                editorTitle.style.left = `${settings.titleOffsetX}px`;
+                editorTitle.style.top = `${settings.titleOffsetY}px`;
+                editorTitle.style.fontSize = `${10 * (Number(settings.titleFontScaleFactor) || 1.0)}px`;
+                editorTitle.style.color = util.rgbArrayToHex(settings.titleColor || [1.0, 1.0, 1.0]);
+                console.log('util.applySettings: Set editor title position:', {
+                    left: editorTitle.style.left,
+                    top: editorTitle.style.top
+                });
+                
+                previewTitle.style.left = `${settings.titleOffsetX}px`;
+                previewTitle.style.top = `${settings.titleOffsetY}px`;
+                previewTitle.style.fontSize = `${10 * (Number(settings.titleFontScaleFactor) || 1.0)}px`;
+                previewTitle.style.color = util.rgbArrayToHex(settings.titleColor || [1.0, 1.0, 1.0]);
+                console.log('util.applySettings: Set preview title position:', {
+                    left: previewTitle.style.left,
+                    top: previewTitle.style.top
+                });
+            } else {
+                console.log('util.applySettings: Title offset values are undefined, skipping title positioning');
+            }
+            
+            // Apply close button visibility to both editor and preview
+            if ('showCloseButton' in settings) {
+                try {
+                    const editorCloseButton = editorChestPanel?.querySelector('.chest-close-button');
+                    const previewCloseButton = previewChestPanel?.querySelector('.chest-close-button');
+                    
+                    console.log('util.applySettings: Applying close button setting:', settings.showCloseButton);
+                    
+                    if (editorCloseButton) {
+                        editorCloseButton.style.display = settings.showCloseButton ? 'block' : 'none';
+                        console.log('util.applySettings: Set editor close button display to:', editorCloseButton.style.display);
+                    }
+                    
+                    if (previewCloseButton) {
+                        previewCloseButton.style.display = settings.showCloseButton ? 'block' : 'none';
+                        console.log('util.applySettings: Set preview close button display to:', previewCloseButton.style.display);
+                    }
+                } catch (error) {
+                    console.error('util.applySettings: Error applying close button setting:', error);
+                }
+            } else {
+                console.log('util.applySettings: showCloseButton property not found in settings, skipping close button update');
+            }
+        } catch (error) {
+            console.error('util.applySettings: Error applying settings:', error);
+        }
+        
+        // Apply layer to the component container (where user places components)
+        const editorComponentContainer = document.querySelector('.editor-canvas .component-container');
+        const previewComponentContainer = document.querySelector('.preview-canvas .component-container');
+        
+        if (editorComponentContainer) {
+            editorComponentContainer.style.zIndex = settings.mainPanelLayer;
+        }
+        
+        if (previewComponentContainer) {
+            previewComponentContainer.style.zIndex = settings.mainPanelLayer;
+        }
     }
 };

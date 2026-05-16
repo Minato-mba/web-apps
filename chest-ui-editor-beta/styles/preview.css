@@ -4,7 +4,7 @@
 }
 
 .preview-canvas {
-    background-image: url('https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/textures/ui/panorama_0.png');
+    background-image: url('https://cdn.jsdelivr.net/gh/Mojang/bedrock-samples@main/resource_pack/textures/ui/panorama_0.png');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -43,9 +43,11 @@
     border-image-source: url('https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/textures/ui/dialog_background_opaque.png');
     border-image-slice: 4 fill;
     border-image-width: 4px;
-    image-rendering: pixelated;
     border-image-repeat: stretch;
     box-sizing: border-box;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
 
 .preview-canvas .inventory-label {
@@ -237,8 +239,8 @@
     background-position: center;
 }
 
-.preview-component.image[data-texture="textures/ui/altar_cross"] {
-    background-image: url('../assets/images/ui/altar_cross.png');
+.preview-component.image[data-texture="textures/ui/combiner_cross"] {
+    background-image: url('../assets/images/ui/combiner_cross.png');
 }
 
 .preview-component.image[data-texture="textures/ui/dark_plus"] {
@@ -255,7 +257,10 @@
 
 .preview-component.label {
     color: var(--mc-text);
+    font-family: 'Minecraft', 'Inter', sans-serif;
     font-size: 10px;
+    font-weight: 400;
+    line-height: 1;
     white-space: nowrap;
     text-shadow: none;
 }

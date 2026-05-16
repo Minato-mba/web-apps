@@ -16,88 +16,61 @@ const mobile = {
         this.createFloatingTemplatesPanel();
         this.createFloatingPropertiesPanel();
         this.createComponentsListPanel();
+        this.createMobileChestUiDrawer();
+        this.createMobileEditorToolbar();
         this.createPropertiesButton();
         this.setupMobileZoom();
 
-        showComponentsBtn.addEventListener('click', function () {
+        showComponentsBtn.addEventListener('click', () => {
             const drawer = document.getElementById('mobile-component-drawer');
             if (drawer.classList.contains('open')) {
                 drawer.classList.remove('open');
-                showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Open Components';
+                showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Components';
             } else {
+                this.closeAllDrawers();
                 drawer.classList.add('open');
-                showComponentsBtn.innerHTML = '<i class="fas fa-times"></i> Close Components';
-
-                const templateDrawer = document.getElementById('mobile-templates-drawer');
-                if (templateDrawer && templateDrawer.classList.contains('open')) {
-                    templateDrawer.classList.remove('open');
-                    showTemplatesBtn.innerHTML = '<i class="fas fa-layer-group"></i> Open Templates';
-                }
+                showComponentsBtn.innerHTML = '<i class="fas fa-times"></i> Close';
             }
 
-            sidebar.style.display = 'none';
-            editorArea.style.display = 'block';
-            previewArea.style.display = 'none';
-            templatesPanel.style.display = 'none';
-
-            showEditorBtn.classList.add('active');
+            this.switchView('editor');
+            showComponentsBtn.classList.add('active');
+            showEditorBtn.classList.remove('active');
             showPreviewBtn.classList.remove('active');
             showTemplatesBtn.classList.remove('active');
         });
 
-        showEditorBtn.addEventListener('click', function () {
-            const drawer = document.getElementById('mobile-component-drawer');
-            drawer.classList.remove('open');
-            showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Open Components';
-
-            sidebar.style.display = 'none';
-            editorArea.style.display = 'block';
-            previewArea.style.display = 'none';
-            templatesPanel.style.display = 'none';
-
+        showEditorBtn.addEventListener('click', () => {
+            this.closeAllDrawers();
+            showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Components';
+            this.switchView('editor');
             showComponentsBtn.classList.remove('active');
             showEditorBtn.classList.add('active');
             showPreviewBtn.classList.remove('active');
             showTemplatesBtn.classList.remove('active');
         });
 
-        showPreviewBtn.addEventListener('click', function () {
-            const drawer = document.getElementById('mobile-component-drawer');
-            drawer.classList.remove('open');
-            showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Open Components';
-
-            sidebar.style.display = 'none';
-            editorArea.style.display = 'none';
-            previewArea.style.display = 'block';
-            templatesPanel.style.display = 'none';
-
+        showPreviewBtn.addEventListener('click', () => {
+            this.closeAllDrawers();
+            showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Components';
+            this.switchView('preview');
             showComponentsBtn.classList.remove('active');
             showEditorBtn.classList.remove('active');
             showPreviewBtn.classList.add('active');
             showTemplatesBtn.classList.remove('active');
         });
 
-        showTemplatesBtn.addEventListener('click', function () {
+        showTemplatesBtn.addEventListener('click', () => {
             const templateDrawer = document.getElementById('mobile-templates-drawer');
             if (templateDrawer.classList.contains('open')) {
                 templateDrawer.classList.remove('open');
-                showTemplatesBtn.innerHTML = '<i class="fas fa-layer-group"></i> Open Templates';
+                showTemplatesBtn.innerHTML = '<i class="fas fa-layer-group"></i> Templates';
             } else {
+                this.closeAllDrawers();
                 templateDrawer.classList.add('open');
-                showTemplatesBtn.innerHTML = '<i class="fas fa-times"></i> Close Templates';
-
-                const componentDrawer = document.getElementById('mobile-component-drawer');
-                if (componentDrawer && componentDrawer.classList.contains('open')) {
-                    componentDrawer.classList.remove('open');
-                    showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Open Components';
-                }
+                showTemplatesBtn.innerHTML = '<i class="fas fa-times"></i> Close';
             }
 
-            sidebar.style.display = 'none';
-            editorArea.style.display = 'block';
-            previewArea.style.display = 'none';
-            templatesPanel.style.display = 'none';
-
+            this.switchView('editor');
             showComponentsBtn.classList.remove('active');
             showEditorBtn.classList.add('active');
             showPreviewBtn.classList.remove('active');
@@ -180,12 +153,89 @@ const mobile = {
         }
     },
 
+    getComponentDisplayInfo: function (component) {
+        if (component.type === 'label') {
+            const text = component.properties.text || '';
+            return text.length > 15 ? `"${text.substring(0, 15)}..."` : `"${text}"`;
+        }
+        if (component.type === 'tab') {
+            return component.properties.show_label && component.properties.label_text
+                ? component.properties.label_text
+                : `Tab ${component.properties.toggle_index || 1}`;
+        }
+        if (component.type === 'button' && component.properties.show_label && component.properties.label_text) {
+            return component.properties.label_text;
+        }
+        if (component.properties.collection_index !== undefined) {
+            return `Index: ${component.properties.collection_index}`;
+        }
+        return '';
+    },
+
+    switchView: function (view) {
+        const sidebar = document.querySelector('.sidebar');
+        const editorArea = document.querySelector('.editor-area');
+        const previewArea = document.querySelector('.preview-area');
+        const templatesPanel = document.querySelector('.template-selector-panel');
+
+        sidebar.style.display = 'none';
+        templatesPanel.style.display = 'none';
+
+        if (view === 'preview') {
+            editorArea.style.display = 'none';
+            previewArea.style.display = 'block';
+            this.refreshPreviewView();
+        } else {
+            editorArea.style.display = 'block';
+            previewArea.style.display = 'none';
+        }
+    },
+
+    refreshPreviewView: function () {
+        if (typeof preview === 'undefined' || typeof editor === 'undefined') return;
+
+        const activeUi = typeof chestUiManager !== 'undefined' ? chestUiManager.getActiveUi() : null;
+        const settings = activeUi?.settings || (typeof defaultSettings !== 'undefined' ? defaultSettings : null);
+
+        if (settings) {
+            preview.updatePreviewWithSettings(editor.getComponents(), settings);
+        } else {
+            preview.updatePreview(editor.getComponents());
+        }
+    },
+
+    closeAllDrawers: function () {
+        const componentDrawer = document.getElementById('mobile-component-drawer');
+        const templateDrawer = document.getElementById('mobile-templates-drawer');
+        const propertiesDrawer = document.getElementById('mobile-properties-drawer');
+        const listDrawer = document.getElementById('mobile-components-list-drawer');
+        const sidebar = document.querySelector('.sidebar');
+
+        if (componentDrawer) componentDrawer.classList.remove('open');
+        if (templateDrawer) templateDrawer.classList.remove('open');
+        if (propertiesDrawer) propertiesDrawer.classList.remove('open');
+        if (listDrawer) listDrawer.classList.remove('open');
+        sidebar?.classList.remove('mobile-sidebar-overlay');
+
+        const showComponentsBtn = document.getElementById('show-components');
+        const showTemplatesBtn = document.getElementById('show-templates');
+        if (showComponentsBtn) showComponentsBtn.innerHTML = '<i class="fas fa-th"></i> Components';
+        if (showTemplatesBtn) showTemplatesBtn.innerHTML = '<i class="fas fa-layer-group"></i> Templates';
+
+        const listButton = document.getElementById('mobile-list-button');
+        if (listButton) listButton.classList.remove('active');
+    },
+
     handleCanvasTap: function (e) {
         if (!this.selectedComponentType) return;
+        if (e.target !== e.currentTarget) return;
 
-        const rect = e.currentTarget.getBoundingClientRect();
-        let x = (e.clientX - rect.left) / editor.zoomLevel;
-        let y = (e.clientY - rect.top) / editor.zoomLevel;
+        const canvas = e.currentTarget;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = rect.width / canvas.offsetWidth;
+        const scaleY = rect.height / canvas.offsetHeight;
+        let x = (e.clientX - rect.left) / scaleX / editor.zoomLevel;
+        let y = (e.clientY - rect.top) / scaleY / editor.zoomLevel;
 
         if (editor.snapToGrid) {
             x = util.snapToGrid(x);
@@ -270,38 +320,96 @@ const mobile = {
             templateItem.classList.remove('template-selected');
         }, 300);
 
-        if (templateName) {
+        if (!templateName) return;
 
-            if (window.templates && typeof window.templates.loadTemplate === 'function') {
-                try {
-                    window.templates.loadTemplate(templateName);
-
-                    const drawer = document.getElementById('mobile-templates-drawer');
-                    if (drawer) {
-                        drawer.classList.remove('open');
-                    }
-
-                    const showTemplatesBtn = document.getElementById('show-templates');
-                    if (showTemplatesBtn) {
-                        showTemplatesBtn.innerHTML = '<i class="fas fa-layer-group"></i> Open Templates';
-                    }
-                } catch (err) {
-                    console.error('Error loading template:', err);
-
-                    const originalTemplate = document.querySelector(`.template-selector-panel .template-item[data-template="${templateName}"]`);
-                    if (originalTemplate) {
-                        originalTemplate.click();
-                    }
-                }
+        try {
+            if (typeof templates !== 'undefined' && typeof templates.loadTemplate === 'function') {
+                templates.loadTemplate(templateName);
             } else {
-                console.error('Templates object or loadTemplate function not available');
-
                 const originalTemplate = document.querySelector(`.template-selector-panel .template-item[data-template="${templateName}"]`);
-                if (originalTemplate) {
-                    originalTemplate.click();
-                }
+                if (originalTemplate) originalTemplate.click();
             }
+
+            this.refreshPreviewView();
+            this.closeAllDrawers();
+        } catch (err) {
+            console.error('Error loading template:', err);
+            const originalTemplate = document.querySelector(`.template-selector-panel .template-item[data-template="${templateName}"]`);
+            if (originalTemplate) originalTemplate.click();
         }
+    },
+
+    createMobileEditorToolbar: function () {
+        const toolbar = document.createElement('div');
+        toolbar.id = 'mobile-editor-toolbar';
+        toolbar.className = 'mobile-editor-toolbar';
+        toolbar.innerHTML = `
+            <button type="button" id="mobile-grid-toggle" class="mobile-toolbar-btn">Grid</button>
+            <button type="button" id="mobile-snap-toggle" class="mobile-toolbar-btn">Snap</button>
+            <button type="button" id="mobile-settings-shortcut" class="mobile-toolbar-btn"><i class="fas fa-cog"></i> Settings</button>
+        `;
+        document.querySelector('.app-container').appendChild(toolbar);
+
+        const gridBtn = toolbar.querySelector('#mobile-grid-toggle');
+        const snapBtn = toolbar.querySelector('#mobile-snap-toggle');
+        const settingsBtn = toolbar.querySelector('#mobile-settings-shortcut');
+        const gridInput = document.getElementById('toggle-grid');
+        const snapInput = document.getElementById('snap-to-grid');
+
+        const syncToolbarState = () => {
+            if (gridBtn && gridInput) gridBtn.classList.toggle('active', gridInput.checked);
+            if (snapBtn && snapInput) snapBtn.classList.toggle('active', snapInput.checked);
+        };
+
+        if (gridBtn && gridInput) {
+            gridBtn.addEventListener('click', () => {
+                gridInput.checked = !gridInput.checked;
+                gridInput.dispatchEvent(new Event('change', { bubbles: true }));
+                syncToolbarState();
+            });
+        }
+
+        if (snapBtn && snapInput) {
+            snapBtn.addEventListener('click', () => {
+                snapInput.checked = !snapInput.checked;
+                snapInput.dispatchEvent(new Event('change', { bubbles: true }));
+                syncToolbarState();
+            });
+        }
+
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => {
+                document.getElementById('settings-button')?.click();
+            });
+        }
+
+        if (gridInput) gridInput.addEventListener('change', syncToolbarState);
+        if (snapInput) snapInput.addEventListener('change', syncToolbarState);
+        syncToolbarState();
+    },
+
+    createMobileChestUiDrawer: function () {
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        if (!sidebar.querySelector('.mobile-sidebar-overlay-close')) {
+            const overlayClose = document.createElement('button');
+            overlayClose.className = 'mobile-sidebar-overlay-close';
+            overlayClose.innerHTML = '<i class="fas fa-times"></i> Done';
+            overlayClose.addEventListener('click', () => sidebar.classList.remove('mobile-sidebar-overlay'));
+            sidebar.prepend(overlayClose);
+        }
+
+        const button = document.createElement('button');
+        button.id = 'mobile-chest-ui-button';
+        button.className = 'mobile-chest-ui-button';
+        button.title = 'Chest UIs';
+        button.innerHTML = '<i class="fas fa-box"></i>';
+        button.addEventListener('click', () => {
+            this.closeAllDrawers();
+            sidebar.classList.toggle('mobile-sidebar-overlay');
+        });
+        document.querySelector('.app-container').appendChild(button);
     },
 
     createPropertiesButton: function () {
@@ -394,14 +502,14 @@ const mobile = {
                     mobile.propertiesContainer.innerHTML = '';
                     mobile.propertiesContainer.appendChild(content);
 
-                    mobile.setMobilePropertyValues(mobile.propertiesContainer, component);
+                    propertiesPanel.setInputValues(mobile.propertiesContainer, component);
 
                     if (componentType) {
                         mobile.propertiesDrawerHeader.querySelector('span').textContent =
                             `${componentType.name} Properties`;
                     }
 
-                    mobile.setupPropertyEventListeners(mobile.propertiesContainer);
+                    propertiesPanel.setupEventListeners(mobile.propertiesContainer, component);
                 } else {
                     if (mobile.propertiesDrawer) {
                         mobile.propertiesDrawer.classList.remove('open');
@@ -413,15 +521,23 @@ const mobile = {
             }
         };
 
+        const originalUpdateComponent = editor.updateComponent;
+        editor.updateComponent = function (component) {
+            originalUpdateComponent.call(editor, component);
+
+            if (window.innerWidth < 768 && mobile.selectedComponent?.id === component.id &&
+                mobile.propertiesContainer?.children.length) {
+                propertiesPanel.setInputValues(mobile.propertiesContainer, component);
+            }
+        };
+
         const originalUpdateComponentPosition = editor.updateComponentPosition;
         editor.updateComponentPosition = function (component) {
             originalUpdateComponentPosition.call(editor, component);
 
-            if (window.innerWidth < 768 && editor.selectedComponent &&
-                component.id === editor.selectedComponent.id) {
-
-                mobile.updateMobilePropertyValues(component);
-
+            if (window.innerWidth < 768 && editor.selectedComponent?.id === component.id &&
+                mobile.propertiesContainer?.children.length) {
+                propertiesPanel.setInputValues(mobile.propertiesContainer, component);
             }
         };
 
@@ -547,7 +663,10 @@ const mobile = {
         const inputContainer = propInput.closest('.property');
         if (!inputContainer) return;
 
-        if (inputContainer.querySelector('.upload-image-btn')) return;
+        if (inputContainer.querySelector('.upload-image-btn') || 
+            inputContainer.querySelector('.upload-scroll-rail-btn') || 
+            inputContainer.querySelector('.upload-scroll-handle-btn') ||
+            inputContainer.querySelector('.upload-scroll-bg-btn')) return;
 
         const uploadContainer = document.createElement('div');
         uploadContainer.className = 'image-upload-container';
@@ -622,7 +741,7 @@ const mobile = {
             });
         });
 
-        const uploadBtns = container.querySelectorAll('.upload-image-btn');
+        const uploadBtns = container.querySelectorAll('.upload-image-btn, .upload-scroll-rail-btn, .upload-scroll-handle-btn, .upload-scroll-bg-btn');
         uploadBtns.forEach(uploadBtn => {
             const inputContainer = uploadBtn.closest('.property');
             if (!inputContainer) return;
@@ -741,13 +860,7 @@ const mobile = {
                 listItem.classList.add('selected');
             }
 
-            let displayInfo = '';
-            if (component.type === 'label') {
-                displayInfo = `"${component.properties.text.substring(0, 15)}"`;
-                if (component.properties.text.length > 15) displayInfo += '...';
-            } else if (component.properties.collection_index !== undefined) {
-                displayInfo = `Index: ${component.properties.collection_index}`;
-            }
+            const displayInfo = this.getComponentDisplayInfo(component);
 
             listItem.innerHTML = `
                 <div class="item-details">
@@ -810,6 +923,9 @@ const mobile = {
         const propertiesDrawer = document.getElementById('mobile-properties-drawer');
         const componentsListDrawer = document.getElementById('mobile-components-list-drawer');
         const listButton = document.getElementById('mobile-list-button');
+        const editorToolbar = document.getElementById('mobile-editor-toolbar');
+        const chestUiButton = document.getElementById('mobile-chest-ui-button');
+        const sidebar = document.querySelector('.sidebar');
 
         if (isMobile) {
             mobileNav.style.display = 'flex';
@@ -820,8 +936,12 @@ const mobile = {
             if (propertiesDrawer) propertiesDrawer.style.display = 'block';
             if (componentsListDrawer) componentsListDrawer.style.display = 'block';
             if (listButton) listButton.style.display = 'block';
+            if (editorToolbar) editorToolbar.style.display = 'flex';
+            if (chestUiButton) chestUiButton.style.display = 'flex';
 
-            document.querySelector('.sidebar').style.display = 'none';
+            if (sidebar && !sidebar.classList.contains('mobile-sidebar-overlay')) {
+                sidebar.style.display = 'none';
+            }
             document.querySelector('.editor-area').style.display = 'block';
             document.querySelector('.preview-area').style.display = 'none';
             document.querySelector('.template-selector-panel').style.display = 'none';
@@ -831,8 +951,8 @@ const mobile = {
             document.getElementById('show-preview').classList.remove('active');
             document.getElementById('show-templates').classList.remove('active');
 
-            document.getElementById('show-components').innerHTML = '<i class="fas fa-th"></i> Open Components';
-            document.getElementById('show-templates').innerHTML = '<i class="fas fa-layer-group"></i> Open Templates';
+            document.getElementById('show-components').innerHTML = '<i class="fas fa-th"></i> Components';
+            document.getElementById('show-templates').innerHTML = '<i class="fas fa-layer-group"></i> Templates';
         } else {
             mobileNav.style.display = 'none';
             document.body.classList.remove('mobile-view');
@@ -842,6 +962,9 @@ const mobile = {
             if (propertiesDrawer) propertiesDrawer.style.display = 'none';
             if (componentsListDrawer) componentsListDrawer.style.display = 'none';
             if (listButton) listButton.style.display = 'none';
+            if (sidebar) sidebar.classList.remove('mobile-sidebar-overlay');
+            if (editorToolbar) editorToolbar.style.display = 'none';
+            if (chestUiButton) chestUiButton.style.display = 'none';
 
             document.querySelector('.sidebar').style.display = 'block';
             document.querySelector('.editor-area').style.display = 'block';

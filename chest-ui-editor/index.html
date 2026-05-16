@@ -49,6 +49,10 @@
         <div class="header">
             <h1>Chest UI Editor (Bedrock Edition Only)</h1>
             <div class="actions">
+                <button id="settings-button" class="action-button" title="Settings"><i class="fas fa-cog"></i><span
+                        class="button-text">Settings</span></button>
+                <button id="reset-button" class="action-button" title="Reset Cache"><i class="fas fa-trash-alt"></i><span
+                        class="button-text">Reset</span></button>
                 <button id="new-project" class="action-button" title="New Project"><i class="fas fa-file"></i><span
                         class="button-text">New</span></button>
                 <button id="load-project" class="action-button" title="Load Project"><i
@@ -57,8 +61,20 @@
                         class="button-text">Import ZIP</span></button>
                 <button id="save-project" class="action-button" title="Save Project"><i class="fas fa-save"></i><span
                         class="button-text">Save</span></button>
-                <button id="export-json" class="action-button" title="Export JSON"><i
-                        class="fas fa-file-export"></i><span class="button-text">Export</span></button>
+                <div class="export-dropdown-container">
+                    <button id="export-json" class="action-button" title="Export Options"><i
+                        class="fas fa-file-export"></i><span class="button-text">Export</span><i class="fas fa-caret-down dropdown-icon"></i></button>
+                    <div id="export-dropdown" class="export-dropdown-menu" style="display: none;">
+                        <div class="export-dropdown-item" data-action="zip">
+                            <i class="fas fa-file-archive"></i>
+                            <span>Export as ZIP</span>
+                        </div>
+                        <div class="export-dropdown-item" data-action="code">
+                            <i class="fas fa-code"></i>
+                            <span>View as Code</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -71,6 +87,24 @@
 
         <div class="main-content">
             <div class="sidebar">
+                <div class="panel chest-ui-manager-panel">
+                    <div class="panel-header">
+                        <h3>Chest UIs</h3>
+                        <button class="fold-button" title="Toggle panel">▼</button>
+                    </div>
+                    <div class="panel-content">
+                        <div class="chest-ui-toolbar">
+                            <div class="input-group">
+                                <input type="text" id="chest-ui-trigger-title" placeholder="Trigger title">
+                                <input type="text" id="chest-ui-new-title" placeholder="New title">
+                            </div>
+                            <button id="add-chest-ui" class="small-action-button" title="Add chest UI"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div id="chest-ui-list" class="chest-ui-list"></div>
+                        <p class="setting-help">Trigger title tests the condition, new title sets the display name.</p>
+                    </div>
+                </div>
+
                 <div class="panel component-palette-panel">
                     <div class="panel-header">
                         <h3>Components</h3>
@@ -102,6 +136,18 @@
                                 <div class="component-icon container-type"></div>
                                 <span>Container Type</span>
                             </div>
+                            <div class="component-item" data-type="dynamic_grid" draggable="true">
+                                <div class="component-icon dynamic-grid"></div>
+                                <span>Dynamic Grid</span>
+                            </div>
+                            <div class="component-item" data-type="tab" draggable="true">
+                                <div class="component-icon tab"></div>
+                                <span>Tab</span>
+                            </div>
+                            <div class="component-item" data-type="button" draggable="true">
+                                <div class="component-icon button"></div>
+                                <span>Button</span>
+                            </div>
                             <div class="component-item" data-type="image" draggable="true">
                                 <div class="component-icon image"></div>
                                 <span>Image</span>
@@ -109,6 +155,10 @@
                             <div class="component-item" data-type="label" draggable="true">
                                 <div class="component-icon label"></div>
                                 <span>Label</span>
+                            </div>
+                            <div class="component-item" data-type="close_button" draggable="true">
+                                <div class="component-icon close-button"></div>
+                                <span>Close Button</span>
                             </div>
                         </div>
                     </div>
@@ -161,6 +211,7 @@
                     <div class="panel-content">
                         <div id="editor-canvas" class="editor-canvas">
                             <div class="chest-panel">
+                                <div class="chest-title" id="editor-chest-title"></div>
                                 <button class="chest-close-button">x</button>
                                 <div class="chest-top-half">
                                     <div id="component-container" class="component-container"></div>
@@ -235,6 +286,7 @@
                                 <div class="chest-panel-background">
 
                                     <div class="chest-panel">
+                                        <div class="chest-title" id="preview-chest-title"></div>
                                         <button class="chest-close-button">x</button>
                                         <div class="chest-top-half">
                                             <div id="preview-component-container" class="component-container"></div>
@@ -305,9 +357,17 @@
             </div>
             <div class="panel-content">
                 <div class="template-list">
+                    <div class="template-item" data-template="empty">
+                        <div class="template-preview empty"></div>
+                        <span>Empty</span>
+                    </div>
                     <div class="template-item" data-template="vanilla">
                         <div class="template-preview vanilla"></div>
                         <span>Vanilla Chest</span>
+                    </div>
+                    <div class="template-item" data-template="double_chest">
+                        <div class="template-preview double-chest"></div>
+                        <span>Double Chest</span>
                     </div>
                     <div class="template-item" data-template="Cooking_Pot">
                         <div class="template-preview cooking-pot"></div>
@@ -317,10 +377,205 @@
                         <div class="template-preview crafting"></div>
                         <span>Crafting UI</span>
                     </div>
-                    <div class="template-item" data-template="altar">
-                        <div class="template-preview altar"></div>
-                        <span>Altar</span>
+                    <div class="template-item" data-template="combiner">
+                        <div class="template-preview combiner"></div>
+                        <span>Combiner</span>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu" style="display: none;">
+        <div class="context-menu-item" id="context-copy">
+            <i class="fas fa-copy"></i> Copy
+        </div>
+        <div class="context-menu-item" id="context-cut">
+            <i class="fas fa-cut"></i> Cut
+        </div>
+        <div class="context-menu-item" id="context-paste" style="display: none;">
+            <i class="fas fa-paste"></i> Paste
+        </div>
+    </div>
+
+    <!-- Release notice (once per NOTICE_VERSION) -->
+    <div id="release-notice-modal" class="settings-modal release-notice-modal" style="display: none;" role="dialog" aria-labelledby="release-notice-title" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content release-notice-content">
+            <div class="modal-header">
+                <h2 id="release-notice-title">What&rsquo;s new in <span id="release-notice-version">2.0.0</span></h2>
+                <button id="close-release-notice" class="close-modal-btn" type="button" title="Close" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body release-notice-body">
+                <p class="release-notice-lead">Chest UI Editor has been updated. Highlights:</p>
+                <ul class="release-notice-list">
+                    <li><strong>Tab</strong> - A tab button that allow switching between layouts using toggles</li>
+                    <li><strong>Dynamic grid</strong> - scrollable slots with configurable size, content height, and scrollbar textures</li>
+                    <li><strong>Button &amp; close button</strong> - slot actions, custom textures, optional label/image; dismiss control with custom or no default art</li>
+                    <li><strong>Multiple Chest UIs</strong> - separate trigger, title, settings, and components per screen</li>
+                    <li><strong>Import ZIP</strong> - restore exported packs; validates <code>formatVersion: 2</code></li>
+                    <li><strong>Per-slot textures</strong> - background, selected, and highlight art on containers and dynamic grid</li>
+                    <li><strong>Chest UI options</strong> - customizable background, size, and taggable title (use the label component for more control)</li>
+                    <li><strong>Double chest template</strong> - new vanilla-style double chest layout</li>
+                    <li><strong>Small chest template</strong> - now uses dynamic grid</li>
+                    <li><strong>Mobile</strong> - components, editor, preview, and templates tabs; touch placement and properties drawer</li>
+                    <li><strong>Layers &amp; layout</strong> - layering fixes; new components placed on top; editable trigger for each UI</li>
+                    <li><strong>Export</strong> - generated UI organized into multiple files instead of one</li>
+                </ul>
+                <p class="release-notice-footnote">Older browser saves and ZIPs without <code>formatVersion: 2</code> (including <code>version: &quot;1.1.0&quot;</code>) cannot be loaded. Save or export again with this build.</p>
+                <p class="release-notice-changelog">
+                    <a href="CHANGELOG.md" target="_blank" rel="noopener noreferrer">View full changelog</a>
+                </p>
+            </div>
+            <div class="modal-footer release-notice-footer">
+                <div class="release-notice-support">
+                    <a href="https://paypal.me/mbarabic" class="release-notice-btn release-notice-btn-paypal" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-paypal" aria-hidden="true"></i><span>PayPal</span>
+                    </a>
+                    <a href="https://ko-fi.com/minato4743" class="release-notice-btn release-notice-btn-kofi" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-mug-hot" aria-hidden="true"></i><span>Ko-fi</span>
+                    </a>
+                </div>
+                <button id="dismiss-release-notice" class="release-notice-btn release-notice-btn-dismiss" type="button">
+                    <i class="fas fa-check" aria-hidden="true"></i><span>Got it</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="settings-modal" style="display: none;">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="close-settings" class="close-modal-btn" title="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <h3>Main Panel Configuration</h3>
+                    <div class="setting-item">
+                        <label for="main-panel-height">Main Panel Height (px):</label>
+                        <input type="number" id="main-panel-height" min="100" max="400" value="166" step="1">
+                        <span class="setting-help">Default: 166px (total chest panel height)</span>
+                    </div>
+                    <div class="setting-item">
+                        <label for="main-panel-layer">Main Panel Layer (z-index):</label>
+                        <input type="number" id="main-panel-layer" min="0" max="100" value="5" step="1">
+                        <span class="setting-help">Default: 5 (component container layer)</span>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3>Title Configuration</h3>
+                    <div class="setting-item">
+                        <label for="title-offset-x">Title Offset X (px):</label>
+                        <input type="number" id="title-offset-x" min="-100" max="100" value="10" step="1">
+                        <span class="setting-help">Default: 10px (horizontal offset)</span>
+                    </div>
+                    <div class="setting-item">
+                        <label for="title-offset-y">Title Offset Y (px):</label>
+                        <input type="number" id="title-offset-y" min="-100" max="100" value="-6" step="1">
+                        <span class="setting-help">Default: -6px (vertical offset)</span>
+                    </div>
+                    <div class="setting-item">
+                        <label for="title-font-scale-factor">Title Font Scale:</label>
+                        <input type="number" id="title-font-scale-factor" min="0.1" max="10" value="1.0" step="0.1">
+                        <span class="setting-help">Default: 1.0 (text scale)</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>Title Color:</label>
+                        <div class="color-picker-controls title-color-controls">
+                            <div class="color-channels">
+                                <div class="property">
+                                    <label for="title-color-r">R:</label>
+                                    <input type="number" id="title-color-r" min="0" max="1" step="0.01" value="1.0"
+                                        class="color-channel-input">
+                                </div>
+                                <div class="property">
+                                    <label for="title-color-g">G:</label>
+                                    <input type="number" id="title-color-g" min="0" max="1" step="0.01" value="1.0"
+                                        class="color-channel-input">
+                                </div>
+                                <div class="property">
+                                    <label for="title-color-b">B:</label>
+                                    <input type="number" id="title-color-b" min="0" max="1" step="0.01" value="1.0"
+                                        class="color-channel-input">
+                                </div>
+                            </div>
+                            <div class="color-preview title-color-preview"></div>
+                        </div>
+                        <div class="color-picker title-color-picker">
+                            <div class="color-option" data-color="[1.0,1.0,1.0]" style="background-color: #FFFFFF;"></div>
+                            <div class="color-option" data-color="[0.0,0.0,0.0]" style="background-color: #000000;"></div>
+                            <div class="color-option" data-color="[0.25,0.25,0.25]" style="background-color: #404040;"></div>
+                            <div class="color-option" data-color="[1.0,0.0,0.0]" style="background-color: #FF0000;"></div>
+                            <div class="color-option" data-color="[0.0,1.0,0.0]" style="background-color: #00FF00;"></div>
+                            <div class="color-option" data-color="[0.0,0.0,1.0]" style="background-color: #0000FF;"></div>
+                            <div class="color-option" data-color="[1.0,1.0,0.0]" style="background-color: #FFFF00;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3>Background Configuration</h3>
+                    <div class="setting-item">
+                        <label for="dialog-background">Background Texture Path:</label>
+                        <input type="text" id="dialog-background" placeholder="textures/ui/dialog_background_opaque">
+                        <div class="background-upload-container">
+                            <button type="button" id="upload-background-btn" class="upload-background-btn">Upload Custom Background</button>
+                            <input type="file" id="background-upload" class="background-upload" accept="image/*" style="display:none">
+                        </div>
+                        <div class="background-preview-container" id="background-preview-container" style="display:none">
+                            <div class="custom-background-preview" id="custom-background-preview"></div>
+                        </div>
+                        <span class="setting-help">Path to background texture (e.g., textures/ui/custom_background)</span>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3>Chest Panel Options</h3>
+                    <div class="setting-item">
+                        <label for="show-close-button">
+                            <input type="checkbox" id="show-close-button" checked>
+                            Show Close Button
+                        </label>
+                        <span class="setting-help">Show or hide the close button (X) in the chest UI</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-settings" class="action-button">
+                    <i class="fas fa-check"></i><span>Apply Settings</span>
+                </button>
+                <button id="cancel-settings" class="action-button">
+                    <i class="fas fa-times"></i><span>Cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Viewer Modal -->
+    <div id="code-viewer-modal" class="settings-modal" style="display: none;">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content code-viewer-content">
+            <div class="modal-header">
+                <h2>Generated JSON UI Code</h2>
+                <button id="close-code-viewer" class="close-modal-btn" title="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="code-viewer-toolbar">
+                    <div class="code-viewer-tabs">
+                        <button class="code-tab active" data-view="full">Full JSON</button>
+                        <button class="code-tab" data-view="custom">Custom Only</button>
+                    </div>
+                    <div class="code-viewer-actions">
+                        <button id="copy-code-btn" class="action-button">
+                            <i class="fas fa-copy"></i><span>Copy to Clipboard</span>
+                        </button>
+                        <span id="copy-status" class="copy-status"></span>
+                    </div>
+                </div>
+                <div class="code-viewer-container">
+                    <pre id="json-code-display" class="json-code"></pre>
                 </div>
             </div>
         </div>
@@ -357,6 +612,21 @@
                 <input type="number" data-property="collection_index" min="0" class="collection-index-input">
             </div>
         </div>
+        <div class="property-group">
+            <h4>Slot Textures</h4>
+            <div class="property">
+                <label>Normal:</label>
+                <input type="text" data-property="slot_background_texture" class="texture-input" value="textures/ui/cell_image">
+            </div>
+            <div class="property">
+                <label>Hover:</label>
+                <input type="text" data-property="slot_highlight_texture" class="texture-input" value="textures/ui/highlight_slot">
+            </div>
+            <div class="property">
+                <label>Selected:</label>
+                <input type="text" data-property="slot_selected_texture" class="texture-input" value="textures/ui/cell_image_selected">
+            </div>
+        </div>
     </template>
 
     <template id="container-item-with-picture-properties">
@@ -391,6 +661,21 @@
             <div class="property">
                 <label>Picture:</label>
                 <input type="text" data-property="picture" class="picture-select" value="textures/ui/book_ui">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Slot Textures</h4>
+            <div class="property">
+                <label>Normal:</label>
+                <input type="text" data-property="slot_background_texture" class="texture-input" value="textures/ui/cell_image">
+            </div>
+            <div class="property">
+                <label>Hover:</label>
+                <input type="text" data-property="slot_highlight_texture" class="texture-input" value="textures/ui/highlight_slot">
+            </div>
+            <div class="property">
+                <label>Selected:</label>
+                <input type="text" data-property="slot_selected_texture" class="texture-input" value="textures/ui/cell_image_selected">
             </div>
         </div>
     </template>
@@ -459,6 +744,17 @@
             </div>
         </div>
         <div class="property-group">
+            <h4>Size</h4>
+            <div class="property">
+                <label>Width:</label>
+                <input type="number" data-property="width" value="18" class="size-input">
+            </div>
+            <div class="property">
+                <label>Height:</label>
+                <input type="number" data-property="height" value="18" class="size-input">
+            </div>
+        </div>
+        <div class="property-group">
             <h4>Settings</h4>
             <div class="property">
                 <label>Collection Index:</label>
@@ -505,6 +801,235 @@
                 </select>
             </div>
         </div>
+        <div class="property-group">
+            <h4>Slot Textures</h4>
+            <div class="property">
+                <label>Normal:</label>
+                <input type="text" data-property="slot_background_texture" class="texture-input" value="textures/ui/cell_image">
+            </div>
+            <div class="property">
+                <label>Hover:</label>
+                <input type="text" data-property="slot_highlight_texture" class="texture-input" value="textures/ui/highlight_slot">
+            </div>
+            <div class="property">
+                <label>Selected:</label>
+                <input type="text" data-property="slot_selected_texture" class="texture-input" value="textures/ui/cell_image_selected">
+            </div>
+        </div>
+    </template>
+
+    <template id="dynamic-grid-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+            <div class="property">
+                <label>Width:</label>
+                <input type="number" data-property="width" min="1">
+            </div>
+            <div class="property">
+                <label>Height:</label>
+                <input type="number" data-property="height" min="1">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Scroll Settings</h4>
+            <div class="property">
+                <label>Scroll Size Width:</label>
+                <input type="number" data-property="scroll_size_width" value="8" min="0" max="50">
+            </div>
+            <div class="property">
+                <label>Scroll Track Size Width:</label>
+                <input type="number" data-property="scrollbar_box_image_size_width" value="8" min="0" max="50">
+            </div>
+            <div class="property">
+                <label>Scroll Rail Texture:</label>
+                <input type="text" data-property="scroll_indent_image_texture" value="textures/ui/ScrollRail" class="texture-input">
+                <div class="image-upload-container">
+                    <button type="button" class="upload-scroll-rail-btn">Upload Custom Image</button>
+                    <input type="file" id="scroll-rail-upload" class="image-upload" accept="image/*" style="display:none">
+                </div>
+                <div class="scroll-rail-preview-container" style="display:none">
+                    <p>Custom scroll rail:</p>
+                    <div class="custom-scroll-rail-preview"></div>
+                </div>
+            </div>
+            <div class="property">
+                <label>Scroll Handle Texture:</label>
+                <input type="text" data-property="scrollbar_box_image_texture" value="textures/ui/ScrollHandle" class="texture-input">
+                <div class="image-upload-container">
+                    <button type="button" class="upload-scroll-handle-btn">Upload Custom Image</button>
+                    <input type="file" id="scroll-handle-upload" class="image-upload" accept="image/*" style="display:none">
+                </div>
+                <div class="scroll-handle-preview-container" style="display:none">
+                    <p>Custom scroll handle:</p>
+                    <div class="custom-scroll-handle-preview"></div>
+                </div>
+            </div>
+            <div class="property">
+                <label>Show Grid Background:</label>
+                <input type="checkbox" data-property="show_background" checked>
+            </div>
+            <div class="property">
+                <label>Scroll Background Texture:</label>
+                <input type="text" data-property="scroll_background_image_texture" value="textures/ui/ScrollRail" class="texture-input">
+                <div class="image-upload-container">
+                    <button type="button" class="upload-scroll-bg-btn">Upload Custom Image</button>
+                    <input type="file" id="scroll-bg-upload" class="image-upload" accept="image/*" style="display:none">
+                </div>
+                <div class="scroll-bg-preview-container" style="display:none">
+                    <p>Custom Grid background:</p>
+                    <div class="custom-scroll-bg-preview"></div>
+                </div>
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Preview Only</h4>
+            <div class="property">
+                <label>Visual slots:</label>
+                <input type="number" data-property="preview_slots" min="0">
+            </div>
+            <div class="property">
+                <label>Slot width:</label>
+                <input type="number" data-property="slot_width" min="1">
+            </div>
+            <div class="property">
+                <label>Slot height:</label>
+                <input type="number" data-property="slot_height" min="1">
+            </div>
+            <div class="property">
+                <label>Content height:</label>
+                <input type="number" data-property="content_height" min="1">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Slot Textures</h4>
+            <div class="property">
+                <label>Normal:</label>
+                <input type="text" data-property="slot_background_texture" class="texture-input" value="textures/ui/cell_image">
+            </div>
+            <div class="property">
+                <label>Hover:</label>
+                <input type="text" data-property="slot_highlight_texture" class="texture-input" value="textures/ui/highlight_slot">
+            </div>
+            <div class="property">
+                <label>Selected:</label>
+                <input type="text" data-property="slot_selected_texture" class="texture-input" value="textures/ui/cell_image_selected">
+            </div>
+        </div>
+    </template>
+
+        <template id="tab-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Size</h4>
+            <div class="property">
+                <label>Width:</label>
+                <input type="number" data-property="width" value="16" class="size-input">
+            </div>
+            <div class="property">
+                <label>Height:</label>
+                <input type="number" data-property="height" value="16" class="size-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Tab</h4>
+            <div class="property">
+                <label>Toggle index:</label>
+                <input type="number" data-property="toggle_index" min="1">
+            </div>
+            <div class="property">
+                <label>Group name:</label>
+                <input type="text" data-property="toggle_group_name" value="custom_chest_tabs">
+            </div>
+            <p class="setting-help">Click the tab toggle on the canvas to make it active, then add components.</p>
+        </div>
+        <div class="property-group">
+            <h4>Textures</h4>
+            <div class="property">
+                <label>Default Texture:</label>
+                <input type="text" data-property="default_texture" class="texture-input" value="textures/ui/button_borderless_light">
+            </div>
+            <div class="property">
+                <label>Selected Texture:</label>
+                <input type="text" data-property="hover_texture" class="texture-input" value="textures/ui/button_borderless_lightpressednohover">
+            </div>
+            <div class="property">
+                <label>Hover Texture:</label>
+                <input type="text" data-property="pressed_texture" class="texture-input" value="textures/ui/button_borderless_lighthover">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Embedded Label</h4>
+            <div class="property">
+                <label>Show Label:</label>
+                <input type="checkbox" data-property="show_label">
+            </div>
+            <div class="property">
+                <label>Text:</label>
+                <input type="text" data-property="label_text" class="text-input">
+            </div>
+            <div class="property">
+                <label>Font Scale:</label>
+                <input type="number" data-property="label_font_scale_factor" min="0.1" max="10" step="0.1" value="1.0">
+            </div>
+            <div class="property">
+                <label>Offset X:</label>
+                <input type="number" data-property="label_offset_x" value="0">
+            </div>
+            <div class="property">
+                <label>Offset Y:</label>
+                <input type="number" data-property="label_offset_y" value="0">
+            </div>
+            <div class="property">
+                <label>Color:</label>
+                <div class="color-picker-controls button-label-color-controls">
+                    <div class="color-channels">
+                        <div class="property">
+                            <label>R:</label>
+                            <input type="number" data-property="label_color-r" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
+                        </div>
+                        <div class="property">
+                            <label>G:</label>
+                            <input type="number" data-property="label_color-g" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
+                        </div>
+                        <div class="property">
+                            <label>B:</label>
+                            <input type="number" data-property="label_color-b" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
+                        </div>
+                    </div>
+                    <div class="color-preview button-label-color-preview"></div>
+                </div>
+                <div class="color-picker button-label-color-picker">
+                    <div class="color-option" data-color="[1.0,1.0,1.0]" style="background-color: #FFFFFF;"></div>
+                    <div class="color-option" data-color="[0.0,0.0,0.0]" style="background-color: #000000;"></div>
+                    <div class="color-option" data-color="[0.25,0.25,0.25]" style="background-color: #404040;"></div>
+                    <div class="color-option" data-color="[1.0,0.0,0.0]" style="background-color: #FF0000;"></div>
+                    <div class="color-option" data-color="[0.0,1.0,0.0]" style="background-color: #00FF00;"></div>
+                    <div class="color-option" data-color="[0.0,0.0,1.0]" style="background-color: #0000FF;"></div>
+                    <div class="color-option" data-color="[1.0,1.0,0.0]" style="background-color: #FFFF00;"></div>
+                </div>
+            </div>
+        </div>
     </template>
 
     <template id="image-properties">
@@ -534,7 +1059,7 @@
             <h4>Image</h4>
             <div class="property">
                 <label>Texture:</label>
-                <input type="text" data-property="texture" class="texture-input" value="textures/ui/altar_cross">
+                <input type="text" data-property="texture" class="texture-input" value="textures/ui/combiner_cross">
                 <div class="image-upload-container">
                     <button type="button" class="upload-image-btn">Upload Custom Image</button>
                     <input type="file" id="image-upload" class="image-upload" accept="image/*" style="display:none">
@@ -548,6 +1073,149 @@
                 <label>Alpha:</label>
                 <input type="range" data-property="alpha" min="0" max="1" step="0.1" value="1" class="alpha-input">
                 <span class="value-display">1.0</span>
+            </div>
+        </div>
+    </template>
+
+    <template id="button-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Size</h4>
+            <div class="property">
+                <label>Width:</label>
+                <input type="number" data-property="width" value="16" class="size-input">
+            </div>
+            <div class="property">
+                <label>Height:</label>
+                <input type="number" data-property="height" value="16" class="size-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Target</h4>
+            <div class="property">
+                <label>Target Slot:</label>
+                <div class="target-slot-controls">
+                    <select data-property="target_collection_index" class="target-slot-select"></select>
+                    <input type="number" class="target-slot-index-input" min="0" value="0" title="Custom target index">
+                </div>
+            </div>
+            <div class="property">
+                <label>Action:</label>
+                <select data-property="pressed_button_name" class="button-action-select">
+                    <option value="button.container_take_all_place_all">Take all / place all</option>
+                    <option value="button.container_take_half_place_one">Take half / place one</option>
+                    <option value="button.container_auto_place">Auto place to inventory</option>
+                    <option value="button.drop_one">Drop one</option>
+                    <option value="button.drop_all">Drop all</option>
+                    <option value="button.coalesce_stack">Merge stacks</option>
+                </select>
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Textures</h4>
+            <div class="property">
+                <label>Default Texture:</label>
+                <input type="text" data-property="default_texture" class="texture-input" value="textures/ui/button_borderless_light">
+            </div>
+            <div class="property">
+                <label>Hover Texture:</label>
+                <input type="text" data-property="hover_texture" class="texture-input" value="textures/ui/button_borderless_lighthover">
+            </div>
+            <div class="property">
+                <label>Pressed Texture:</label>
+                <input type="text" data-property="pressed_texture" class="texture-input" value="textures/ui/button_borderless_lightpressed">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Embedded Label</h4>
+            <div class="property">
+                <label>Show Label:</label>
+                <input type="checkbox" data-property="show_label">
+            </div>
+            <div class="property">
+                <label>Text:</label>
+                <input type="text" data-property="label_text" class="text-input">
+            </div>
+            <div class="property">
+                <label>Font Scale:</label>
+                <input type="number" data-property="label_font_scale_factor" min="0.1" max="10" step="0.1" value="1.0">
+            </div>
+            <div class="property">
+                <label>Offset X:</label>
+                <input type="number" data-property="label_offset_x" value="0">
+            </div>
+            <div class="property">
+                <label>Offset Y:</label>
+                <input type="number" data-property="label_offset_y" value="0">
+            </div>
+            <div class="property">
+                <label>Color:</label>
+                <div class="color-picker-controls button-label-color-controls">
+                    <div class="color-channels">
+                        <div class="property">
+                            <label>R:</label>
+                            <input type="number" data-property="label_color-r" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
+                        </div>
+                        <div class="property">
+                            <label>G:</label>
+                            <input type="number" data-property="label_color-g" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
+                        </div>
+                        <div class="property">
+                            <label>B:</label>
+                            <input type="number" data-property="label_color-b" min="0" max="1" step="0.01" value="1.0"
+                                class="color-channel-input">
+                        </div>
+                    </div>
+                    <div class="color-preview button-label-color-preview"></div>
+                </div>
+                <div class="color-picker button-label-color-picker">
+                    <div class="color-option" data-color="[1.0,1.0,1.0]" style="background-color: #FFFFFF;"></div>
+                    <div class="color-option" data-color="[0.0,0.0,0.0]" style="background-color: #000000;"></div>
+                    <div class="color-option" data-color="[0.25,0.25,0.25]" style="background-color: #404040;"></div>
+                    <div class="color-option" data-color="[1.0,0.0,0.0]" style="background-color: #FF0000;"></div>
+                    <div class="color-option" data-color="[0.0,1.0,0.0]" style="background-color: #00FF00;"></div>
+                    <div class="color-option" data-color="[0.0,0.0,1.0]" style="background-color: #0000FF;"></div>
+                    <div class="color-option" data-color="[1.0,1.0,0.0]" style="background-color: #FFFF00;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Embedded Image</h4>
+            <div class="property">
+                <label>Show Image:</label>
+                <input type="checkbox" data-property="show_image">
+            </div>
+            <div class="property">
+                <label>Texture:</label>
+                <input type="text" data-property="image_texture" class="texture-input" value="textures/ui/dark_plus">
+            </div>
+            <div class="property">
+                <label>Width:</label>
+                <input type="number" data-property="image_width" min="1" value="8">
+            </div>
+            <div class="property">
+                <label>Height:</label>
+                <input type="number" data-property="image_height" min="1" value="8">
+            </div>
+            <div class="property">
+                <label>Offset X:</label>
+                <input type="number" data-property="image_offset_x" value="0">
+            </div>
+            <div class="property">
+                <label>Offset Y:</label>
+                <input type="number" data-property="image_offset_y" value="0">
             </div>
         </div>
     </template>
@@ -569,6 +1237,10 @@
             <div class="property">
                 <label>Content:</label>
                 <input type="text" data-property="text" class="text-input">
+            </div>
+            <div class="property">
+                <label>Font Scale:</label>
+                <input type="number" data-property="font_scale_factor" min="0.1" max="10" step="0.1" value="1.0">
             </div>
             <div class="property">
                 <label>Color:</label>
@@ -605,8 +1277,49 @@
         </div>
     </template>
 
+    <template id="close-button-properties">
+        <div class="property-group">
+            <h4>Position</h4>
+            <div class="property">
+                <label>X:</label>
+                <input type="number" data-property="x" class="position-input">
+            </div>
+            <div class="property">
+                <label>Y:</label>
+                <input type="number" data-property="y" class="position-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Size</h4>
+            <div class="property">
+                <label>Width:</label>
+                <input type="number" data-property="width" value="16" class="size-input">
+            </div>
+            <div class="property">
+                <label>Height:</label>
+                <input type="number" data-property="height" value="16" class="size-input">
+            </div>
+        </div>
+        <div class="property-group">
+            <h4>Textures</h4>
+            <div class="property">
+                <label>Default Texture:</label>
+                <input type="text" data-property="default_texture" class="texture-input" value="textures/ui/close_button">
+            </div>
+            <div class="property">
+                <label>Hover Texture:</label>
+                <input type="text" data-property="hover_texture" class="texture-input" value="textures/ui/close_button_hover">
+            </div>
+            <div class="property">
+                <label>Pressed Texture:</label>
+                <input type="text" data-property="pressed_texture" class="texture-input" value="textures/ui/close_button_pressed">
+            </div>
+        </div>
+    </template>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="scripts/util.js"></script>
+    <script src="scripts/project-format.js"></script>
     <script src="scripts/components.js"></script>
     <script src="scripts/properties.js"></script>
     <script src="scripts/templates.js"></script>
@@ -614,6 +1327,7 @@
     <script src="scripts/editor.js"></script>
     <script src="scripts/mobile.js"></script>
     <script src="scripts/export.js"></script>
+    <script src="scripts/release-notice.js"></script>
     <script src="scripts/app.js"></script>
 </body>
 

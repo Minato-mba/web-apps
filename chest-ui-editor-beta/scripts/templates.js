@@ -20,14 +20,28 @@ const templates = {
             return;
         }
 
-
         editor.clearComponents();
 
-
-        const templateComponents = this.templates[templateName]();
+        const templateResult = this.templates[templateName]();
+        const templateComponents = Array.isArray(templateResult) ? templateResult : (templateResult.components || []);
         templateComponents.forEach(component => {
             editor.addComponent(component);
         });
+
+        // Apply active UI's settings after loading template
+        const activeUi = chestUiManager.getActiveUi();
+        if (activeUi && activeUi.settings) {
+            if (!Array.isArray(templateResult) && templateResult.settings) {
+                Object.assign(activeUi.settings, templateResult.settings);
+            }
+            util.applySettings(activeUi.settings);
+            chestUiManager.updateTitleDisplay(activeUi);
+            if (typeof preview !== 'undefined') {
+                preview.updatePreviewWithSettings(editor.getComponents(), activeUi.settings);
+            }
+        } else if (typeof preview !== 'undefined') {
+            preview.updatePreview(editor.getComponents());
+        }
     },
     templates: {
         
@@ -39,16 +53,47 @@ const templates = {
         vanilla: function () {
             const components = [];
 
+            const grid = createComponent('dynamic_grid', 7, 9);
+            grid.width = 162;
+            grid.height = 54;
+            grid.properties.preview_slots = 27;
+            grid.properties.content_height = 54;
+            grid.properties.slot_width = 18;
+            grid.properties.slot_height = 18;
+            grid.properties.scroll_size_width = 0;
+            grid.properties.scrollbar_box_image_size_width = 0;
+            grid.properties.show_background = false;
+            components.push(grid);
 
-            for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 9; col++) {
-                    const component = createComponent('container_item', 7 + col * 18, 9 + row * 18);
-                    component.properties.collection_index = row * 9 + col;
-                    components.push(component);
+            return {
+                components,
+                settings: {
+                    mainPanelHeight: defaultSettings.mainPanelHeight
                 }
-            }
+            };
+        },
 
-            return components;
+        double_chest: function () {
+            const components = [];
+
+            const grid = createComponent('dynamic_grid', 7, 9);
+            grid.width = 162;
+            grid.height = 108;
+            grid.properties.preview_slots = 54;
+            grid.properties.content_height = 108;
+            grid.properties.slot_width = 18;
+            grid.properties.slot_height = 18;
+            grid.properties.scroll_size_width = 0;
+            grid.properties.scrollbar_box_image_size_width = 0;
+            grid.properties.show_background = false;
+            components.push(grid);
+
+            return {
+                components,
+                settings: {
+                    mainPanelHeight: 220
+                }
+            };
         },
 
 
@@ -139,12 +184,12 @@ const templates = {
         },
 
 
-        altar: function () {
+        combiner: function () {
             const components = [];
 
 
             const cross = createComponent('image', 36, 13);
-            cross.properties.texture = "textures/ui/altar_cross";
+            cross.properties.texture = "textures/ui/combiner_cross";
             cross.width = 41;
             cross.height = 29;
             components.push(cross);

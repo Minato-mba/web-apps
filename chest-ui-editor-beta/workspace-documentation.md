@@ -9,12 +9,12 @@ A desktop-focused web application that allows users to:
 - Visually design custom chest UIs using drag-and-drop components
 - Preview designs in real-time
 - Export designs as ready-to-use Minecraft Bedrock resource packs
-- Import/export projects for sharing and collaboration
+- **Save/Load** - versioned project data in browser storage only
+- **Import/Export ZIP** - resource packs and `chest_ui_data.json` for files and in-game use
 
 ### Target Platform
-- **Primary:** Desktop (PC/Mac)
-- **Secondary:** Mobile support exists but is NOT the development priority
-- Focus on mouse/keyboard interaction over touch
+- **Primary:** Desktop (PC/Mac) - mouse/keyboard
+- **Secondary:** Mobile (`mobile.js`, `mobile.css`) - touch placement, properties drawer, preview; test coarse-pointer layouts when changing editor UI
 
 ### Core Workflow
 1. User drags components from palette onto 162x54px canvas (representing 9x3 chest grid)
@@ -23,7 +23,7 @@ A desktop-focused web application that allows users to:
 4. Export generates complete JSON UI file + resource pack ZIP
 
 ### In-Game Integration
-- Generated UI triggers when player opens chest named `§t§e§s§t§r` (special formatting codes)
+- Generated UI triggers when player opens chest named `Display Name` (special formatting codes)
 - Uses `container_items` collection binding
 - Requires custom entity with matching inventory size OR use vanilla containers
 - UI behavior controlled via Script API
@@ -36,18 +36,18 @@ A desktop-focused web application that allows users to:
 chest-ui-editor/
 ├── index.html              # Main application HTML structure
 ├── README.md               # User-facing documentation
-├── .cursorrules-chest-editor  # This file - AI development guide
 ├── scripts/
-│   ├── app.js              # Application initialization & setup
+│   ├── app.js              # Init, chestUiManager, Save/Load (browser), settings
 │   ├── components.js       # Component type definitions & factory
-│   ├── editor.js           # Editor canvas management & interaction
-│   ├── export.js           # Resource pack export & ZIP generation
+│   ├── editor.js           # Canvas, selection, tabs (setActiveTab, tab_parent_id)
+│   ├── export.js           # ZIP export & Import ZIP
 │   ├── imageManager.js     # Image upload & management system
-│   ├── mobile.js           # Mobile view handling (secondary priority)
+│   ├── mobile.js           # Mobile view handling
 │   ├── preview.js          # Live preview & JSON UI generation
+│   ├── project-format.js   # formatVersion 2 - build/validate/apply/persist
 │   ├── properties.js       # Properties panel management
 │   ├── templates.js        # Pre-built template definitions
-│   └── util.js             # Utility functions
+│   └── util.js             # Utility functions (localStorage, ZIP helpers)
 ├── styles/
 │   ├── main.css            # Core application styles
 │   ├── components.css      # Component visual styles
@@ -61,9 +61,18 @@ chest-ui-editor/
 
 **app.js:**
 - DOMContentLoaded initialization
-- Action button handlers (New, Save, Load, Export)
-- Project persistence (localStorage)
-- Panel fold/unfold state management
+- `chestUiManager` - multiple Chest UIs per project (`uis`, `activeId`, per-UI settings/components)
+- Action buttons: New, **Save** / **Load** (browser only via `projectFormat`), Import ZIP, Export
+- Settings modal; panel fold/unfold state
+- Startup: `loadSavedProject({ silent: true })` when a valid v2 browser save exists
+
+**project-format.js:**
+- `FORMAT_VERSION: 2`, `FORMAT_LABEL: '2.0.0'`
+- `build()` / `buildFromEditor()` - payload for browser save and ZIP `chest_ui_data.json`
+- `validate()` / `assertValid()` - reject missing or legacy formats (including old `version: "1.1.0"` without `formatVersion: 2`)
+- `apply()` - restore components, `uiProject`, settings, `uploadedImages` into editor
+- `persistLocal()` / `saveToBrowser()` - write to `minecraft_chest_ui_project` in localStorage
+- **Do not** add file download/upload to Save/Load; files are Import ZIP / Export ZIP only
 
 **components.js:**
 - Defines `componentTypes` object with all component definitions
@@ -78,6 +87,7 @@ chest-ui-editor/
 - Position snapping and constraints
 - Z-index management
 - Component CRUD operations
+- **Tabs:** `setActiveTab()`, `tab_parent_id` on children, visibility filter for inactive tab pages in editor
 
 **export.js:**
 - Resource pack ZIP generation using JSZip library
@@ -135,6 +145,7 @@ Each component type is defined in `componentTypes` object with:
 
 **Editor Properties:**
 - `collection_index` - Slot number in container_items collection (auto-incremented)
+- `slot_background_texture`, `slot_selected_texture`, `slot_highlight_texture` - Optional per-slot cell art (vanilla `inventory_*` defaults or custom paths)
 - `x, y` - Position
 - `width, height` - Size (default: 18x18)
 
@@ -422,13 +433,68 @@ Generates 10 conditional image layers:
 - UI borders and frames
 - Custom icons and symbols
 
-### 8. Label
+### 8. Button
+
+**Purpose:** Non-slot action control bound to an existing `container_items` index via `property_bag`
+
+**Editor Properties:**
+- `target_collection_index` - slot to act on (does not consume its own `collection_index`)
+- `pressed_button_name` - e.g. `button.container_auto_place`, `button.drop_all`
+- `default_texture`, `hover_texture`, `pressed_texture` - borderless button textures (often skipped in ZIP via `defaultButtonTextures`)
+- Optional embedded label/image (`show_label`, `label_text`, …)
+
+**Export:** Inherits `drop_button@common.button` (or pack namespace equivalent); instance sets `$pressed_button_name` and texture variables.
+
+**See also:** `how_to_add_new_component.md` §11 for full export shape.
+
+### 9. Tab
+
+**Purpose:** One tab toggle + one full-size page panel per dragged Tab component (add tabs incrementally; not a bundled multi-tab panel)
+
+**Editor Properties:**
+- `toggle_index` - drives exported `$name` (`toggle1`, `toggle2`, …) and page visibility bindings
+- `toggle_group_name` - shared toggle group (default `custom_chest_tabs`)
+- `is_active` - which tab is edited in the canvas (editor only; export uses bindings)
+- Textures: same borderless set as Button - unselected `button_borderless_light`, selected `button_borderless_lightpressednohover`, hover-unselected `button_borderless_lighthover`
+- Optional embedded label (same pattern as Button; default `show_label: false`, empty `label_text`)
+
+**Child components:** Dropped while a tab is active get `tab_parent_id` = that tab’s `id`. `editor.setActiveTab(tabId)` switches visible children.
+
+**Export (`preview.createTabsLayout()`):**
+- Tab bar: `tab_toggle` controls with `$name: toggleN`, `common_toggles.light_text_toggle` pattern
+- Each page: `panel` at `100%` × `100%` with `#visible` binding to `source_control_name: toggleN` (short names, not `tab_component_*` ids)
+- Page children exported via `createNestedComponentControl()`
+- Tabs disable `usesCollectionHost` shortcut only for `dynamic_grid`, not for `tab`
+
+**Editor rendering:** `<motion.div class="editor-component button tab">` (not `<button>`) to avoid global `button { border-radius }` in `main.css`. Mouse handlers must use string concatenation for `classList`, not template literals evaluated at render time.
+
+**Palette icon:** `assets/images/tab.png`
+
+### 10. Dynamic Grid (scroll panel)
+
+**Purpose:** Scrollable grid of slots using `grid` + scrollbar controls in exported JSON (not a single `collection_panel` slot list)
+
+**Editor Properties:**
+- `slot_width`, `slot_height` - cell size (default 18×18)
+- `content_height` - scrollable content height in export
+- `preview_slots` - how many slots to draw in the editor preview (not exported as slot count)
+- `scroll_size_width` - scrollbar rail width
+- `scroll_indent_image_texture`, `scrollbar_box_image_texture`, `scroll_background_image_texture` - rail, handle, background (`user_uploaded:` supported)
+- `show_background` - toggle scroll panel background image
+- `slot_background_texture`, `slot_selected_texture`, `slot_highlight_texture` - per-cell slot art (shared with container item defaults)
+
+**Editor:** Fake scrollbar preview; column count derived from width minus scrollbar width.
+
+**Export:** Dedicated branch in `preview.js`; textures extracted in `export.js` / `extractTexturesFromComponents()`
+
+### 11. Label
 
 **Purpose:** Static text display
 
 **Editor Properties:**
 - `text` - Text content
 - `color` - RGB array [R, G, B] (0.0 to 1.0 scale)
+- `font_scale_factor` - Label scale (editor uses `10 * font_scale_factor` px)
 - `x, y` - Position
 
 **JSON UI Output:**
@@ -450,6 +516,22 @@ Generates 10 conditional image layers:
 - Instructions
 - Section labels
 
+### 12. Close Button
+
+**Purpose:** Dismisses the chest screen using vanilla `common.close_button` behavior
+
+**Editor Properties:**
+- `default_texture`, `hover_texture`, `pressed_texture` (vanilla `textures/ui/close_button_*` or uploaded)
+- Position and size
+
+**Export:** `close_button_holder` stack panel with `close@common.close_button` and per-state `$close_button_texture` overrides.
+
+**Settings integration:** `showCloseButton` in Chest UI settings can add a close control without placing this component; the draggable component is for custom position/textures.
+
+**Use Cases:**
+- Top-right dismiss control on custom chest panels
+- Replacing default close placement from settings
+
 ## JSON UI Generation System
 
 ### Generation Flow
@@ -465,7 +547,7 @@ Generates 10 conditional image layers:
      "small_chest_screen@common.inventory_screen_common": {
        "variables": [
          {
-           "requires": "($text = '§t§e§s§t§r')",
+           "requires": "($text = 'Display Name')",
            "$screen_content": "chest.custom"
          }
        ]
@@ -595,35 +677,48 @@ When texture not found:
 
 ## Project Persistence
 
-### Save Format (localStorage)
+### Versioned format (`scripts/project-format.js`)
+
+**Current:** `formatVersion: 2`, `formatLabel: "2.0.0"`. Bump `FORMAT_VERSION` for breaking schema changes; add migration in `validate()` if needed.
+
+**Save / Load (browser only):**
+- Key: `minecraft_chest_ui_project`
+- **Save** → `projectFormat.saveToBrowser()` (`buildFromEditor` + `persistLocal`)
+- **Load** → `projectFormat.apply()` after `validate()`; manual Load shows errors; startup load uses `{ silent: true }`
+- **No** `.json` file download or file picker on Save/Load
+
+**Legacy projects** without `formatVersion: 2` (including `version: "1.1.0"`) are **rejected** with a clear message. Users must re-save or re-export.
+
+### Browser save payload shape
 
 ```javascript
 {
-  components: [
-    {
-      id: "...",
-      type: "container_item",
-      x: 7,
-      y: 9,
-      width: 18,
-      height: 18,
-      properties: { collection_index: 0 }
-    }
-    // ... more components
-  ],
-  uploadedImages: {
-    "user_uploaded:custom_image_abc": {
-      data: "data:image/png;base64,...",
-      type: "image/png",
-      originalName: "myimage.png"
-    }
+  formatVersion: 2,
+  formatLabel: "2.0.0",
+  exportedAt: 1730000000000,
+  components: [ /* flat list for active UI fallback */ ],
+  uiProject: {
+    activeId: "...",
+    uis: [
+      {
+        id: "...",
+        triggerTitle: "§F§l...",
+        newTitle: "Display Name",
+        settings: { mainPanelHeight, titleOffsetX, dialogBackground, showCloseButton, ... },
+        components: [ /* per-UI component arrays */ ]
+      }
+    ]
   },
-  version: "1.0.2",
-  timestamp: 1234567890
+  settings: { /* global/settings modal snapshot */ },
+  uploadedImages: {
+    "user_uploaded:custom_image_abc": { data: "data:image/png;base64,...", ... }
+  }
 }
 ```
 
-### ZIP Import/Export
+Settings-only updates and Import ZIP also call `projectFormat.persistLocal(projectFormat.buildFromEditor())` so the browser copy stays on v2.
+
+### ZIP Import/Export (files)
 
 **Export Structure:**
 ```
@@ -643,15 +738,18 @@ ChestUI_ResourcePack.zip
 │   │   └── on_off_active.png
 │   └── pot/
 │       └── pot.png
-└── chest_ui_data.json               # Editor project data (for re-import)
+└── chest_ui_data.json               # Same v2 project payload as browser save (formatVersion: 2)
 ```
 
 **Import Process:**
-1. User selects ZIP file
-2. Extract `chest_ui_data.json`
-3. Extract custom image files from `textures/ui/custom/`
-4. Load images into `imageManager` as `user_uploaded:` paths
-5. Restore component array to editor
+1. User selects ZIP file (`import-zip` / `util.importZipFile`)
+2. Parse `chest_ui_data.json` → `projectFormat.assertValid(data)`
+3. Extract custom images from `textures/ui/custom/` (or `images/`) into `imageManager`
+4. `projectFormat.apply(data)` then `persistLocal(buildFromEditor())` for browser continuity
+
+**Export Process:**
+- `export.js` embeds `projectFormat.build({ components, uiProject, settings })` in ZIP
+- UI JSON files generated by `preview.generateProjectJSON()`
 
 ## Development Guidelines
 
@@ -768,6 +866,8 @@ const needsIndex = ['container_item', 'container_item_with_picture',
 - Use inline styles for dynamic properties (position, size, color)
 - Use CSS classes for static styling
 - Keep editor and preview rendering separate but consistent
+- UI textures in editor/preview: use `image-rendering: pixelated` via `withPixelatedRendering()` / `styles/components.css` where applicable
+- Prefer `<motion.div class="editor-component …">` over `<button>` for custom controls (tabs, buttons) to avoid global button styles in `main.css`
 
 **JSON UI Generation:**
 - Follow vanilla Minecraft JSON UI patterns exactly
@@ -907,11 +1007,11 @@ Standard layer values used:
 - 20+: Storage/durability bars
 - 27: Stack count labels
 
-## Integration with Parent Cursorrules
+## Integration with Parent workspace-documentation
 
 ### JSON UI Fundamentals
 
-For core JSON UI concepts, refer to parent `.cursorrules`:
+For core JSON UI concepts, refer to parent `workspace-documentation.md`:
 - Namespace system and element referencing
 - Binding types (collection, view, global)
 - Molang expression syntax
@@ -929,7 +1029,7 @@ This editor specializes in:
 
 ### Key Differences
 
-**Parent cursorrules:** General JSON UI development
+**Parent workspace-documentation:** General JSON UI development
 - Hand-editing JSON UI files
 - Working in `resource_pack/ui/custom/` directory
 - Full JSON UI feature set
@@ -1154,10 +1254,18 @@ Common modifications:
 ### Import Failing
 
 **Check:**
-- ZIP contains chest_ui_data.json?
-- JSON structure matches current version format?
+- ZIP contains `chest_ui_data.json`?
+- `formatVersion === 2` (old exports without `formatVersion` are unsupported)
+- `projectFormat.validate()` error message for missing `components` or wrong version
 - Image paths in data match images in ZIP?
 - No corrupted Base64 image data?
+
+### Save/Load Failing
+
+**Check:**
+- Browser save exists under `minecraft_chest_ui_project`?
+- Saved data has `formatVersion: 2` (re-save or Import ZIP after upgrading editor)
+- Use **Import ZIP** / **Export** for file transfer, not Save/Load
 
 ## Advanced Techniques
 
@@ -1302,15 +1410,17 @@ When extending this editor:
 
 ## Version History
 
-- **1.0.2** - Current version
-  - Component system established
-  - ZIP import/export functional
-  - Basic templates included
+- **2.0.0** (`formatVersion: 2`) - Current project format
+  - Versioned browser save/load and ZIP `chest_ui_data.json`
+  - Per-Tab components with `tab_parent_id` / `createTabsLayout`
+  - Button, dynamic grid, multi-Chest-UI `chestUiManager`
+  - Legacy `version: "1.1.0"` / unversioned saves not loaded
+- **1.0.2** - Earlier editor (pre-`formatVersion`; not compatible with v2 load)
 
 ## Support and Resources
 
 **For JSON UI Questions:**
-- Refer to parent `.cursorrules` in repository root
+- Refer to parent `workspace-documentation.md` in repository root
 - Check vanilla JSON UI files in `resource_pack/ui/`
 - Visit https://wiki.bedrock.dev/json-ui/
 

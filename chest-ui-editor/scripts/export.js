@@ -1,4 +1,18 @@
 const exporter = {
+    defaultButtonTextures: new Set([
+        'textures/ui/button_borderless_light',
+        'textures/ui/button_borderless_lighthover',
+        'textures/ui/button_borderless_lightpressed',
+        'textures/ui/button_borderless_lightpressednohover',
+        'textures/ui/cell_image',
+        'textures/ui/cell_image_selected',
+        'textures/ui/highlight_slot'
+    ]),
+
+    shouldPackageTexture: function (path) {
+        return !this.defaultButtonTextures.has(path);
+    },
+
     extractTexturePaths: function (json) {
         const texturePaths = new Set();
 
@@ -9,12 +23,62 @@ const exporter = {
                 texturePaths.add(obj.texture);
             }
 
+            if (obj.picture && typeof obj.picture === 'string' && !obj.picture.startsWith('$')) {
+                texturePaths.add(obj.picture);
+            }
+
             if (obj.$texture && typeof obj.$texture === 'string' && !obj.$texture.startsWith('$')) {
                 texturePaths.add(obj.$texture);
             }
 
             if (obj.$path_to_image && typeof obj.$path_to_image === 'string' && !obj.$path_to_image.startsWith('$')) {
                 texturePaths.add(obj.$path_to_image);
+            }
+
+            [
+                '$default_button_texture',
+                '$hover_button_texture',
+                '$pressed_button_texture',
+                '$pressed_no_hover_texture',
+                '$default_texture',
+                '$hover_texture',
+                '$embedded_image_texture',
+                '$cell_image_texture',
+                '$cell_image_selected_texture',
+                '$highlight_slot_texture'
+            ].forEach(textureVariable => {
+                if (obj[textureVariable] && typeof obj[textureVariable] === 'string' && !obj[textureVariable].startsWith('$')) {
+                    if (this.shouldPackageTexture(obj[textureVariable])) {
+                        texturePaths.add(obj[textureVariable]);
+                    }
+                }
+            });
+
+            // Handle dynamic grid texture variables that contain uploaded images
+            if (obj.$scroll_background_image_texture && typeof obj.$scroll_background_image_texture === 'string' && obj.$scroll_background_image_texture.startsWith('user_uploaded:')) {
+                texturePaths.add(obj.$scroll_background_image_texture);
+            }
+
+            if (obj.$scroll_indent_image_texture && typeof obj.$scroll_indent_image_texture === 'string' && obj.$scroll_indent_image_texture.startsWith('user_uploaded:')) {
+                texturePaths.add(obj.$scroll_indent_image_texture);
+            }
+
+            if (obj.$scrollbar_box_image_texture && typeof obj.$scrollbar_box_image_texture === 'string' && obj.$scrollbar_box_image_texture.startsWith('user_uploaded:')) {
+                texturePaths.add(obj.$scrollbar_box_image_texture);
+            }
+
+            // Handle dialog background texture that contains uploaded images or regular paths
+            if (obj.$dialog_background_texture && typeof obj.$dialog_background_texture === 'string' && !obj.$dialog_background_texture.startsWith('$')) {
+                // Skip the default dialog_background_opaque texture - it's already in Minecraft
+                if (obj.$dialog_background_texture !== 'textures/ui/dialog_background_opaque') {
+                    // Convert Minecraft texture path back to user_uploaded path for extraction
+                    if (obj.$dialog_background_texture.startsWith('textures/ui/custom/')) {
+                        const imageName = obj.$dialog_background_texture.replace('textures/ui/custom/', '');
+                        texturePaths.add(`user_uploaded:${imageName}`);
+                    } else {
+                        texturePaths.add(obj.$dialog_background_texture);
+                    }
+                }
             }
 
             if (Array.isArray(obj)) {
@@ -30,21 +94,66 @@ const exporter = {
         return texturePaths;
     },
 
+    extractTexturesFromComponents: function (components, texturePaths) {
+        const findComponentTextures = (component) => {
+            if (!component || !component.properties) return;
+
+            // Check for uploaded images in component properties
+            for (const [key, value] of Object.entries(component.properties)) {
+                if (typeof value === 'string' && value.startsWith('user_uploaded:')) {
+                    texturePaths.add(value);
+                }
+            }
+        };
+
+        if (Array.isArray(components)) {
+            components.forEach(component => findComponentTextures(component));
+        }
+    },
+
+    getExportFiles: function (json) {
+        if (json && json.uiDefs && json.chestScreen && json.customUi) {
+            const files = {
+                "_ui_defs.json": json.uiDefs,
+                "chest_screen.json": json.chestScreen,
+                "custom_chest_ui.json": json.customUi
+            };
+
+            // Add custom scroller file if it exists
+            if (json.customScroller) {
+                files["custom_scroll.json"] = json.customScroller;
+            }
+
+            return files;
+        }
+
+        return {
+            "chest_screen.json": json
+        };
+    },
+
     generatePlaceholderTexture: function (path) {
         return new Promise(async (resolve) => {
-            try {
-                const response = await fetch(`../assets/${path.replace('textures', 'images')}.png`);
+            const localPath = `../assets/${path.replace('textures', 'images')}.png`;
+            const bedrockSamplePath = path.startsWith('textures/ui/')
+                ? `https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/${path}.png`
+                : null;
 
-                if (response.ok) {
-                    const blob = await response.blob();
-                    resolve({
-                        blob: blob,
-                        isPlaceholder: false
-                    });
-                    return;
+            for (const textureUrl of [localPath, bedrockSamplePath].filter(Boolean)) {
+                try {
+                    const response = await fetch(textureUrl);
+
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        resolve({
+                            blob: blob,
+                            isPlaceholder: false
+                        });
+                        return;
+                    }
+                } catch (error) {
+                    console.error(`Error loading texture from ${textureUrl}:`, error);
                 }
-            } catch (error) {
-                console.error(`Error loading texture from ${path}:`, error);
             }
 
             const canvas = document.createElement('canvas');
@@ -96,18 +205,23 @@ const exporter = {
         });
     },
 
-    createResourcePackZip: async function (json) {
+    createResourcePackZip: async function (json, settings = null) {
         const zip = new JSZip();
         const resourcePack = zip.folder("ChestUI_ResourcePack");
         const jsonForExport = JSON.parse(JSON.stringify(json));
+        const exportFiles = this.getExportFiles(jsonForExport);
         const texturePaths = this.extractTexturePaths(jsonForExport);
 
-        const componentsData = {
-            components: editor.getComponents(),
-            version: '1.0.2',
-            timestamp: Date.now()
-        };
-        zip.file("chest_ui_data.json", JSON.stringify(componentsData, null, 2));
+        // Also extract textures from component data (for dynamic grid uploaded images)
+        const components = editor.getComponents();
+        this.extractTexturesFromComponents(components, texturePaths);
+
+        const componentsData = projectFormat.build({
+            components,
+            uiProject: typeof chestUiManager !== 'undefined' ? chestUiManager.toJSON() : null,
+            settings
+        });
+        zip.file('chest_ui_data.json', JSON.stringify(componentsData, null, 2));
 
         const manifestJson = this.generateManifestJson();
         resourcePack.file("manifest.json", JSON.stringify(manifestJson, null, 2));
@@ -141,7 +255,9 @@ const exporter = {
             }
         }
 
-        resourcePack.file("ui/chest_screen.json", JSON.stringify(jsonForExport, null, 2));
+        Object.entries(exportFiles).forEach(([filename, fileJson]) => {
+            resourcePack.file(`ui/${filename}`, JSON.stringify(fileJson, null, 2));
+        });
 
         for (const path of texturePaths) {
             if (!path.startsWith('user_uploaded:') && path.startsWith('textures/')) {
@@ -150,6 +266,10 @@ const exporter = {
                     if (imageManager.uploadedImages[userUploadedPath]) {
                         continue;
                     }
+                }
+
+                if (this.defaultButtonTextures.has(path)) {
+                    continue;
                 }
 
                 const textureResult = await this.generatePlaceholderTexture(path);
@@ -170,7 +290,13 @@ const exporter = {
             }
         }
 
-        return zip.generateAsync({ type: "blob" });
+        return zip.generateAsync({ 
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: {
+                level: 9
+            }
+        });
     },
 
     generateManifestJson: function () {
@@ -209,6 +335,12 @@ const exporter = {
                 obj.$path_to_image = newPath;
             }
 
+            ['$default_button_texture', '$hover_button_texture', '$pressed_button_texture', '$embedded_image_texture'].forEach(textureVariable => {
+                if (obj[textureVariable] === oldPath) {
+                    obj[textureVariable] = newPath;
+                }
+            });
+
             if (Array.isArray(obj)) {
                 obj.forEach(item => updatePath(item));
             } else {
@@ -236,13 +368,30 @@ const exporter = {
             exportButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span class="button-text">Processing...</span>';
             exportButton.disabled = true;
 
-            const json = preview.generateJSON();
+            // Load settings before generating JSON
+            const settings = util.loadFromLocalStorage('chest_ui_settings') || {
+                mainPanelHeight: 166,
+                mainPanelLayer: 5
+            };
+            
+            if (typeof chestUiManager !== 'undefined') {
+                chestUiManager.captureActive();
+            }
 
-            const zipBlob = await this.createResourcePackZip(json);
+            const json = preview.generateProjectJSON(
+                settings,
+                typeof chestUiManager !== 'undefined' ? chestUiManager.getExportUis() : null
+            );
+
+            const zipBlob = await this.createResourcePackZip(json, settings);
+
+            // Create a blob with explicit MIME type for ZIP files
+            const properZipBlob = new Blob([zipBlob], { type: 'application/zip' });
 
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(zipBlob);
+            a.href = URL.createObjectURL(properZipBlob);
             a.download = "ChestUI_ResourcePack.zip";
+            a.setAttribute('download', 'ChestUI_ResourcePack.zip'); // Force download attribute
             document.body.appendChild(a);
             a.click();
 
@@ -266,42 +415,25 @@ const exporter = {
 function importZipProject() {
     util.importZipFile(async (data, imageFiles) => {
         try {
+            projectFormat.assertValid(data);
+
             if (imageFiles && imageFiles.length > 0) {
                 await Promise.all(imageFiles.map(item => {
                     return new Promise((resolve) => {
-                        imageManager.storeImage(item.file, (storedPath) => {
+                        imageManager.storeImage(item.file, () => {
                             resolve();
                         }, item.path);
                     });
                 }));
             }
 
-            editor.clearComponents();
-
-            if (data.components && Array.isArray(data.components)) {
-                data.components.forEach(comp => {
-                    const component = createComponent(
-                        comp.type,
-                        comp.x,
-                        comp.y,
-                        comp.width,
-                        comp.height,
-                        comp.properties
-                    );
-
-                    if (comp.id) {
-                        component.id = comp.id;
-                    }
-
-                    if (comp.zIndex !== undefined) {
-                        component.zIndex = comp.zIndex;
-                    }
-
-                    editor.addComponent(component);
-                });
+            if (!projectFormat.apply(data, { silent: true })) {
+                throw new Error('Imported ZIP project failed validation after loading images.');
             }
 
-            alert('Project imported successfully!');
+            projectFormat.persistLocal(projectFormat.buildFromEditor());
+
+            alert(`Project imported successfully (format ${projectFormat.FORMAT_LABEL}).`);
         } catch (err) {
             console.error('Error importing project:', err);
             alert('Error importing project: ' + err.message);
