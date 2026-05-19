@@ -217,19 +217,20 @@
     }
 
     .glyph-cell img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+      width: calc(var(--img-w, 16) / 16 * 100%);
+      height: calc(var(--img-h, 16) / 16 * 100%);
       image-rendering: pixelated;
       display: block;
-      margin: auto;
+      margin: 0;
       z-index: 2;
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
     .cell-label {
       position: absolute;
-      font-size: 0.8rem;
+      font-size: 1.15rem;
       color: rgba(255, 255, 255, 0.6);
       z-index: 1;
       text-align: center;
@@ -368,6 +369,94 @@
 
     #search-box {
       width: 100%;
+    }
+
+    .error-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .error-modal-content {
+      width: 90%;
+      max-width: 480px;
+      border-image-source: url("../content/assets/images/container.png");
+      border-image-slice: 4 4 4 4 fill;
+      border-width: 8px;
+      border-style: solid;
+      padding: 20px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .error-modal-title {
+      text-align: center;
+      font-size: 1.5rem;
+      font-family: MinecraftTen;
+      color: #ff5555;
+      text-shadow: 2px 2px 0 #7a0000;
+      margin-bottom: 6px;
+    }
+
+    .error-modal-subtitle {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #58585a;
+      margin-bottom: 14px;
+    }
+
+    .error-list {
+      overflow-y: auto;
+      flex: 1;
+      margin-bottom: 14px;
+    }
+
+    .error-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .error-row:last-child {
+      border-bottom: none;
+    }
+
+    .error-icon {
+      width: 22px;
+      height: 22px;
+      background-color: #aa3333;
+      border: 2px solid #881111;
+      flex-shrink: 0;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffaaaa;
+      font-size: 0.85rem;
+      font-family: Minecraftia, sans-serif;
+    }
+
+    .error-filename {
+      color: #58585a;
+      font-size: 1.1rem;
+      line-height: 1.15;
+      word-break: break-all;
+    }
+
+    .error-reason {
+      color: #FF5C4D;
+      font-size: 1rem;
+      margin-top: 2px;
     }
 
     @media (max-width: 768px) {
@@ -903,6 +992,8 @@
       <div class="control-group">
         <button class="minecraft-button" id="import-button">Import Glyph</button>
         <input type="file" id="import-file" accept="image/png" style="display: none;">
+        <button class="minecraft-button" id="import-textures-button">Import Textures</button>
+        <input type="file" id="import-textures-file" accept="image/png" multiple style="display: none;">
         <button class="minecraft-button" id="clear-button">Clear All</button>
       </div>
     </div>
@@ -917,6 +1008,7 @@
   <div class="mobile-bottom-nav" id="mobile-nav" style="display: none;">
     <button class="nav-button" id="mobile-generate">Generate</button>
     <button class="nav-button" id="mobile-import">Import</button>
+    <button class="nav-button" id="mobile-import-textures">Textures</button>
     <button class="nav-button" id="mobile-clear">Clear All</button>
   </div>
 
@@ -947,6 +1039,15 @@
     </div>
   </div>
 
+  <div class="error-modal-overlay" id="error-modal">
+    <div class="error-modal-content">
+      <div class="error-modal-title">Import Errors</div>
+      <div class="error-modal-subtitle" id="error-modal-subtitle"></div>
+      <div class="error-list" id="error-list"></div>
+      <button class="minecraft-button" id="close-error-modal">OK</button>
+    </div>
+  </div>
+
   <canvas id="output-canvas" width="256" height="256"></canvas>
 
   <script>
@@ -964,6 +1065,9 @@
     const repoImagesContainer = document.getElementById('repo-images');
     const searchBox = document.getElementById('search-box');
     const outputName = document.getElementById('output-name');
+    const errorModal = document.getElementById('error-modal');
+    const errorList = document.getElementById('error-list');
+    const errorModalSubtitle = document.getElementById('error-modal-subtitle');
 
     window.onload = () => {
       createGlyphGrid();
@@ -1182,6 +1286,10 @@
       div.title = name.replace('.png', '').replaceAll('_', ' ');
 
       const img = document.createElement('img');
+      img.onload = () => {
+        img.style.setProperty('--img-w', img.naturalWidth);
+        img.style.setProperty('--img-h', img.naturalHeight);
+      };      
       img.src = src;
       img.alt = name;
       img.loading = 'lazy';
@@ -1208,15 +1316,26 @@
       document.getElementById('import-button').addEventListener('click', () => {
         document.getElementById('import-file').click();
       });
+      document.getElementById('import-textures-button').addEventListener('click', () => {
+        document.getElementById('import-textures-file').click();
+      });
 
       document.getElementById('custom-image').addEventListener('change', uploadCustomImage);
       document.getElementById('import-file').addEventListener('change', importGlyph);
+      document.getElementById('import-textures-file').addEventListener('change', importMultipleTextures);
+
+      document.getElementById('close-error-modal').addEventListener('click', () => {
+        errorModal.style.display = 'none';
+      });
 
       searchBox.addEventListener('input', filterVanillaImages);
 
       window.addEventListener('click', (e) => {
         if (e.target === cellModal || e.target === vanillaModal) {
           closeAllModals();
+        }
+        if (e.target === errorModal) {
+          errorModal.style.display = 'none';
         }
       });
     }
@@ -1248,6 +1367,10 @@
         newCell.dataset.codePoint = cell.dataset.codePoint;
 
         const img = document.createElement('img');
+        img.onload = () => {
+          img.style.setProperty('--img-w', img.naturalWidth);
+          img.style.setProperty('--img-h', img.naturalHeight);
+        };
         img.src = imageURIs[name];
         newCell.appendChild(img);
 
@@ -1295,6 +1418,10 @@
         newCell.dataset.codePoint = cell.dataset.codePoint;
 
         const img = document.createElement('img');
+        img.onload = () => {
+          img.style.setProperty('--img-w', img.naturalWidth);
+          img.style.setProperty('--img-h', img.naturalHeight);
+        };
         img.src = src;
         newCell.appendChild(img);
 
@@ -1309,6 +1436,124 @@
 
         closeAllModals();
       }
+    }
+
+    function applyTextureToCell(index, src, name) {
+      const cell = document.querySelector(`.glyph-cell[data-index="${index}"]`);
+
+      const newCell = document.createElement('div');
+      newCell.classList.add('glyph-cell');
+      newCell.dataset.index = index;
+      newCell.dataset.codePoint = cell.dataset.codePoint;
+
+      const img = document.createElement('img');
+      img.onload = () => {
+        img.style.setProperty('--img-w', img.naturalWidth);
+        img.style.setProperty('--img-h', img.naturalHeight);
+      };
+      img.src = src;
+      newCell.appendChild(img);
+
+      cell.parentNode.replaceChild(newCell, cell);
+
+      newCell.addEventListener('click', () => openCellOptions(index));
+
+      glyphData[index] = {
+        src: src,
+        name: name
+      };
+    }
+
+    function importMultipleTextures(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
+
+      const errors = [];
+      let pendingCount = files.length;
+      let nextEmptyIndex = glyphData.findIndex(slot => slot === null);
+
+      if (nextEmptyIndex === -1) {
+        event.target.value = '';
+        showErrorModal([{ filename: '(all slots)', reason: 'No empty cells available' }]);
+        return;
+      }
+
+      const processNext = (fileIndex, src, filename) => {
+        const img = new Image();
+        img.onload = () => {
+          if (img.width > 16 || img.height > 16) {
+            errors.push({ filename, reason: `Image exceeds 16x16 pixels (${img.width}x${img.height})` });
+          } else {
+            if (nextEmptyIndex !== -1) {
+              applyTextureToCell(nextEmptyIndex, src, filename);
+              nextEmptyIndex = glyphData.findIndex((slot, i) => i > nextEmptyIndex && slot === null);
+            } else {
+              errors.push({ filename, reason: 'No empty cells remaining' });
+            }
+          }
+
+          pendingCount--;
+          if (pendingCount === 0) {
+            event.target.value = '';
+            if (errors.length > 0) showErrorModal(errors);
+          }
+        };
+        img.onerror = () => {
+          errors.push({ filename, reason: 'Could not load image' });
+          pendingCount--;
+          if (pendingCount === 0) {
+            event.target.value = '';
+            if (errors.length > 0) showErrorModal(errors);
+          }
+        };
+        img.src = src;
+      };
+
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => processNext(null, e.target.result, file.name);
+        reader.onerror = () => {
+          errors.push({ filename: file.name, reason: 'Could not read file' });
+          pendingCount--;
+          if (pendingCount === 0) {
+            event.target.value = '';
+            if (errors.length > 0) showErrorModal(errors);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function showErrorModal(errors) {
+      errorList.innerHTML = '';
+      errorModalSubtitle.textContent = errors.length + ' texture' + (errors.length !== 1 ? 's' : '') + ' could not be imported';
+
+      errors.forEach(({ filename, reason }) => {
+        const row = document.createElement('div');
+        row.classList.add('error-row');
+
+        const icon = document.createElement('div');
+        icon.classList.add('error-icon');
+        icon.textContent = '!';
+
+        const info = document.createElement('div');
+
+        const fnEl = document.createElement('div');
+        fnEl.classList.add('error-filename');
+        fnEl.textContent = filename;
+
+        const reasonEl = document.createElement('div');
+        reasonEl.classList.add('error-reason');
+        reasonEl.textContent = reason;
+
+        info.appendChild(fnEl);
+        info.appendChild(reasonEl);
+        row.appendChild(icon);
+        row.appendChild(info);
+        errorList.appendChild(row);
+      });
+
+      errorModal.style.display = 'flex';
     }
 
     function copyUnicodeSymbol() {
@@ -1459,7 +1704,7 @@
           const drawPromise = new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
-              ctx.drawImage(img, x, y, 16, 16);
+              ctx.drawImage(img, x, y, img.naturalWidth, img.naturalHeight);
               resolve();
             };
             img.src = glyphData[i].src;
@@ -1575,6 +1820,9 @@
         document.getElementById('mobile-generate').addEventListener('click', generateAndDownload);
         document.getElementById('mobile-import').addEventListener('click', () => {
           document.getElementById('import-file').click();
+        });
+        document.getElementById('mobile-import-textures').addEventListener('click', () => {
+          document.getElementById('import-textures-file').click();
         });
         document.getElementById('mobile-clear').addEventListener('click', clearAllCells);
 
