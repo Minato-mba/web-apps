@@ -17,6 +17,7 @@
 - Touch and mouse coordinates no longer divide by zoom twice
 - Mobile/tablet view no longer resets when the viewport resizes or rotates
 - Content canvas now matches the exported 162 px chest content width
+- Built-in templates now remove the legacy 7 px chest-panel inset
 - Label serialization now writes the correct Y value
 - Imported ZIP custom textures keep their original project paths
 - Panel resizing refreshes center and bottom anchored components

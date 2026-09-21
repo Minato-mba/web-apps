@@ -70,7 +70,7 @@ chest-ui-editor/
 - `FORMAT_VERSION: 3`, `FORMAT_LABEL: '3.0.0'`
 - `build()` / `buildFromEditor()` - payload for browser save and ZIP `chest_ui_data.json`
 - `validate()` / `assertValid()` - accept v2/v3 and reject older or malformed formats
-- `migrate()` - preserve v2 in-game coordinates while adding explicit top-left anchors
+- `migrate()` - preserve v2 in-game coordinates while adding explicit top-left anchors and removing the legacy 7 px panel inset
 - `apply()` - restore components, `uiProject`, settings, `uploadedImages` into editor
 - `persistLocal()` / `saveToBrowser()` - write to `minecraft_chest_ui_project` in localStorage
 - **Do not** add file download/upload to Save/Load; files are Import ZIP / Export ZIP only

@@ -230,9 +230,10 @@ const projectFormat = {
             (components || []).forEach(component => {
                 component.anchor_from = component.anchor_from || 'top_left';
                 component.anchor_to = component.anchor_to || 'top_left';
-                // v2 added one pixel only during export. Fold it into the real
-                // Bedrock offset so existing packs keep their in-game position.
-                component.x = (Number(component.x) || 0) + 1;
+                // v2 coordinates used the full chest panel. Export also added
+                // one pixel. The v3 content panel is centered 8 px from the
+                // root, so: oldX + 1 - 8 = oldX - 7.
+                component.x = (Number(component.x) || 0) - 7;
                 component.y = Number(component.y) || 0;
             });
         };
