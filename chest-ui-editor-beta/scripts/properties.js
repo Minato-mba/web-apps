@@ -60,6 +60,7 @@ const propertiesPanel = {
         this.propertiesContainer.appendChild(fragment);
     },
     setInputValues: function (fragment, component) {
+        this.addLayoutControls(fragment, component);
 
         const xInput = fragment.querySelector('[data-property="x"]');
         const yInput = fragment.querySelector('[data-property="y"]');
@@ -148,37 +149,116 @@ const propertiesPanel = {
         }
     },
 
+    addLayoutControls: function (fragment, component) {
+        if (!fragment || fragment.querySelector('.layout-anchor-group')) return;
+        jsonUiLayout.normalizeComponent(component);
+
+        const firstGroup = fragment.querySelector('.property-group');
+        if (!firstGroup) return;
+
+        const anchorLabels = {
+            top_left: 'Top left',
+            top_middle: 'Top middle',
+            top_right: 'Top right',
+            left_middle: 'Left middle',
+            center: 'Center',
+            right_middle: 'Right middle',
+            bottom_left: 'Bottom left',
+            bottom_middle: 'Bottom middle',
+            bottom_right: 'Bottom right'
+        };
+        const options = Object.keys(jsonUiLayout.anchors)
+            .map(anchor => `<option value="${anchor}">${anchorLabels[anchor]}</option>`)
+            .join('');
+
+        const group = document.createElement('div');
+        group.className = 'property-group layout-anchor-group';
+        group.innerHTML = `
+            <h4>Bedrock Layout</h4>
+            <div class="property">
+                <label>Anchor From:</label>
+                <select data-layout-property="anchor_from">${options}</select>
+            </div>
+            <div class="property">
+                <label>Anchor To:</label>
+                <select data-layout-property="anchor_to">${options}</select>
+            </div>
+            <p class="help-text">X/Y are offsets between these anchors. Changing an anchor keeps the component visually in place; resizing follows Bedrock anchor behavior.</p>
+        `;
+        firstGroup.parentNode.insertBefore(group, firstGroup);
+
+        const xLabel = firstGroup.querySelector('[data-property="x"]')?.closest('.property')?.querySelector('label');
+        const yLabel = firstGroup.querySelector('[data-property="y"]')?.closest('.property')?.querySelector('label');
+        if (xLabel) xLabel.textContent = 'Offset X:';
+        if (yLabel) yLabel.textContent = 'Offset Y:';
+
+        const hasWidth = !!fragment.querySelector('[data-property="width"]');
+        const hasHeight = !!fragment.querySelector('[data-property="height"]');
+        if (!hasWidth || !hasHeight) {
+            const sizeGroup = document.createElement('div');
+            sizeGroup.className = 'property-group';
+            sizeGroup.innerHTML = `
+                <h4>Size</h4>
+                ${hasWidth ? '' : '<div class="property"><label>Width:</label><input type="number" min="1" step="1" data-property="width" class="size-input"></div>'}
+                ${hasHeight ? '' : '<div class="property"><label>Height:</label><input type="number" min="1" step="1" data-property="height" class="size-input"></div>'}
+            `;
+            firstGroup.parentNode.insertBefore(sizeGroup, firstGroup.nextSibling);
+        }
+
+        group.querySelector('[data-layout-property="anchor_from"]').value = component.anchor_from;
+        group.querySelector('[data-layout-property="anchor_to"]').value = component.anchor_to;
+    },
+
     setupEventListeners: function (fragment, component) {
         const xInput = fragment.querySelector('[data-property="x"]');
         const yInput = fragment.querySelector('[data-property="y"]');
 
         if (xInput) {
             xInput.addEventListener('input', e => {
-                component.x = parseInt(e.target.value) || 0;
+                component.x = Number.parseFloat(e.target.value) || 0;
                 editor.updateComponentPosition(component);
             });
         }
 
         if (yInput) {
             yInput.addEventListener('input', e => {
-                component.y = parseInt(e.target.value) || 0;
+                component.y = Number.parseFloat(e.target.value) || 0;
                 editor.updateComponentPosition(component);
             });
         }
+
+        const anchorFromInput = fragment.querySelector('[data-layout-property="anchor_from"]');
+        const anchorToInput = fragment.querySelector('[data-layout-property="anchor_to"]');
+        const updateAnchors = () => {
+            const parentSize = jsonUiLayout.getParentSize(editor.canvas);
+            jsonUiLayout.setAnchorsPreservingPosition(
+                component,
+                anchorFromInput?.value || component.anchor_from,
+                anchorToInput?.value || component.anchor_to,
+                parentSize
+            );
+            editor.updateComponent(component);
+            if (xInput) xInput.value = component.x;
+            if (yInput) yInput.value = component.y;
+            if (anchorFromInput) anchorFromInput.value = component.anchor_from;
+            if (anchorToInput) anchorToInput.value = component.anchor_to;
+        };
+        anchorFromInput?.addEventListener('change', updateAnchors);
+        anchorToInput?.addEventListener('change', updateAnchors);
 
         const widthInput = fragment.querySelector('[data-property="width"]');
         const heightInput = fragment.querySelector('[data-property="height"]');
 
         if (widthInput) {
             widthInput.addEventListener('input', e => {
-                component.width = parseInt(e.target.value) || componentTypes[component.type].defaultWidth;
+                component.width = Math.max(1, Number.parseFloat(e.target.value) || componentTypes[component.type].defaultWidth);
                 editor.updateComponent(component);
             });
         }
 
         if (heightInput) {
             heightInput.addEventListener('input', e => {
-                component.height = parseInt(e.target.value) || componentTypes[component.type].defaultHeight;
+                component.height = Math.max(1, Number.parseFloat(e.target.value) || componentTypes[component.type].defaultHeight);
                 editor.updateComponent(component);
             });
         }
@@ -187,7 +267,7 @@ const propertiesPanel = {
         propertyInputs.forEach(input => {
             const propName = input.getAttribute('data-property');
             if (propName === 'x' || propName === 'y' || propName === 'width' || propName === 'height' ||
-                propName.startsWith('label_color-')) {
+                propName.startsWith('label_color-') || propName.startsWith('color-')) {
                 return;
             }
 
@@ -213,10 +293,32 @@ const propertiesPanel = {
                 });
             } else {
                 input.addEventListener('input', e => {
-                    component.properties[propName] = e.target.value;
+                    if ((propName.includes('texture') || propName === 'picture') &&
+                        !/^[A-Za-z0-9_./:-]*$/.test(e.target.value)) {
+                        e.target.setCustomValidity('Use a Minecraft texture path or an uploaded image path.');
+                        return;
+                    }
+                    e.target.setCustomValidity('');
+                    if (input.type === 'number') {
+                        let value = Number.parseFloat(e.target.value);
+                        if (!Number.isFinite(value)) return;
+                        if (input.min !== '') value = Math.max(value, Number(input.min));
+                        if (input.max !== '') value = Math.min(value, Number(input.max));
+                        component.properties[propName] = value;
+                    } else {
+                        component.properties[propName] = e.target.value;
+                    }
                     editor.updateComponent(component);
                 });
             }
+        });
+
+        fragment.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('change', () => {
+                if (!editor.isRestoringState) {
+                    editor.saveState(`Edit ${componentTypes[component.type]?.name || 'component'} properties`);
+                }
+            });
         });
 
         if (component.type === 'label') {

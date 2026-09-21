@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Chest UI Editor</title>
 
     <!-- Primary Meta Tags -->
@@ -404,17 +404,22 @@
         <div class="modal-backdrop"></div>
         <div class="modal-content release-notice-content">
             <div class="modal-header">
-                <h2 id="release-notice-title">What&rsquo;s new in <span id="release-notice-version">2.0.0</span></h2>
+                <h2 id="release-notice-title">What&rsquo;s new in <span id="release-notice-version">3.0.0</span></h2>
                 <button id="close-release-notice" class="close-modal-btn" type="button" title="Close" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body release-notice-body">
                 <p class="release-notice-lead">Chest UI Editor has been updated. Highlights:</p>
                 <ul class="release-notice-list">
+                    <li><strong>True Bedrock anchors</strong> - every component supports <code>anchor_from</code>, <code>anchor_to</code>, and anchor-relative offsets</li>
+                    <li><strong>Accurate sizing</strong> - centered and edge-anchored controls resize like Bedrock; labels now export explicit sizes</li>
+                    <li><strong>Mobile fixes</strong> - corrected touch coordinates, stable orientation changes, tablet support, and safe-area spacing</li>
+                    <li><strong>Project migration</strong> - <code>formatVersion: 2</code> projects automatically migrate to <code>formatVersion: 3</code></li>
+                    <li><strong>Reliability</strong> - fixed custom-image restore, label Y serialization, and import/export geometry issues</li>
                     <li><strong>Tab</strong> - A tab button that allow switching between layouts using toggles</li>
                     <li><strong>Dynamic grid</strong> - scrollable slots with configurable size, content height, and scrollbar textures</li>
                     <li><strong>Button &amp; close button</strong> - slot actions, custom textures, optional label/image; dismiss control with custom or no default art</li>
                     <li><strong>Multiple Chest UIs</strong> - separate trigger, title, settings, and components per screen</li>
-                    <li><strong>Import ZIP</strong> - restore exported packs; validates <code>formatVersion: 2</code></li>
+                    <li><strong>Import ZIP</strong> - restore exported packs and custom textures</li>
                     <li><strong>Per-slot textures</strong> - background, selected, and highlight art on containers and dynamic grid</li>
                     <li><strong>Chest UI options</strong> - customizable background, size, and taggable title (use the label component for more control)</li>
                     <li><strong>Double chest template</strong> - new vanilla-style double chest layout</li>
@@ -423,7 +428,7 @@
                     <li><strong>Layers &amp; layout</strong> - layering fixes; new components placed on top; editable trigger for each UI</li>
                     <li><strong>Export</strong> - generated UI organized into multiple files instead of one</li>
                 </ul>
-                <p class="release-notice-footnote">Older browser saves and ZIPs without <code>formatVersion: 2</code> (including <code>version: &quot;1.1.0&quot;</code>) cannot be loaded. Save or export again with this build.</p>
+                <p class="release-notice-footnote">Version 2 projects migrate automatically. Projects older than version 2 are not supported.</p>
                 <p class="release-notice-changelog">
                     <a href="CHANGELOG.md" target="_blank" rel="noopener noreferrer">View full changelog</a>
                 </p>
@@ -445,12 +450,12 @@
     </div>
 
     <!-- Settings Modal -->
-    <div id="settings-modal" class="settings-modal" style="display: none;">
+    <div id="settings-modal" class="settings-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Settings</h2>
-                <button id="close-settings" class="close-modal-btn" title="Close">&times;</button>
+                <h2 id="settings-modal-title">Settings</h2>
+                <button id="close-settings" class="close-modal-btn" title="Close" aria-label="Close settings">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="setting-group">
@@ -554,12 +559,12 @@
     </div>
 
     <!-- Code Viewer Modal -->
-    <div id="code-viewer-modal" class="settings-modal" style="display: none;">
+    <div id="code-viewer-modal" class="settings-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="code-viewer-title">
         <div class="modal-backdrop"></div>
         <div class="modal-content code-viewer-content">
             <div class="modal-header">
-                <h2>Generated JSON UI Code</h2>
-                <button id="close-code-viewer" class="close-modal-btn" title="Close">&times;</button>
+                <h2 id="code-viewer-title">Generated JSON UI Code</h2>
+                <button id="close-code-viewer" class="close-modal-btn" title="Close" aria-label="Close code viewer">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="code-viewer-toolbar">
@@ -893,7 +898,7 @@
             <h4>Preview Only</h4>
             <div class="property">
                 <label>Visual slots:</label>
-                <input type="number" data-property="preview_slots" min="0">
+                <input type="number" data-property="preview_slots" min="0" max="500">
             </div>
             <div class="property">
                 <label>Slot width:</label>
@@ -1317,8 +1322,10 @@
         </div>
     </template>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="assets/vendor/jszip.min.js"></script>
     <script src="scripts/util.js"></script>
+    <script src="scripts/imageManager.js"></script>
+    <script src="scripts/layout.js"></script>
     <script src="scripts/project-format.js"></script>
     <script src="scripts/components.js"></script>
     <script src="scripts/properties.js"></script>

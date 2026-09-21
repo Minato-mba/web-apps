@@ -3,7 +3,7 @@
  * Bump NOTICE_VERSION when the popup content should show again.
  */
 const releaseNotice = {
-    NOTICE_VERSION: '2.0.0',
+    NOTICE_VERSION: '3.0.0',
     STORAGE_KEY: 'chest_ui_editor_release_notice_version',
     CHANGELOG_URL: 'CHANGELOG.md',
     PAYPAL_DONATE_URL: 'https://paypal.me/mbarabic',

@@ -64,12 +64,13 @@ chest-ui-editor/
 - `chestUiManager` - multiple Chest UIs per project (`uis`, `activeId`, per-UI settings/components)
 - Action buttons: New, **Save** / **Load** (browser only via `projectFormat`), Import ZIP, Export
 - Settings modal; panel fold/unfold state
-- Startup: `loadSavedProject({ silent: true })` when a valid v2 browser save exists
+- Startup: `loadSavedProject({ silent: true })` when a valid v2 or v3 browser save exists
 
 **project-format.js:**
-- `FORMAT_VERSION: 2`, `FORMAT_LABEL: '2.0.0'`
+- `FORMAT_VERSION: 3`, `FORMAT_LABEL: '3.0.0'`
 - `build()` / `buildFromEditor()` - payload for browser save and ZIP `chest_ui_data.json`
-- `validate()` / `assertValid()` - reject missing or legacy formats (including old `version: "1.1.0"` without `formatVersion: 2`)
+- `validate()` / `assertValid()` - accept v2/v3 and reject older or malformed formats
+- `migrate()` - preserve v2 in-game coordinates while adding explicit top-left anchors
 - `apply()` - restore components, `uiProject`, settings, `uploadedImages` into editor
 - `persistLocal()` / `saveToBrowser()` - write to `minecraft_chest_ui_project` in localStorage
 - **Do not** add file download/upload to Save/Load; files are Import ZIP / Export ZIP only
@@ -80,6 +81,11 @@ chest-ui-editor/
 - Auto-increment collection index system via `getNextCollectionIndex()`
 - Rendering logic (editor view vs preview view)
 - JSON generation per component type
+
+**layout.js:**
+- Shared Bedrock anchor and offset geometry for editor, preview, dragging, and export
+- Converts anchor-relative offsets to browser top/left positions
+- Preserves visual position when the user changes anchors
 
 **editor.js:**
 - Canvas drag-and-drop system
@@ -679,7 +685,7 @@ When texture not found:
 
 ### Versioned format (`scripts/project-format.js`)
 
-**Current:** `formatVersion: 2`, `formatLabel: "2.0.0"`. Bump `FORMAT_VERSION` for breaking schema changes; add migration in `validate()` if needed.
+**Current:** `formatVersion: 3`, `formatLabel: "3.0.0"`. Version 2 projects migrate automatically. Bump `FORMAT_VERSION` for breaking schema changes and add an explicit migration.
 
 **Save / Load (browser only):**
 - Key: `minecraft_chest_ui_project`
@@ -687,14 +693,14 @@ When texture not found:
 - **Load** → `projectFormat.apply()` after `validate()`; manual Load shows errors; startup load uses `{ silent: true }`
 - **No** `.json` file download or file picker on Save/Load
 
-**Legacy projects** without `formatVersion: 2` (including `version: "1.1.0"`) are **rejected** with a clear message. Users must re-save or re-export.
+**Legacy projects:** v2 loads and migrates to v3. Unversioned projects and formats older than v2 are rejected with a clear message.
 
 ### Browser save payload shape
 
 ```javascript
 {
-  formatVersion: 2,
-  formatLabel: "2.0.0",
+  formatVersion: 3,
+  formatLabel: "3.0.0",
   exportedAt: 1730000000000,
   components: [ /* flat list for active UI fallback */ ],
   uiProject: {
@@ -738,7 +744,7 @@ ChestUI_ResourcePack.zip
 │   │   └── on_off_active.png
 │   └── pot/
 │       └── pot.png
-└── chest_ui_data.json               # Same v2 project payload as browser save (formatVersion: 2)
+└── chest_ui_data.json               # Same v3 project payload as browser save (formatVersion: 3)
 ```
 
 **Import Process:**
@@ -1255,7 +1261,7 @@ Common modifications:
 
 **Check:**
 - ZIP contains `chest_ui_data.json`?
-- `formatVersion === 2` (old exports without `formatVersion` are unsupported)
+- `formatVersion` is `2` or `3` (v2 migrates; unversioned exports are unsupported)
 - `projectFormat.validate()` error message for missing `components` or wrong version
 - Image paths in data match images in ZIP?
 - No corrupted Base64 image data?
@@ -1264,7 +1270,7 @@ Common modifications:
 
 **Check:**
 - Browser save exists under `minecraft_chest_ui_project`?
-- Saved data has `formatVersion: 2` (re-save or Import ZIP after upgrading editor)
+- Saved data has `formatVersion: 2` or `3`; a successful v2 load is resaved as v3
 - Use **Import ZIP** / **Export** for file transfer, not Save/Load
 
 ## Advanced Techniques
@@ -1410,7 +1416,10 @@ When extending this editor:
 
 ## Version History
 
-- **2.0.0** (`formatVersion: 2`) - Current project format
+- **3.0.0** (`formatVersion: 3`) - Current project format
+  - Bedrock anchor-aware geometry and explicit label sizing
+  - Responsive/touch coordinate fixes and v2 migration
+- **2.0.0** (`formatVersion: 2`) - Migrated automatically
   - Versioned browser save/load and ZIP `chest_ui_data.json`
   - Per-Tab components with `tab_parent_id` / `createTabsLayout`
   - Button, dynamic grid, multi-Chest-UI `chestUiManager`

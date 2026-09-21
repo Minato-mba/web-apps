@@ -20,19 +20,7 @@ const preview = {
     },
 
     updatePreview: function (components) {
-        this.previewContainer.innerHTML = '';
-
-        components.filter(component => {
-            return typeof editor === 'undefined' || editor.isComponentVisibleInActiveTab(component);
-        }).forEach(component => {
-            const componentType = componentTypes[component.type];
-            if (!componentType) return;
-
-            const previewHtml = componentType.renderPreview(component);
-            if (previewHtml) {
-                this.previewContainer.innerHTML += previewHtml;
-            }
-        });
+        this.renderComponents(components);
 
         // Apply background texture from current active UI
         const activeUi = chestUiManager.getActiveUi();
@@ -42,22 +30,36 @@ const preview = {
     },
 
     updatePreviewWithSettings: function (components, settings) {
-        this.previewContainer.innerHTML = '';
+        this.renderComponents(components);
 
+        // Apply background texture to chest panel
+        this.applyBackgroundToPreview(settings);
+    },
+
+    renderComponents: function (components) {
+        this.previewContainer.replaceChildren();
         components.filter(component => {
             return typeof editor === 'undefined' || editor.isComponentVisibleInActiveTab(component);
         }).forEach(component => {
             const componentType = componentTypes[component.type];
             if (!componentType) return;
-
             const previewHtml = componentType.renderPreview(component);
-            if (previewHtml) {
-                this.previewContainer.innerHTML += previewHtml;
-            }
-        });
+            if (!previewHtml) return;
 
-        // Apply background texture to chest panel
-        this.applyBackgroundToPreview(settings);
+            const template = document.createElement('template');
+            template.innerHTML = previewHtml.trim();
+            const element = template.content.firstElementChild;
+            if (!element) return;
+            jsonUiLayout.applyToElement(element, component, this.previewContainer);
+            this.previewContainer.appendChild(element);
+        });
+    },
+
+    getComponentPlacement: function (component) {
+        return {
+            ...jsonUiLayout.getPlacement(component),
+            size: [component.width, component.height]
+        };
     },
 
     applyBackgroundToPreview: function (settings) {
@@ -165,9 +167,8 @@ const preview = {
                         "text": component.properties.text,
                         "color": component.properties.color,
                         "font_scale_factor": Number(component.properties.font_scale_factor) || 1.0,
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
-                        "offset": [component.x + 1, component.y]
+                        ...this.getComponentPlacement(component),
+                        "size": [component.width, component.height]
                     }
                 });
             }
@@ -178,9 +179,7 @@ const preview = {
                         "type": "image",
                         "texture": component.properties.texture,
                         "alpha": component.properties.alpha,
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
-                        "offset": [component.x + 1, component.y],
+                        ...this.getComponentPlacement(component),
                         "size": [component.width, component.height]
                     }
                 });
@@ -193,9 +192,7 @@ const preview = {
                 const progressControl = {
                     [controlName]: {
                         "collection_index": index,
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
-                        "offset": [component.x + 1, component.y],
+                        ...this.getComponentPlacement(component),
                         "controls": [
                             {
                                 "default": {
@@ -229,9 +226,7 @@ const preview = {
                 controls.push({
                     [controlName]: {
                         "collection_index": index,
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
-                        "offset": [component.x + 1, component.y],
+                        ...this.getComponentPlacement(component),
                         "controls": [
                             {
                                 "default": {
@@ -260,9 +255,7 @@ const preview = {
                 controls.push({
                     [controlName]: {
                         "collection_index": index,
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
-                        "offset": [component.x + 1, component.y],
+                        ...this.getComponentPlacement(component),
                         "$texture": component.properties.texture
                     }
                 });
@@ -275,9 +268,7 @@ const preview = {
                 const containerControl = {
                     [controlName]: {
                         "collection_index": index,
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
-                        "offset": [component.x + 1, component.y],
+                        ...this.getComponentPlacement(component),
                         ...this.getSlotTextureVariables(component, namespace),
                         "controls": []
                     }
@@ -303,9 +294,7 @@ const preview = {
                 controls.push({
                     [controlName]: {
                         "collection_index": index,
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
-                        "offset": [component.x + 1, component.y],
+                        ...this.getComponentPlacement(component),
                         ...this.getSlotTextureVariables(component, namespace),
                         "$path_to_image": component.properties.picture
                     }
@@ -320,10 +309,8 @@ const preview = {
                 controls.push({
                     [`${panelName}_wrapper`]: {
                         "type": "panel",
-                        "offset": [component.x + 1, component.y],
+                        ...this.getComponentPlacement(component),
                         "size": [component.width, component.height],
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
                         "controls": [
                             {
                                 [`${panelName}@custom_scroll.scrolling_panel`]: {
@@ -352,9 +339,7 @@ const preview = {
 
                 const buttonControl = {
                     [controlName]: {
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
-                        "offset": [component.x + 1, component.y],
+                        ...this.getComponentPlacement(component),
                         "size": [component.width, component.height],
                         "$pressed_button_name": component.properties.pressed_button_name,
                         "property_bag": {
@@ -400,9 +385,7 @@ const preview = {
                 const control = {
                     [controlName]: {
                         "collection_index": index,
-                        "anchor_from": "top_left",
-                        "anchor_to": "top_left",
-                        "offset": [component.x + 1, component.y],
+                        ...this.getComponentPlacement(component),
                         ...this.getSlotTextureVariables(component, namespace)
                     }
                 };
@@ -445,7 +428,7 @@ const preview = {
                             "chest_panel": {
                                 "type": "panel",
                                 "size": ["100%", this.getMainPanelHeight(settings)],
-                                "layer": 5,
+                                "layer": Number(settings.mainPanelLayer) || 5,
                                 "controls": [
                                             {
                                                 [`${panelPrefix}_top_half@${namespace}.${panelPrefix}_top_half`]: {}
@@ -490,8 +473,8 @@ const preview = {
             [`${panelPrefix}_content`]: {
                 "type": usesCollectionHost ? "collection_panel" : "panel",
                 "size": [162, this.calculatePanelHeight(settings)],
-                "anchor_from": "top_left",
-                "anchor_to": "top_left",
+                "anchor_from": "top_middle",
+                "anchor_to": "top_middle",
                 ...(usesCollectionHost ? {
                     "$item_collection_name": "container_items",
                     "collection_name": "container_items",
@@ -919,9 +902,8 @@ const preview = {
                     "text": component.properties.text,
                     "color": component.properties.color,
                     "font_scale_factor": Number(component.properties.font_scale_factor) || 1.0,
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
-                    "offset": [component.x + 1, component.y]
+                    ...this.getComponentPlacement(component),
+                    "size": [component.width, component.height]
                 }
             };
         }
@@ -932,9 +914,7 @@ const preview = {
                     "type": "image",
                     "texture": component.properties.texture,
                     "alpha": component.properties.alpha,
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
-                    "offset": [component.x + 1, component.y],
+                    ...this.getComponentPlacement(component),
                     "size": [component.width, component.height]
                 }
             };
@@ -944,9 +924,7 @@ const preview = {
             const index = Number(component.properties.target_collection_index) || 0;
             return {
                 [`button_${this.safeId(component.id)}@${namespace}.drop_button`]: {
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
-                    "offset": [component.x + 1, component.y],
+                    ...this.getComponentPlacement(component),
                     "size": [component.width, component.height],
                     "$pressed_button_name": component.properties.pressed_button_name,
                     "property_bag": {
@@ -976,10 +954,8 @@ const preview = {
             return {
                 [`${panelName}_wrapper`]: {
                     "type": "panel",
-                    "offset": [component.x + 1, component.y],
+                    ...this.getComponentPlacement(component),
                     "size": [component.width, component.height],
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
                     "controls": [
                         {
                             [`${panelName}@custom_scroll.scrolling_panel`]: {
@@ -1009,9 +985,7 @@ const preview = {
             const control = {
                 [controlName]: {
                     "collection_index": index,
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
-                    "offset": [component.x + 1, component.y],
+                    ...this.getComponentPlacement(component),
                     "controls": [
                         {
                             "default": {
@@ -1043,9 +1017,7 @@ const preview = {
             return {
                 [`item${index}@${namespace}.on_off_item`]: {
                     "collection_index": index,
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
-                    "offset": [component.x + 1, component.y],
+                    ...this.getComponentPlacement(component),
                     "controls": [
                         {
                             "default": {
@@ -1072,9 +1044,7 @@ const preview = {
             return {
                 [`item${index}@${namespace}.pot`]: {
                     "collection_index": index,
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
-                    "offset": [component.x + 1, component.y],
+                    ...this.getComponentPlacement(component),
                     "$texture": component.properties.texture
                 }
             };
@@ -1086,9 +1056,7 @@ const preview = {
             const control = {
                 [controlName]: {
                     "collection_index": index,
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
-                    "offset": [component.x + 1, component.y],
+                    ...this.getComponentPlacement(component),
                     ...this.getSlotTextureVariables(component, namespace),
                     "controls": []
                 }
@@ -1112,9 +1080,7 @@ const preview = {
             return {
                 [`item${index}@${namespace}.container_item_with_picture`]: {
                     "collection_index": index,
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
-                    "offset": [component.x + 1, component.y],
+                    ...this.getComponentPlacement(component),
                     ...this.getSlotTextureVariables(component, namespace),
                     "$path_to_image": component.properties.picture
                 }
@@ -1130,9 +1096,7 @@ const preview = {
         const control = {
             [controlName]: {
                 "collection_index": index,
-                "anchor_from": "top_left",
-                "anchor_to": "top_left",
-                "offset": [component.x + 1, component.y],
+                ...this.getComponentPlacement(component),
                 ...this.getSlotTextureVariables(component, namespace)
             }
         };
@@ -1163,12 +1127,10 @@ const preview = {
             const toggleName = this.getTabToggleName(tab);
             const tabWidth = Number(tab.width) || 16;
             const tabHeight = Number(tab.height) || 16;
-            const label = tab.properties.show_label ? (tab.properties.label_text || '') : '';
-
             return {
                 [`tab_${this.safeId(tab.id)}@${namespace}.tab_toggle`]: {
                     "$name": toggleName,
-                    "$text": label,
+                    "$text": "",
                     "$index": Number(tab.properties.toggle_index) || 1,
                     "$toggle_name": groupName,
                     "$toggle_size": [tabWidth, tabHeight],
@@ -1177,9 +1139,16 @@ const preview = {
                     "$hover_texture": getExportTexturePath(tab.properties.hover_texture || defaultTabTextures.hover_texture),
                     "$pressed_texture": getExportTexturePath(tab.properties.pressed_texture || defaultTabTextures.pressed_texture),
                     "$pressed_no_hover_texture": getExportTexturePath(tab.properties.hover_texture || defaultTabTextures.hover_texture),
-                    "anchor_from": "top_left",
-                    "anchor_to": "top_left",
-                    "offset": [tab.x + 1, tab.y],
+                    "$show_embedded_image": !!tab.properties.show_image,
+                    "$embedded_image_texture": getExportTexturePath(tab.properties.image_texture),
+                    "$embedded_image_size": [Number(tab.properties.image_width) || 8, Number(tab.properties.image_height) || 8],
+                    "$embedded_image_offset": [Number(tab.properties.image_offset_x) || 0, Number(tab.properties.image_offset_y) || 0],
+                    "$show_embedded_label": !!tab.properties.show_label,
+                    "$embedded_label_text": tab.properties.label_text || "",
+                    "$embedded_label_color": tab.properties.label_color || [1.0, 1.0, 1.0],
+                    "$embedded_label_font_scale_factor": Number(tab.properties.label_font_scale_factor) || 1.0,
+                    "$embedded_label_offset": [Number(tab.properties.label_offset_x) || 0, Number(tab.properties.label_offset_y) || 0],
+                    ...this.getComponentPlacement(tab),
                     "layer": 20
                 }
             };
@@ -1225,8 +1194,7 @@ const preview = {
 
         return {
             tabs_layout: {
-                "type": "stack_panel",
-                "orientation": "vertical",
+                "type": "panel",
                 "size": ["100%", "100%"],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
@@ -1240,8 +1208,8 @@ const preview = {
                     },
                     {
                         "pages": {
-                            "type": "stack_panel",
-                            "size": ["100%", "fill"],
+                            "type": "panel",
+                            "size": ["100%", "100%"],
                             "controls": pageControls
                         }
                     }
@@ -1306,40 +1274,36 @@ const preview = {
 
     calculatePanelHeight: function (settings) {
         const DEFAULT_COLLECTION_PANEL_HEIGHT = 54;  // Default collection panel height
-        
-        if (!settings || !settings.mainPanelHeight) {
-            return DEFAULT_COLLECTION_PANEL_HEIGHT;
-        }
+        const INVENTORY_HEIGHT = 92;
+        const TOP_OFFSET = 12;
+        const LABEL_PADDING = 8;
+        const FIXED_OVERHEAD = INVENTORY_HEIGHT + TOP_OFFSET + LABEL_PADDING;
+        const configuredHeight = Math.max(
+            DEFAULT_COLLECTION_PANEL_HEIGHT,
+            (Number(settings?.mainPanelHeight) || 166) - FIXED_OVERHEAD
+        );
         
         // Calculate based on the actual component positions
         const components = this.currentComponents || [];
-        let maxY = 0;
+        let maxY = configuredHeight;
+        const parentSize = {
+            width: jsonUiLayout.DEFAULT_PARENT_WIDTH,
+            height: configuredHeight
+        };
         
         // Find the maximum Y position + height from all components
         components.filter(component => {
             return typeof editor === 'undefined' || editor.isComponentVisibleInActiveTab(component);
         }).forEach(component => {
-            const componentBottom = component.y + (component.height || 18);
+            const topLeft = jsonUiLayout.getTopLeft(component, parentSize);
+            const componentBottom = topLeft.top + (component.height || 18);
             if (componentBottom > maxY) {
                 maxY = componentBottom;
             }
         });
         
-        // If there are components, use their maximum extent + some padding
-        if (maxY > 0) {
-            const calculatedHeight = Math.ceil(maxY + 2); // Add 2px padding
-            return Math.max(DEFAULT_COLLECTION_PANEL_HEIGHT, calculatedHeight);
-        }
-        
-        // Otherwise, calculate from settings
-        const INVENTORY_HEIGHT = 92;
-        const TOP_OFFSET = 12;
-        const LABEL_PADDING = 8;
-        const FIXED_OVERHEAD = INVENTORY_HEIGHT + TOP_OFFSET + LABEL_PADDING;
-        
-        const collectionPanelHeight = settings.mainPanelHeight - FIXED_OVERHEAD;
-        
-        return Math.max(DEFAULT_COLLECTION_PANEL_HEIGHT, collectionPanelHeight);
+        const padding = maxY > configuredHeight ? 2 : 0;
+        return Math.max(DEFAULT_COLLECTION_PANEL_HEIGHT, Math.ceil(maxY + padding));
     },
 
     addComponentDefinitions: function (json, components) {
@@ -1466,6 +1430,15 @@ const preview = {
                 "$hover_texture|default": "textures/ui/button_borderless_lightpressednohover",
                 "$pressed_texture|default": "textures/ui/button_borderless_lighthover",
                 "$pressed_no_hover_texture|default": "textures/ui/button_borderless_lightpressednohover",
+                "$show_embedded_image|default": false,
+                "$embedded_image_texture|default": "",
+                "$embedded_image_size|default": [8, 8],
+                "$embedded_image_offset|default": [0, 0],
+                "$show_embedded_label|default": false,
+                "$embedded_label_text|default": "",
+                "$embedded_label_color|default": [1.0, 1.0, 1.0],
+                "$embedded_label_font_scale_factor|default": 1.0,
+                "$embedded_label_offset|default": [0, 0],
                 "size": "$padding",
                 "controls": [
                     {
@@ -1489,6 +1462,32 @@ const preview = {
                             "$toggle_group_forced_index": "$index",
                             "anchor_from": "center",
                             "anchor_to": "center"
+                        }
+                    },
+                    {
+                        "embedded_image": {
+                            "type": "image",
+                            "texture": "$embedded_image_texture",
+                            "visible": "$show_embedded_image",
+                            "anchor_from": "center",
+                            "anchor_to": "center",
+                            "offset": "$embedded_image_offset",
+                            "size": "$embedded_image_size",
+                            "layer": 3
+                        }
+                    },
+                    {
+                        "embedded_label": {
+                            "type": "label",
+                            "text": "$embedded_label_text",
+                            "color": "$embedded_label_color",
+                            "font_scale_factor": "$embedded_label_font_scale_factor",
+                            "visible": "$show_embedded_label",
+                            "anchor_from": "center",
+                            "anchor_to": "center",
+                            "offset": "$embedded_label_offset",
+                            "size": ["100%", "100%"],
+                            "layer": 4
                         }
                     }
                 ]

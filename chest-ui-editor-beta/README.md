@@ -10,9 +10,10 @@ A web-based editor for creating custom chest UIs for Minecraft Bedrock Edition. 
 - Live editor and preview
 - Pre-built templates (vanilla grid, cooking pot, crafting, …)
 - **Multiple Chest UIs** in one project (different trigger/display titles per UI)
-- **Save / Load** - versioned project in browser storage (`formatVersion: 2`)
+- **Save / Load** - versioned project in browser storage (`formatVersion: 3`); v2 projects migrate automatically
 - **Import ZIP / Export** - resource pack + `chest_ui_data.json` for sharing and in-game use
 - Custom image uploads (packaged under `textures/ui/custom/`)
+- Per-component Bedrock anchors (`anchor_from` / `anchor_to`) with anchor-relative offsets and sizing
 - Per–Chest UI settings: title, offsets, font scale, dialog background, optional close button
 - Mobile-friendly layout (components / editor / preview / templates)
 
@@ -112,7 +113,7 @@ Vanilla-style chest close control (`common.close_button`).
 
 1. **Components:** Drag from the sidebar onto the canvas; select to edit in the Properties panel.
 2. **Chest UIs:** Use the Chest UI manager panel to add UIs with separate trigger titles and display names; switch between them to edit each layout.
-3. **Save / Load:** Stores the project in browser storage (version 2). Older saves without `formatVersion: 2` are not loaded - save again or import a new ZIP from this editor.
+3. **Save / Load:** Stores the project in browser storage (version 3). Version 2 saves and ZIPs migrate automatically; older formats are rejected.
 4. **Import ZIP:** Restores a previously exported pack and project data; updates the browser save.
 5. **Export:** ZIP resource pack (UI JSON + textures + `chest_ui_data.json`) or **View as Code** for the generated JSON.
 6. **Settings:** Panel height/layer, title text/offset/color/scale, dialog background, close button visibility.

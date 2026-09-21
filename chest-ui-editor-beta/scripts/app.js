@@ -264,6 +264,9 @@ const chestUiManager = {
         util.applySettings(active.settings);
         editor.updateComponentList();
         editor.fixComponentZIndices();
+        editor.history = [];
+        editor.historyIndex = -1;
+        editor.saveState('Loaded chest UI');
         
         // Update title display with offset
         this.updateTitleDisplay(active);
@@ -286,7 +289,7 @@ const chestUiManager = {
             editorTitle.textContent = displayTitle;
             // Apply offset values directly (CSS provides base position)
             editorTitle.style.left = `${ui.settings.titleOffsetX ?? defaultSettings.titleOffsetX}px`;
-            editorTitle.style.top = `${(ui.settings.titleOffsetY ?? defaultSettings.titleOffsetY) + 10}px`;
+            editorTitle.style.top = `${(ui.settings.titleOffsetY ?? defaultSettings.titleOffsetY) + 12}px`;
             editorTitle.style.fontSize = `${10 * (Number(ui.settings.titleFontScaleFactor) || defaultSettings.titleFontScaleFactor)}px`;
             editorTitle.style.color = util.rgbArrayToHex(ui.settings.titleColor || defaultSettings.titleColor);
         }
@@ -295,7 +298,7 @@ const chestUiManager = {
             previewTitle.textContent = displayTitle;
             // Apply offset values directly (CSS provides base position)
             previewTitle.style.left = `${ui.settings.titleOffsetX ?? defaultSettings.titleOffsetX}px`;
-            previewTitle.style.top = `${(ui.settings.titleOffsetY ?? defaultSettings.titleOffsetY) + 10}px`;
+            previewTitle.style.top = `${(ui.settings.titleOffsetY ?? defaultSettings.titleOffsetY) + 12}px`;
             previewTitle.style.fontSize = `${10 * (Number(ui.settings.titleFontScaleFactor) || defaultSettings.titleFontScaleFactor)}px`;
             previewTitle.style.color = util.rgbArrayToHex(ui.settings.titleColor || defaultSettings.titleColor);
         }
@@ -348,7 +351,7 @@ const chestUiManager = {
                     ...(component.properties || {})
                 };
             }
-            return component;
+            return jsonUiLayout.normalizeComponent(component);
         });
     },
 
@@ -565,6 +568,10 @@ function loadSavedProject(options = {}) {
 
         if (!projectFormat.apply(data, { silent })) {
             return false;
+        }
+
+        if (data.formatVersion !== projectFormat.FORMAT_VERSION) {
+            projectFormat.persistLocal(projectFormat.buildFromEditor());
         }
 
         if (!silent) {

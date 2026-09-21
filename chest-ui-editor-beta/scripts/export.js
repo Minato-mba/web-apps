@@ -212,9 +212,22 @@ const exporter = {
         const exportFiles = this.getExportFiles(jsonForExport);
         const texturePaths = this.extractTexturePaths(jsonForExport);
 
-        // Also extract textures from component data (for dynamic grid uploaded images)
+        // Package textures from every Chest UI, not only the currently active editor.
         const components = editor.getComponents();
-        this.extractTexturesFromComponents(components, texturePaths);
+        const allUis = typeof chestUiManager !== 'undefined' ? chestUiManager.getExportUis() : [];
+        const allComponents = allUis.length
+            ? allUis.flatMap(ui => ui.components || [])
+            : components;
+        this.extractTexturesFromComponents(allComponents, texturePaths);
+        allUis.forEach(ui => {
+            const background = ui.settings?.dialogBackground;
+            if (typeof background === 'string' && background.startsWith('user_uploaded:')) {
+                texturePaths.add(background);
+            }
+        });
+        // Uploaded assets are small editor-owned resources. Including all of
+        // them prevents inactive UI and nested-property assets from being lost.
+        Object.keys(imageManager.uploadedImages || {}).forEach(path => texturePaths.add(path));
 
         const componentsData = projectFormat.build({
             components,

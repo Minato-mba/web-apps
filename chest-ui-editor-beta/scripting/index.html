@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Script Builder — Chest UI Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #141414;
+  --surface: #1e1e1e;
+  --surface2: #252525;
+  --surface3: #2d2d2d;
+  --border: #404040;
+  --border-bright: #606060;
+  --text: #d8d8d8;
+  --text-dim: #888;
+  --text-muted: #555;
+  --green: #4ade80;
+  --green-dim: rgba(74,222,128,0.08);
+  --green-glow: 0 0 12px rgba(74,222,128,0.25);
+  --gold: #fbbf24;
+  --gold-dim: rgba(251,191,36,0.08);
+  --red: #f87171;
+  --red-dim: rgba(248,113,113,0.08);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96,165,250,0.08);
+  --purple: #a78bfa;
+  --slot-bg: #181818;
+  --slot-border: #3a3a3a;
+  --radius: 3px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(74,222,128,0.04) 0%, transparent 60%);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+/* ── HEADER ── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 24px 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent, transparent 24px,
+    rgba(255,255,255,0.012) 24px, rgba(255,255,255,0.012) 25px
+  );
+  pointer-events: none;
+}
+header h1 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 17px;
+  color: var(--green);
+  text-shadow: 0 0 30px rgba(74,222,128,0.5), 2px 2px 0 rgba(0,0,0,0.8);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  position: relative;
+}
+header p {
+  color: var(--text-dim);
+  font-size: 14px;
+  position: relative;
+}
+.header-tag {
+  display: inline-block;
+  background: var(--green-dim);
+  border: 1px solid rgba(74,222,128,0.3);
+  color: var(--green);
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 100px;
+  margin-bottom: 12px;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* ── LAYOUT ── */
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 28px 20px 0;
+}
+
+/* ── SECTION CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border-bright); }
+
+.card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-title .step-num {
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  flex-shrink: 0;
+}
+.card-title .step-label { color: var(--gold); }
+.card-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0 18px;
+}
+.card-hint {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+/* ── FORM CONTROLS ── */
+label {
+  display: block;
+  color: var(--text-dim);
+  font-size: 12px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  background: var(--slot-bg);
+  border: 1px solid var(--slot-border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+}
+input:focus, select:focus {
+  border-color: var(--green);
+  box-shadow: var(--green-glow);
+}
+input::placeholder { color: var(--text-muted); }
+select option { background: var(--surface2); }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, transform 0.05s;
+  white-space: nowrap;
+}
+.btn:hover { background: #333; border-color: var(--border-bright); }
+.btn:active { transform: scale(0.98); }
+.btn.green { border-color: rgba(74,222,128,0.4); color: var(--green); }
+.btn.green:hover { background: var(--green-dim); border-color: var(--green); }
+.btn.gold  { border-color: rgba(251,191,36,0.4); color: var(--gold); }
+.btn.gold:hover  { background: var(--gold-dim); border-color: var(--gold); }
+.btn.red   { border-color: rgba(248,113,113,0.3); color: var(--red); padding: 5px 10px; font-size: 12px; }
+.btn.red:hover   { background: var(--red-dim); border-color: var(--red); }
+.btn.blue  { border-color: rgba(96,165,250,0.4); color: var(--blue); }
+.btn.blue:hover  { background: var(--blue-dim); border-color: var(--blue); }
+.btn.sm { padding: 5px 10px; font-size: 12px; }
+
+/* ── SLOT GRID ── */
+.legend {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.legend-dot {
+  width: 11px; height: 11px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+.legend-dot.unused  { border-color: var(--slot-border); background: var(--slot-bg); }
+.legend-dot.recipe  { border-color: var(--green); background: var(--green-dim); }
+.legend-dot.result  { border-color: var(--gold); background: var(--gold-dim); }
+
+.slot-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.mc-slot {
+  width: 52px; height: 52px;
+  background: var(--slot-bg);
+  border: 2px solid var(--slot-border);
+  border-radius: 2px;
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.4), inset 2px 2px 0 rgba(255,255,255,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.12s, background 0.12s, transform 0.06s;
+  position: relative;
+}
+.mc-slot:hover { transform: scale(1.08); }
+.mc-slot:active { transform: scale(0.96); }
+.mc-slot .si { /* slot index */
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--text-muted);
+  position: absolute;
+  top: 4px; left: 5px;
+}
+.mc-slot .sr { /* slot role icon */
+  font-size: 18px;
+  line-height: 1;
+}
+.mc-slot.unused { opacity: 0.45; }
+.mc-slot.recipe {
+  border-color: var(--green);
+  background: var(--green-dim);
+  box-shadow: 0 0 8px rgba(74,222,128,0.15), inset -2px -2px 0 rgba(0,0,0,0.3);
+  opacity: 1;
+}
+.mc-slot.result {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+  box-shadow: 0 0 8px rgba(251,191,36,0.15), inset -2px -2px 0 rgba(0,0,0,0.3);
+  opacity: 1;
+}
+#slot-summary {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ── ITEMS TABLE ── */
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 14px;
+}
+.items-table th {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0.3px;
+}
+.items-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--surface2);
+  vertical-align: middle;
+}
+.symbol-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  background: var(--blue-dim);
+  border: 1px solid rgba(96,165,250,0.3);
+  border-radius: 2px;
+  color: var(--blue);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+}
+
+/* ── RECIPE CARDS ── */
+.recipe-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.recipe-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.recipe-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--text-muted);
+}
+.recipe-body {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.recipe-inputs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.recipe-slot-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.rsl { /* recipe slot label */
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.recipe-slot-select {
+  width: 150px;
+  background: var(--slot-bg);
+  border: 1px solid var(--green);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  padding: 7px 10px;
+  outline: none;
+  transition: box-shadow 0.12s;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.recipe-slot-select:focus { box-shadow: var(--green-glow); }
+
+.arrow { font-size: 20px; color: var(--text-muted); margin-bottom: 4px; flex-shrink: 0; }
+
+.recipe-result {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.result-fields {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.result-fields .id-field { flex: 1; min-width: 170px; }
+.result-fields .amt-field { width: 68px; }
+
+.pattern-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--blue-dim);
+  border: 1px solid rgba(96,165,250,0.2);
+  border-radius: 100px;
+  padding: 3px 10px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--blue);
+}
+.pattern-tag .pt-label { color: var(--text-muted); font-size: 11px; }
+
+/* ── TRIGGER ── */
+.trigger-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media (max-width: 520px) { .trigger-cards { grid-template-columns: 1fr; } }
+
+.trigger-card {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.trigger-card.selected {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+.trigger-icon { font-size: 28px; margin-bottom: 10px; }
+.trigger-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.trigger-card.selected .trigger-title { color: var(--green); }
+.trigger-desc { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+.trigger-config {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.trigger-config.hidden { display: none; }
+.trig-row { display: flex; gap: 10px; align-items: flex-end; }
+.trig-row .narrow { width: 90px; }
+.trig-row .unit { color: var(--text-dim); font-size: 13px; padding-bottom: 9px; }
+
+.tip-box {
+  background: var(--blue-dim);
+  border: 1px solid rgba(96,165,250,0.2);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 14px;
+  line-height: 1.7;
+}
+.tip-box strong { color: var(--blue); }
+
+/* ── GENERATE ── */
+.generate-section {
+  text-align: center;
+  padding: 10px 0 20px;
+}
+#generate-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 16px 36px;
+  background: rgba(74,222,128,0.08);
+  border: 2px solid var(--green);
+  border-radius: var(--radius);
+  color: var(--green);
+  cursor: pointer;
+  text-shadow: 0 0 12px rgba(74,222,128,0.5);
+  box-shadow: var(--green-glow), 0 4px 0 rgba(0,80,0,0.6);
+  transition: background 0.12s, box-shadow 0.12s, transform 0.06s;
+}
+#generate-btn:hover {
+  background: rgba(74,222,128,0.14);
+  box-shadow: 0 0 20px rgba(74,222,128,0.4), 0 4px 0 rgba(0,80,0,0.6);
+}
+#generate-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 10px rgba(74,222,128,0.3), 0 1px 0 rgba(0,80,0,0.6);
+}
+
+/* ── VALIDATION MESSAGES ── */
+.msg { border-radius: var(--radius); padding: 12px 16px; font-size: 13px; margin-bottom: 14px; line-height: 1.7; }
+.msg.error { background: var(--red-dim); border: 1px solid rgba(248,113,113,0.3); color: var(--red); }
+.msg.success { background: var(--green-dim); border: 1px solid rgba(74,222,128,0.3); color: var(--green); }
+
+/* ── OUTPUT ── */
+.output-section { display: none; }
+.code-block {
+  background: #0d0d0d;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  overflow-x: auto;
+  max-height: 560px;
+  overflow-y: auto;
+}
+#code-output {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: #9cdcfe;
+  white-space: pre;
+  line-height: 1.65;
+}
+.output-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  justify-content: flex-end;
+}
+.file-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+.file-hint code {
+  background: var(--slot-bg);
+  border: 1px solid var(--border);
+  color: var(--gold);
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ── HELPERS ── */
+.mt-10 { margin-top: 10px; }
+.mt-14 { margin-top: 14px; }
+.flex { display: flex; }
+.gap-10 { gap: 10px; }
+.items-end { align-items: flex-end; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">CHEST UI EDITOR</div>
+  <h1>⚒ SCRIPT BUILDER</h1>
+  <p>Build crafting scripts for your chest UI — no coding required</p>
+</header>
+
+<div class="container">
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- STEP 1: SETUP                                      -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-title">
+      <span class="step-num">1</span>
+      <span class="step-label">SETUP</span>
+    </div>
+    <div class="card-divider"></div>
+    <p class="card-hint">Enter the type of entity that holds your chest UI (from your entity definition). Then click the slots below to mark which are <span style="color:var(--green)">recipe inputs</span> and which is the <span style="color:var(--gold)">result output</span>. Click a slot again to change or clear it.</p>
+
+    <label>Entity Type</label>
+    <input type="text" id="entity-type" value="minecraft:chest_minecart" placeholder="e.g. minecraft:chest_minecart" style="margin-bottom:20px">
+
+    <label style="margin-bottom:10px">Inventory Slot Layout — click to assign roles</label>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot recipe"></div> Recipe slot (input)</div>
+      <div class="legend-item"><div class="legend-dot result"></div> Result slot (output)</div>
+      <div class="legend-item"><div class="legend-dot unused"></div> Unused</div>
+    </div>
+    <div class="slot-row" id="slot-grid"></div>
+    <div id="slot-summary"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- STEP 2: ITEMS                                      -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-title">
+      <span class="step-num">2</span>
+      <span class="step-label">ITEMS</span>
+    </div>
+    <div class="card-divider"></div>
+    <p class="card-hint">Add every Minecraft item that can appear as an ingredient or result. Each item is automatically given a short letter symbol used to define recipes.</p>
+    <div id="items-list"><div class="empty-state">No items yet — click Add Item below</div></div>
+    <button class="btn green" onclick="addItem()">+ Add Item</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- STEP 3: RECIPES                                    -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-title">
+      <span class="step-num">3</span>
+      <span class="step-label">RECIPES</span>
+    </div>
+    <div class="card-divider"></div>
+    <p class="card-hint">Define what combinations produce what result. For each recipe slot, choose which item goes in it (or leave it Empty). The pattern preview shows how the script sees your recipe.</p>
+    <div id="recipes-list"><div class="empty-state">Configure slots and add items first, then add recipes here</div></div>
+    <button class="btn green" onclick="addRecipe()">+ Add Recipe</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- STEP 4: TRIGGER                                    -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-title">
+      <span class="step-num">4</span>
+      <span class="step-label">TRIGGER</span>
+    </div>
+    <div class="card-divider"></div>
+    <p class="card-hint">Choose how the crafting check runs in-game.</p>
+
+    <div class="trigger-cards">
+      <div class="trigger-card selected" id="tcard-auto" onclick="selectTrigger('auto')">
+        <div class="trigger-icon">⏱</div>
+        <div class="trigger-title">AUTO INTERVAL</div>
+        <div class="trigger-desc">Checks for a valid recipe automatically every few ticks. Simplest option — always watching.</div>
+      </div>
+      <div class="trigger-card" id="tcard-drop" onclick="selectTrigger('drop')">
+        <div class="trigger-icon">🖱</div>
+        <div class="trigger-title">ITEM DROP (BUTTON)</div>
+        <div class="trigger-desc">Fires only when a Button in your UI drops a specific item. Crafts on demand when the player clicks.</div>
+      </div>
+    </div>
+
+    <div class="trigger-config" id="tc-auto">
+      <label>Check every N ticks &nbsp;<span style="color:var(--text-muted);font-size:11px">(20 ticks = 1 second)</span></label>
+      <div class="trig-row">
+        <div class="narrow"><input type="number" id="trigger-interval" value="5" min="1" max="200"></div>
+        <div class="unit">ticks</div>
+      </div>
+    </div>
+
+    <div class="trigger-config hidden" id="tc-drop">
+      <label>Trigger Item ID</label>
+      <input type="text" id="trigger-item" placeholder="e.g. minecraft:stick">
+      <div class="tip-box">
+        <strong>How to set this up:</strong> In the Chest UI Editor, add a <strong>Button</strong> component. Set its action to <strong>"Drop one"</strong> or <strong>"Drop all"</strong> and point it at a slot that holds your trigger item. When the player clicks that button, the item is dropped from the entity, and the script detects it and runs the crafting.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- GENERATE                                           -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="generate-section">
+    <div id="validation-msg"></div>
+    <button id="generate-btn" onclick="generateScript()">▶ GENERATE SCRIPT</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- OUTPUT                                             -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="card output-section" id="output-section">
+    <div class="card-title">
+      <span class="step-num" style="color:var(--green);border-color:rgba(74,222,128,0.3)">✓</span>
+      <span class="step-label">YOUR SCRIPT</span>
+    </div>
+    <div class="card-divider"></div>
+    <div class="file-hint">
+      <span>📁</span>
+      Place this file in your behavior pack at
+      <code>scripts/crafting.js</code>
+      and register it in <code>manifest.json</code> under <code>"entry"</code>
+    </div>
+    <div class="code-block"><pre id="code-output"></pre></div>
+    <div class="output-actions">
+      <button class="btn blue" onclick="copyScript()">📋 Copy Code</button>
+      <button class="btn gold" onclick="downloadScript()">💾 Download .js</button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+const TOTAL_SLOTS = 9;
+const AUTO_SYMBOLS = 'abcdefghijklmnopqrstuvwxyz';
+
+// slots[i] = { index: i, role: 'unused'|'recipe'|'result' }
+let slots = Array.from({ length: TOTAL_SLOTS }, (_, i) => ({ index: i, role: 'unused' }));
+
+// items = [ { id: string, symbol: string } ]
+let items = [];
+
+// recipes = [ { assignment: { [slotIdx]: symbol|null }, result: string, amount: number } ]
+let recipes = [];
+
+// trigger state
+let triggerType = 'auto'; // 'auto' | 'drop'
+
+/* ═══════════════════════════════════════════════════════════
+   SLOT GRID
+═══════════════════════════════════════════════════════════ */
+function renderSlotGrid() {
+  const grid = document.getElementById('slot-grid');
+  grid.innerHTML = '';
+  slots.forEach((slot, i) => {
+    const el = document.createElement('div');
+    el.className = `mc-slot ${slot.role}`;
+    el.title = 'Click to cycle: unused → recipe → result';
+    el.innerHTML = `<span class="si">${slot.index}</span><span class="sr">${roleIcon(slot.role)}</span>`;
+    el.addEventListener('click', () => cycleSlot(i));
+    grid.appendChild(el);
+  });
+  updateSlotSummary();
+  syncRecipeSlots();
+}
+
+function roleIcon(role) {
+  if (role === 'recipe') return '⚙';
+  if (role === 'result') return '★';
+  return '';
+}
+
+function cycleSlot(i) {
+  const cur = slots[i].role;
+  const hasResult = slots.some((s, j) => j !== i && s.role === 'result');
+  if (cur === 'unused') {
+    slots[i].role = 'recipe';
+  } else if (cur === 'recipe') {
+    slots[i].role = hasResult ? 'unused' : 'result';
+  } else {
+    slots[i].role = 'unused';
+  }
+  renderSlotGrid();
+}
+
+function updateSlotSummary() {
+  const rs = getRecipeSlotIndices();
+  const res = getResultSlotIndex();
+  const parts = [];
+  if (rs.length) parts.push(`Recipe slots: [${rs.join(', ')}]`);
+  if (res !== null) parts.push(`Result slot: ${res}`);
+  document.getElementById('slot-summary').textContent = parts.join('  ·  ') || 'Click slots above to configure them';
+}
+
+function getRecipeSlotIndices() {
+  return slots.filter(s => s.role === 'recipe').map(s => s.index).sort((a, b) => a - b);
+}
+
+function getResultSlotIndex() {
+  const r = slots.find(s => s.role === 'result');
+  return r ? r.index : null;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ITEMS
+═══════════════════════════════════════════════════════════ */
+function nextSymbol() {
+  const used = new Set(items.map(i => i.symbol));
+  for (const s of AUTO_SYMBOLS) {
+    if (!used.has(s)) return s;
+  }
+  return null;
+}
+
+function addItem() {
+  const sym = nextSymbol();
+  if (!sym) { showMsg('Maximum 26 items reached', 'error'); return; }
+  items.push({ id: '', symbol: sym });
+  renderItems();
+  renderRecipes();
+}
+
+function removeItem(idx) {
+  const sym = items[idx].symbol;
+  items.splice(idx, 1);
+  // Clear this symbol from all recipe assignments
+  recipes.forEach(r => {
+    for (const k in r.assignment) {
+      if (r.assignment[k] === sym) r.assignment[k] = null;
+    }
+  });
+  renderItems();
+  renderRecipes();
+}
+
+function renderItems() {
+  const c = document.getElementById('items-list');
+  if (!items.length) {
+    c.innerHTML = '<div class="empty-state">No items yet — click Add Item below</div>';
+    return;
+  }
+  let html = `<table class="items-table">
+    <thead><tr>
+      <th>SYM</th>
+      <th>MINECRAFT ITEM ID</th>
+      <th></th>
+    </tr></thead><tbody>`;
+  items.forEach((item, i) => {
+    html += `<tr>
+      <td><span class="symbol-badge">${escHtml(item.symbol)}</span></td>
+      <td><input type="text" value="${escHtml(item.id)}" placeholder="minecraft:oak_planks"
+          oninput="items[${i}].id = this.value.trim(); rebuildRecipeDropdowns();"
+          style="font-size:14px;padding:7px 10px"></td>
+      <td><button class="btn red" onclick="removeItem(${i})">✕</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  c.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RECIPES
+═══════════════════════════════════════════════════════════ */
+function addRecipe() {
+  const rsi = getRecipeSlotIndices();
+  if (!rsi.length) {
+    showMsg('Configure recipe slots first (Step 1)', 'error'); return;
+  }
+  if (!items.length) {
+    showMsg('Add at least one item first (Step 2)', 'error'); return;
+  }
+  const assignment = {};
+  rsi.forEach(idx => { assignment[idx] = null; });
+  recipes.push({ assignment, result: '', amount: 1 });
+  renderRecipes();
+}
+
+function removeRecipe(idx) {
+  recipes.splice(idx, 1);
+  renderRecipes();
+}
+
+// Call when slots change — sync recipe assignments to current recipe slots
+function syncRecipeSlots() {
+  const rsi = getRecipeSlotIndices();
+  recipes.forEach(r => {
+    const newAssign = {};
+    rsi.forEach(idx => { newAssign[idx] = r.assignment[idx] !== undefined ? r.assignment[idx] : null; });
+    r.assignment = newAssign;
+  });
+  renderRecipes();
+}
+
+function getPattern(recipe) {
+  const rsi = getRecipeSlotIndices();
+  let pattern = '';
+  rsi.forEach(idx => { pattern += (recipe.assignment[idx] || ' '); });
+  return pattern.trim();
+}
+
+function renderRecipes() {
+  const c = document.getElementById('recipes-list');
+  const rsi = getRecipeSlotIndices();
+
+  if (!recipes.length) {
+    c.innerHTML = '<div class="empty-state">No recipes yet — click Add Recipe below</div>';
+    return;
+  }
+
+  c.innerHTML = '';
+  recipes.forEach((recipe, ri) => {
+    const pattern = getPattern(recipe);
+
+    let inputsHTML = '';
+    rsi.forEach(slotIdx => {
+      const sel = recipe.assignment[slotIdx];
+      let opts = `<option value="">— Empty —</option>`;
+      items.forEach(item => {
+        const label = item.id ? item.id.replace(/^minecraft:/, '') : `(item ${item.symbol})`;
+        opts += `<option value="${escHtml(item.symbol)}" ${sel === item.symbol ? 'selected' : ''}>${escHtml(item.symbol)}: ${escHtml(label)}</option>`;
+      });
+      inputsHTML += `
+        <div class="recipe-slot-item">
+          <div class="rsl">Slot ${slotIdx}</div>
+          <select class="recipe-slot-select"
+              onchange="recipes[${ri}].assignment[${slotIdx}] = this.value || null; renderRecipes();">
+            ${opts}
+          </select>
+        </div>`;
+    });
+
+    const div = document.createElement('div');
+    div.className = 'recipe-card';
+    div.innerHTML = `
+      <div class="recipe-header">
+        <div class="recipe-num">RECIPE ${ri + 1}</div>
+        <button class="btn red sm" onclick="removeRecipe(${ri})">✕ Remove</button>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-inputs">${inputsHTML}</div>
+        <div class="arrow">→</div>
+        <div class="recipe-result">
+          <div class="rsl" style="color:var(--gold)">Result</div>
+          <div class="result-fields">
+            <div class="id-field">
+              <input type="text" value="${escHtml(recipe.result)}" placeholder="minecraft:oak_wood"
+                  style="border-color:rgba(251,191,36,0.4)"
+                  oninput="recipes[${ri}].result = this.value.trim()">
+            </div>
+            <div class="amt-field">
+              <input type="number" value="${recipe.amount}" min="1" max="64"
+                  style="border-color:rgba(251,191,36,0.4)"
+                  oninput="recipes[${ri}].amount = Math.max(1, parseInt(this.value)||1)">
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px">item id &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; amount</div>
+        </div>
+      </div>
+      <div>
+        <span class="pattern-tag">
+          <span class="pt-label">PATTERN</span>
+          <span>"${escHtml(pattern || '…')}"</span>
+        </span>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+function rebuildRecipeDropdowns() {
+  // lightweight re-render when item IDs change
+  renderRecipes();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TRIGGER
+═══════════════════════════════════════════════════════════ */
+function selectTrigger(type) {
+  triggerType = type;
+  document.getElementById('tcard-auto').classList.toggle('selected', type === 'auto');
+  document.getElementById('tcard-drop').classList.toggle('selected', type === 'drop');
+  document.getElementById('tc-auto').classList.toggle('hidden', type !== 'auto');
+  document.getElementById('tc-drop').classList.toggle('hidden', type !== 'drop');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   VALIDATION
+═══════════════════════════════════════════════════════════ */
+function validate() {
+  const errors = [];
+
+  const entityType = document.getElementById('entity-type').value.trim();
+  if (!entityType) errors.push('Entity type is required');
+
+  const rsi = getRecipeSlotIndices();
+  const resultSlot = getResultSlotIndex();
+
+  if (!rsi.length) errors.push('Set at least one recipe slot (Step 1)');
+  if (resultSlot === null) errors.push('Set a result slot (Step 1)');
+
+  if (!items.length) errors.push('Add at least one item (Step 2)');
+
+  const ids = [];
+  items.forEach((item, i) => {
+    if (!item.id) errors.push(`Item ${i + 1} (symbol "${item.symbol}"): Minecraft ID is required`);
+    else ids.push(item.id);
+  });
+  if (ids.length !== new Set(ids).size) errors.push('Two or more items share the same Minecraft ID');
+
+  if (!recipes.length) errors.push('Add at least one recipe (Step 3)');
+
+  const patterns = new Set();
+  recipes.forEach((recipe, i) => {
+    const pat = getPattern(recipe);
+    if (!pat.trim()) errors.push(`Recipe ${i + 1}: At least one ingredient slot must be filled`);
+    else if (patterns.has(pat)) errors.push(`Recipe ${i + 1}: Duplicate pattern "${pat}" — same combination already defined`);
+    else patterns.add(pat);
+    if (!recipe.result) errors.push(`Recipe ${i + 1}: Result item ID is required`);
+    if (!recipe.amount || recipe.amount < 1) errors.push(`Recipe ${i + 1}: Amount must be at least 1`);
+  });
+
+  if (triggerType === 'auto') {
+    const iv = parseInt(document.getElementById('trigger-interval').value);
+    if (!iv || iv < 1) errors.push('Trigger interval must be at least 1 tick');
+  } else {
+    const ti = document.getElementById('trigger-item').value.trim();
+    if (!ti) errors.push('Trigger item ID is required for Item Drop mode');
+  }
+
+  return errors;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CODE GENERATION
+═══════════════════════════════════════════════════════════ */
+function generateScript() {
+  const errors = validate();
+  const msgEl = document.getElementById('validation-msg');
+
+  if (errors.length) {
+    msgEl.innerHTML = `<div class="msg error">⚠ Fix these issues before generating:<br>• ${errors.join('<br>• ')}</div>`;
+    document.getElementById('output-section').style.display = 'none';
+    return;
+  }
+
+  msgEl.innerHTML = '<div class="msg success">✓ All good! Script generated below.</div>';
+
+  const entityType = document.getElementById('entity-type').value.trim();
+  const rsi = getRecipeSlotIndices();
+  const resultSlotIdx = getResultSlotIndex();
+
+  const itemsObj = {};
+  items.forEach(item => { itemsObj[item.id] = item.symbol; });
+
+  const recipesObj = {};
+  recipes.forEach(r => {
+    const pat = getPattern(r);
+    if (pat.trim()) recipesObj[pat] = { result: r.result, amount: r.amount };
+  });
+
+  let code;
+  if (triggerType === 'auto') {
+    const iv = parseInt(document.getElementById('trigger-interval').value);
+    code = genAutoScript(entityType, rsi, resultSlotIdx, itemsObj, recipesObj, iv);
+  } else {
+    const ti = document.getElementById('trigger-item').value.trim();
+    code = genDropScript(entityType, rsi, resultSlotIdx, itemsObj, recipesObj, ti);
+  }
+
+  document.getElementById('code-output').textContent = code;
+  const out = document.getElementById('output-section');
+  out.style.display = 'block';
+  setTimeout(() => out.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
+
+function fmtObj(obj) {
+  const entries = Object.entries(obj);
+  if (!entries.length) return '{}';
+  const lines = entries.map(([k, v]) => {
+    if (v !== null && typeof v === 'object') {
+      const inner = Object.entries(v).map(([ik, iv]) => `${ik}: ${JSON.stringify(iv)}`).join(', ');
+      return `    ${JSON.stringify(k)}: { ${inner} }`;
+    }
+    return `    ${JSON.stringify(k)}: ${JSON.stringify(v)}`;
+  });
+  return '{\n' + lines.join(',\n') + ',\n}';
+}
+
+// ── SHARED HELPERS (appear in both script types) ──────────────────────────
+const SHARED_HELPERS = `
+function countIngredients(pattern) {
+    const counts = {};
+    for (const char of pattern) {
+        if (char !== " ") counts[char] = (counts[char] || 0) + 1;
+    }
+    return counts;
+}
+
+function checkRecipe(inventory) {
+    let recipePattern = "";
+    const slotItems = {};
+    for (const slot of recipeSlots) {
+        const item = inventory.getItem(slot);
+        if (item) {
+            const symbol = items[item.typeId];
+            if (symbol) {
+                recipePattern += symbol;
+                if (!slotItems[symbol]) slotItems[symbol] = [];
+                slotItems[symbol].push({ slot, amount: item.amount });
+            } else {
+                recipePattern += " ";
+            }
+        } else {
+            recipePattern += " ";
+        }
+    }
+    const recipeKey = recipePattern.trim();
+    const recipe = recipes[recipeKey];
+    if (!recipe) return null;
+
+    const requiredIngredients = countIngredients(recipeKey);
+    for (const symbol in requiredIngredients) {
+        const total = (slotItems[symbol] || []).reduce((sum, i) => sum + i.amount, 0);
+        if (total < requiredIngredients[symbol]) return null;
+    }
+    return { recipe, slotItems, requiredIngredients };
+}`;
+
+// ── AUTO INTERVAL SCRIPT ──────────────────────────────────────────────────
+function genAutoScript(entityType, rsi, resultSlot, itemsObj, recipesObj, interval) {
+  return `import { world, ItemStack, system } from "@minecraft/server";
+
+// ─── CONFIGURATION ─────────────────────────────────────────────────────────
+const items = ${fmtObj(itemsObj)};
+
+const recipes = ${fmtObj(recipesObj)};
+
+const recipeSlots = [${rsi.join(', ')}];
+const resultSlot  = ${resultSlot};
+const crafting_entity_type = "${entityType}";
+// ───────────────────────────────────────────────────────────────────────────
+${SHARED_HELPERS}
+
+function craftItem(inventory, recipeInfo, entityId) {
+    if (!inventory.getItem(resultSlot)) {
+        const { recipe, slotItems, requiredIngredients } = recipeInfo;
+        inventory.setItem(resultSlot, new ItemStack(recipe.result, recipe.amount));
+        craftedItems.set(entityId, true);
+        craftedRecipes.set(entityId, { recipe, pattern: requiredIngredients, slotMapping: slotItems });
+    }
+}
+
+function consumeIngredients(inventory, entityId, amountTaken) {
+    const recipeInfo = craftedRecipes.get(entityId);
+    if (!recipeInfo) return;
+    const { recipe, pattern, slotMapping } = recipeInfo;
+    const fraction = amountTaken / recipe.amount;
+    if (fraction <= 0) return;
+    for (const symbol in pattern) {
+        let remaining = Math.ceil(pattern[symbol] * fraction);
+        for (const slotInfo of (slotMapping[symbol] || [])) {
+            if (remaining <= 0) break;
+            const item = inventory.getItem(slotInfo.slot);
+            if (!item) continue;
+            const take = Math.min(item.amount, remaining);
+            if (take >= item.amount) {
+                inventory.setItem(slotInfo.slot, null);
+            } else {
+                item.amount -= take;
+                inventory.setItem(slotInfo.slot, item);
+            }
+            remaining -= take;
+        }
+    }
+    if (fraction >= 1) craftedRecipes.delete(entityId);
+}
+
+function isEntityValid(entity) {
+    try { return entity && typeof entity === "object" && entity.id !== undefined; }
+    catch (e) { return false; }
+}
+
+const inventoryCache   = new Map();
+const lastResultStates = new Map();
+const craftedItems     = new Map();
+const craftedRecipes   = new Map();
+const dimensions = ["overworld", "nether", "the_end"].map(n => world.getDimension(n));
+
+function updateInventoryCache() {
+    const entities = dimensions.flatMap(dim => dim.getEntities({ type: crafting_entity_type }));
+    for (const entity of entities) {
+        try {
+            const inv = entity.getComponent("minecraft:inventory");
+            if (inv?.container) {
+                const id = entity.id;
+                inventoryCache.set(id, { entity, container: inv.container });
+                if (!lastResultStates.has(id)) {
+                    const ri = inv.container.getItem(resultSlot);
+                    lastResultStates.set(id, {
+                        hasItem: !!ri,
+                        amount: ri ? ri.amount : 0,
+                        typeId: ri ? ri.typeId : null
+                    });
+                    if (ri) craftedItems.set(id, false);
+                }
+            }
+        } catch (e) { continue; }
+    }
+}
+
+function processCrafting() {
+    for (const entityId of inventoryCache.keys()) {
+        const cached = inventoryCache.get(entityId);
+        if (!cached) continue;
+        const { entity, container: inventory } = cached;
+        try {
+            if (!isEntityValid(entity)) {
+                inventoryCache.delete(entityId);
+                lastResultStates.delete(entityId);
+                craftedItems.delete(entityId);
+                craftedRecipes.delete(entityId);
+                continue;
+            }
+            const cur = inventory.getItem(resultSlot);
+            const currentResult = { hasItem: !!cur, amount: cur ? cur.amount : 0, typeId: cur ? cur.typeId : null };
+            const prev = lastResultStates.get(entityId);
+            const wasCrafted = craftedItems.get(entityId);
+
+            if (prev.hasItem && currentResult.hasItem) {
+                if (prev.typeId === currentResult.typeId && prev.amount !== currentResult.amount) {
+                    if (wasCrafted === true && currentResult.amount < prev.amount) {
+                        consumeIngredients(inventory, entityId, prev.amount - currentResult.amount);
+                    }
+                } else if (prev.typeId !== currentResult.typeId) {
+                    craftedItems.set(entityId, false);
+                    craftedRecipes.delete(entityId);
+                }
+            } else if (prev.hasItem && !currentResult.hasItem) {
+                if (wasCrafted === true) consumeIngredients(inventory, entityId, prev.amount);
+                craftedItems.set(entityId, false);
+            } else if (!prev.hasItem && currentResult.hasItem) {
+                craftedItems.set(entityId, false);
+            }
+
+            lastResultStates.set(entityId, currentResult);
+
+            const recipeInfo = checkRecipe(inventory);
+            if (!currentResult.hasItem && recipeInfo) {
+                craftItem(inventory, recipeInfo, entityId);
+                const newResult = inventory.getItem(resultSlot);
+                if (newResult) {
+                    lastResultStates.set(entityId, {
+                        hasItem: true, amount: newResult.amount, typeId: newResult.typeId
+                    });
+                }
+            } else if (wasCrafted === true) {
+                const still = checkRecipe(inventory);
+                if (!still || cur?.typeId !== still.recipe.result) {
+                    inventory.setItem(resultSlot, null);
+                    craftedItems.set(entityId, false);
+                    craftedRecipes.delete(entityId);
+                    lastResultStates.set(entityId, { hasItem: false, amount: 0, typeId: null });
+                }
+            }
+        } catch (e) {
+            inventoryCache.delete(entityId);
+            lastResultStates.delete(entityId);
+            craftedItems.delete(entityId);
+            craftedRecipes.delete(entityId);
+        }
+    }
+}
+
+system.runInterval(() => {
+    updateInventoryCache();
+    processCrafting();
+}, ${interval});
+`;
+}
+
+// ── ITEM DROP SCRIPT ──────────────────────────────────────────────────────
+function genDropScript(entityType, rsi, resultSlot, itemsObj, recipesObj, triggerItem) {
+  return `import { world, ItemStack } from "@minecraft/server";
+
+// ─── CONFIGURATION ─────────────────────────────────────────────────────────
+const items = ${fmtObj(itemsObj)};
+
+const recipes = ${fmtObj(recipesObj)};
+
+const recipeSlots = [${rsi.join(', ')}];
+const resultSlot  = ${resultSlot};
+const crafting_entity_type = "${entityType}";
+const trigger_item = "${triggerItem}"; // The item your Button component drops when clicked
+// ───────────────────────────────────────────────────────────────────────────
+${SHARED_HELPERS}
+
+function consumeIngredients(inventory, slotItems, requiredIngredients) {
+    for (const symbol in requiredIngredients) {
+        let remaining = requiredIngredients[symbol];
+        for (const { slot } of (slotItems[symbol] || [])) {
+            if (remaining <= 0) break;
+            const item = inventory.getItem(slot);
+            if (!item) continue;
+            const take = Math.min(item.amount, remaining);
+            if (take >= item.amount) {
+                inventory.setItem(slot, null);
+            } else {
+                item.amount -= take;
+                inventory.setItem(slot, item);
+            }
+            remaining -= take;
+        }
+    }
+}
+
+// Fires when an entity drops items — triggered by Button "Drop one / Drop all" actions
+world.afterEvents.entityItemDrop.subscribe((event) => {
+    const { entity, items: droppedItems } = event;
+    if (entity.typeId !== crafting_entity_type) return;
+
+    // Only act when the trigger item was dropped (from your Button component)
+    const hasTrigger = droppedItems.some(dropped => {
+        try { return dropped.getComponent("item")?.itemStack?.typeId === trigger_item; }
+        catch { return false; }
+    });
+    if (!hasTrigger) return;
+
+    try {
+        const inventoryComponent = entity.getComponent("minecraft:inventory");
+        if (!inventoryComponent?.container) return;
+        const inventory = inventoryComponent.container;
+
+        if (inventory.getItem(resultSlot)) return; // result slot already has an item
+
+        const recipeInfo = checkRecipe(inventory);
+        if (!recipeInfo) return;
+
+        const { recipe, slotItems, requiredIngredients } = recipeInfo;
+        consumeIngredients(inventory, slotItems, requiredIngredients);
+        inventory.setItem(resultSlot, new ItemStack(recipe.result, recipe.amount));
+    } catch (e) { /* ignore */ }
+});
+`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COPY / DOWNLOAD
+═══════════════════════════════════════════════════════════ */
+function copyScript() {
+  const text = document.getElementById('code-output').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.currentTarget;
+    const prev = btn.innerHTML;
+    btn.innerHTML = '✓ Copied!';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+    setTimeout(() => { btn.innerHTML = prev; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
+  }).catch(() => { alert('Could not copy. Please select the code manually.'); });
+}
+
+function downloadScript() {
+  const text = document.getElementById('code-output').textContent;
+  const blob = new Blob([text], { type: 'text/javascript' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'crafting.js';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════ */
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showMsg(text, type) {
+  const el = document.getElementById('validation-msg');
+  el.innerHTML = `<div class="msg ${type}">${text}</div>`;
+  setTimeout(() => { if (el.textContent === text) el.innerHTML = ''; }, 3500);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+renderSlotGrid();
+renderItems();
+renderRecipes();
+</script>
+</body>
+</html>

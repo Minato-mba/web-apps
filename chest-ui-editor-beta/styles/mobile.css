@@ -9,7 +9,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .mobile-nav {
         display: flex;
     }
@@ -57,7 +57,6 @@
 
     .chest-panel {
         transform-origin: top left;
-        transform: scale(0.9);
         margin: 10px auto;
     }
 
@@ -102,7 +101,7 @@
     }
 
     .chest-panel {
-        transform: scale(0.75);
+        transform-origin: top center;
     }
 
     .template-item {
@@ -172,7 +171,9 @@
     transform: translateY(100%);
     transition: transform 0.3s ease-in-out;
     max-height: 70vh;
+    max-height: 70dvh;
     overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom);
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
 }
@@ -255,6 +256,7 @@
     display: flex;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .mobile-view .mobile-nav-button {
@@ -280,7 +282,7 @@
 }
 
 .mobile-view .component-container {
-    min-height: 200px;
+    min-height: 0;
 }
 
 .mobile-component-drawer .component-item.selected {
@@ -466,6 +468,7 @@
 .mobile-view .editor-component {
     position: absolute;
     cursor: pointer;
+    touch-action: none;
 }
 
 /* Small components need larger touch targets in the editor (export size unchanged) */
@@ -478,26 +481,7 @@
 .mobile-view .editor-component.container-type,
 .mobile-view .editor-component.progress-bar,
 .mobile-view .editor-component.image {
-    touch-action: manipulation;
-}
-
-@media (pointer: coarse) {
-    .mobile-view .editor-component.tab,
-    .mobile-view .editor-component.button,
-    .mobile-view .editor-component.close-button,
-    .mobile-view .editor-component.on_off-item,
-    .mobile-view .editor-component.container-item,
-    .mobile-view .editor-component.container-item-with-picture,
-    .mobile-view .editor-component.container-type,
-    .mobile-view .editor-component.progress-bar,
-    .mobile-view .editor-component.image {
-        min-width: 44px;
-        min-height: 44px;
-    }
-
-    .mobile-view .editor-component.label {
-        min-height: 44px;
-    }
+    touch-action: none;
 }
 
 .mobile-view .editor-component:active {
@@ -634,6 +618,7 @@
     transform: translateY(100%);
     transition: transform 0.3s ease-in-out;
     max-height: 70vh;
+    max-height: 70dvh;
     overflow-y: auto;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
@@ -773,6 +758,7 @@
     width: 96%;
     max-width: none;
     max-height: 92vh;
+    max-height: 92dvh;
     margin: 0 8px;
 }
 
@@ -811,7 +797,7 @@
 .mobile-editor-toolbar {
     display: none;
     position: fixed;
-    bottom: 56px;
+    bottom: calc(56px + env(safe-area-inset-bottom));
     left: 8px;
     right: 8px;
     z-index: 999;
@@ -844,7 +830,7 @@
     top: 0;
     left: 0;
     right: 0;
-    bottom: 52px;
+    bottom: calc(52px + env(safe-area-inset-bottom));
     z-index: 1100;
     width: 100%;
     max-width: none;
@@ -905,10 +891,4 @@
 
 .mobile-view .preview-canvas .chest-panel {
     transform-origin: top center;
-}
-
-@media (max-width: 480px) {
-    .mobile-view .preview-canvas .chest-panel {
-        transform: scale(0.85);
-    }
 }

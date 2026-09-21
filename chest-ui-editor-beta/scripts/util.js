@@ -1,4 +1,12 @@
 const util = {
+    escapeHtml: function (value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    },
 
     generateUniqueId: () => {
         return 'component_' + Math.random().toString(36).substr(2, 9);
@@ -126,10 +134,24 @@ const util = {
         input.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
+            if (file.size > 25 * 1024 * 1024) {
+                alert('ZIP is too large. The maximum supported archive size is 25 MB.');
+                return;
+            }
 
             try {
                 const zipData = await file.arrayBuffer();
                 const zip = await JSZip.loadAsync(zipData);
+                const entries = Object.values(zip.files);
+                if (entries.length > 500) {
+                    throw new Error('ZIP contains too many files (maximum 500).');
+                }
+                const totalUncompressed = entries.reduce((total, entry) => {
+                    return total + Number(entry?._data?.uncompressedSize || 0);
+                }, 0);
+                if (totalUncompressed > 100 * 1024 * 1024) {
+                    throw new Error('ZIP expands beyond the 100 MB safety limit.');
+                }
 
                 const jsonFile = zip.file("chest_ui_data.json");
                 if (!jsonFile) {
@@ -138,6 +160,9 @@ const util = {
                 }
 
                 const jsonContent = await jsonFile.async('string');
+                if (jsonContent.length > 5 * 1024 * 1024) {
+                    throw new Error('chest_ui_data.json exceeds the 5 MB safety limit.');
+                }
                 let data;
                 try {
                     data = JSON.parse(jsonContent);
@@ -160,10 +185,11 @@ const util = {
                         if (!zipEntry.dir) {
                             const promise = zipEntry.async("blob").then(blob => {
                                 const imageName = relativePath.split('/').pop();
+                                const projectImageName = imageName.replace(/\.[^/.]+$/, '');
                                 const imageFile = new File([blob], imageName, { type: blob.type || 'image/png' });
                                 imageFiles.push({
                                     file: imageFile,
-                                    path: 'user_uploaded:' + imageName
+                                    path: 'user_uploaded:' + projectImageName
                                 });
                             });
                             imagePromises.push(promise);
@@ -235,7 +261,7 @@ const util = {
                 });
                 
                 editorTitle.style.left = `${settings.titleOffsetX}px`;
-                editorTitle.style.top = `${settings.titleOffsetY}px`;
+                editorTitle.style.top = `${settings.titleOffsetY + 12}px`;
                 editorTitle.style.fontSize = `${10 * (Number(settings.titleFontScaleFactor) || 1.0)}px`;
                 editorTitle.style.color = util.rgbArrayToHex(settings.titleColor || [1.0, 1.0, 1.0]);
                 console.log('util.applySettings: Set editor title position:', {
@@ -244,7 +270,7 @@ const util = {
                 });
                 
                 previewTitle.style.left = `${settings.titleOffsetX}px`;
-                previewTitle.style.top = `${settings.titleOffsetY}px`;
+                previewTitle.style.top = `${settings.titleOffsetY + 12}px`;
                 previewTitle.style.fontSize = `${10 * (Number(settings.titleFontScaleFactor) || 1.0)}px`;
                 previewTitle.style.color = util.rgbArrayToHex(settings.titleColor || [1.0, 1.0, 1.0]);
                 console.log('util.applySettings: Set preview title position:', {
@@ -292,6 +318,11 @@ const util = {
         
         if (previewComponentContainer) {
             previewComponentContainer.style.zIndex = settings.mainPanelLayer;
+        }
+
+        // Parent height changes alter center/bottom anchor calculations.
+        if (typeof editor !== 'undefined' && editor.refreshComponentLayouts) {
+            requestAnimationFrame(() => editor.refreshComponentLayouts());
         }
     }
 };

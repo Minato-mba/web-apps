@@ -55,6 +55,11 @@ const editor = {
         });
 
         document.addEventListener('keydown', e => {
+            const blockingOverlay = [...document.querySelectorAll(
+                '.settings-modal, #code-viewer-modal, .mobile-component-drawer.open, .mobile-templates-drawer.open, .mobile-properties-drawer.open, .mobile-components-list-drawer.open'
+            )].some(element => element.offsetParent !== null);
+            if (blockingOverlay) return;
+
             const isEditingField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) ||
                 e.target.isContentEditable;
 
@@ -151,8 +156,8 @@ const editor = {
             // Account for browser zoom
             const scaleX = rect.width / this.canvas.offsetWidth;
             const scaleY = rect.height / this.canvas.offsetHeight;
-            let x = (e.clientX - rect.left) / scaleX / this.zoomLevel;
-            let y = (e.clientY - rect.top) / scaleY / this.zoomLevel;
+            let x = (e.clientX - rect.left) / scaleX;
+            let y = (e.clientY - rect.top) / scaleY;
 
             if (this.snapToGrid) {
                 x = util.snapToGrid(x);
@@ -198,8 +203,8 @@ const editor = {
                 // Account for browser zoom
                 const scaleX = rect.width / this.canvas.offsetWidth;
                 const scaleY = rect.height / this.canvas.offsetHeight;
-                let x = (touch.clientX - rect.left) / scaleX / this.zoomLevel;
-                let y = (touch.clientY - rect.top) / scaleY / this.zoomLevel;
+                let x = (touch.clientX - rect.left) / scaleX;
+                let y = (touch.clientY - rect.top) / scaleY;
 
                 if (this.snapToGrid) {
                     x = util.snapToGrid(x);
@@ -378,12 +383,13 @@ const editor = {
             
             // Highlight components within selection box
             this.components.forEach(comp => {
-                // Convert component coordinates to editorCanvas coordinates
-                // Scale component position and size by zoom level
-                const compLeft = (comp.x * this.zoomLevel) + offsetX;
-                const compTop = (comp.y * this.zoomLevel) + offsetY;
-                const compRight = compLeft + ((comp.width || 18) * this.zoomLevel);
-                const compBottom = compTop + ((comp.height || 18) * this.zoomLevel);
+                const componentElement = this.canvas.querySelector(`[data-id="${comp.id}"]`);
+                if (!componentElement || componentElement.style.display === 'none') return;
+                const componentRect = componentElement.getBoundingClientRect();
+                const compLeft = (componentRect.left - editorRect.left) / scaleX;
+                const compTop = (componentRect.top - editorRect.top) / scaleY;
+                const compRight = (componentRect.right - editorRect.left) / scaleX;
+                const compBottom = (componentRect.bottom - editorRect.top) / scaleY;
                 
                 // Check if component intersects with selection box
                 if (compLeft < boxRight && compRight > boxLeft &&
@@ -452,12 +458,13 @@ const editor = {
             console.log('Editor zoom level:', this.zoomLevel);
             
             this.components.forEach(comp => {
-                // Convert component coordinates to editorCanvas coordinates
-                // Scale component position and size by zoom level
-                const compLeft = (comp.x * this.zoomLevel) + offsetX;
-                const compTop = (comp.y * this.zoomLevel) + offsetY;
-                const compRight = compLeft + ((comp.width || 18) * this.zoomLevel);
-                const compBottom = compTop + ((comp.height || 18) * this.zoomLevel);
+                const componentElement = this.canvas.querySelector(`[data-id="${comp.id}"]`);
+                if (!componentElement || componentElement.style.display === 'none') return;
+                const componentRect = componentElement.getBoundingClientRect();
+                const compLeft = (componentRect.left - editorRect.left) / scaleX;
+                const compTop = (componentRect.top - editorRect.top) / scaleY;
+                const compRight = (componentRect.right - editorRect.left) / scaleX;
+                const compBottom = (componentRect.bottom - editorRect.top) / scaleY;
                 
                 console.log(`Component ${comp.id}:`, { 
                     x: comp.x, y: comp.y, 
@@ -568,8 +575,10 @@ const editor = {
             
             // Calculate delta in logical canvas pixels
             // Both start and current are in rendered pixels, divide by zoom to get logical pixels
-            const deltaX = (currentX - startX) / this.zoomLevel;
-            const deltaY = (currentY - startY) / this.zoomLevel;
+            const scaleX = rect.width / this.canvas.offsetWidth;
+            const scaleY = rect.height / this.canvas.offsetHeight;
+            const deltaX = (currentX - startX) / scaleX;
+            const deltaY = (currentY - startY) / scaleY;
 
             // Move all selected components together
             componentOffsets.forEach(({ component, offsetX, offsetY }) => {
@@ -629,10 +638,11 @@ const editor = {
             // Calculate delta in logical canvas pixels
             const canvasLogicalWidth = this.canvas.offsetWidth;
             const canvasRenderedWidth = rect.width;
-            const scale = canvasRenderedWidth / canvasLogicalWidth;
+            const scaleX = canvasRenderedWidth / canvasLogicalWidth;
+            const scaleY = rect.height / this.canvas.offsetHeight;
             
-            const deltaX = (currentX - startX) / scale;
-            const deltaY = (currentY - startY) / scale;
+            const deltaX = (currentX - startX) / scaleX;
+            const deltaY = (currentY - startY) / scaleY;
 
             // Move all selected components together
             componentOffsets.forEach(({ component, offsetX, offsetY }) => {
@@ -802,6 +812,7 @@ const editor = {
         }
 
         this.canvas.appendChild(element);
+        jsonUiLayout.applyToElement(element, component, this.canvas);
         if (component.type !== 'tab') {
             element.style.display = this.isComponentVisibleInActiveTab(component) ? '' : 'none';
         }
@@ -813,8 +824,7 @@ const editor = {
         const element = this.canvas.querySelector(`[data-id="${component.id}"]`);
         if (!element) return;
 
-        element.style.left = `${component.x}px`;
-        element.style.top = `${component.y}px`;
+        jsonUiLayout.applyToElement(element, component, this.canvas);
 
         if (component.zIndex !== undefined) {
             element.style.zIndex = component.zIndex;
@@ -858,6 +868,13 @@ const editor = {
 
         this.refreshTabVisibility();
         preview.updateComponent(component);
+    },
+    refreshComponentLayouts: function () {
+        this.components.forEach(component => {
+            const element = this.canvas.querySelector(`[data-id="${component.id}"]`);
+            if (element) jsonUiLayout.applyToElement(element, component, this.canvas);
+        });
+        preview.updatePreview(this.getComponents());
     },
     toggleComponentSelection: function (component) {
         const index = this.selectedComponents.indexOf(component);
@@ -1091,11 +1108,11 @@ const editor = {
 
             let displayInfo = '';
             if (component.type === 'label') {
-                displayInfo = `"${component.properties.text.substring(0, 15)}"`;
+                displayInfo = `"${util.escapeHtml(component.properties.text.substring(0, 15))}"`;
                 if (component.properties.text.length > 15) displayInfo += '...';
             } else if (component.type === 'tab') {
                 displayInfo = component.properties.show_label && component.properties.label_text
-                    ? component.properties.label_text
+                    ? util.escapeHtml(component.properties.label_text)
                     : `Tab ${component.properties.toggle_index || 1}`;
             } else if (component.properties.collection_index !== undefined) {
                 displayInfo = `Index: ${component.properties.collection_index}`;
@@ -1317,6 +1334,8 @@ const editor = {
             y: comp.y,
             width: comp.width,
             height: comp.height,
+            anchor_from: comp.anchor_from,
+            anchor_to: comp.anchor_to,
             zIndex: comp.zIndex,
             properties: JSON.parse(JSON.stringify(comp.properties))  // Deep clone properties
         }));
@@ -1343,6 +1362,7 @@ const editor = {
 
         // Paste components with slight offset
         const pastedComponents = [];
+        this.isRestoringState = true;
         this.clipboard.forEach(comp => {
             const newComponent = {
                 id: util.generateUniqueId(),  // New unique ID
@@ -1351,12 +1371,15 @@ const editor = {
                 y: comp.y + 10,
                 width: comp.width,
                 height: comp.height,
+                anchor_from: comp.anchor_from,
+                anchor_to: comp.anchor_to,
                 properties: JSON.parse(JSON.stringify(comp.properties))  // Deep clone properties
             };
 
-            this.addComponent(newComponent);
+            this.addComponent(jsonUiLayout.normalizeComponent(newComponent));
             pastedComponents.push(newComponent);
         });
+        this.isRestoringState = false;
 
         // Select the newly pasted components
         if (pastedComponents.length > 0) {

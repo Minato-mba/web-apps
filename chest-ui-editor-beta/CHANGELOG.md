@@ -2,6 +2,26 @@
 
 ---
 
+## [3.0.0] - 2026-09-21
+
+### Added
+
+- Per-component `anchor_from` and `anchor_to` controls with Bedrock-accurate offset and size behavior
+- Shared geometry model used by the editor, preview, drag selection, and JSON export
+- Explicit label width and height editing/export
+- Automatic migration from project `formatVersion: 2` to `formatVersion: 3`
+- Mobile safe-area and dynamic-viewport support
+
+### Fixed
+
+- Touch and mouse coordinates no longer divide by zoom twice
+- Mobile/tablet view no longer resets when the viewport resizes or rotates
+- Content canvas now matches the exported 162 px chest content width
+- Label serialization now writes the correct Y value
+- Imported ZIP custom textures keep their original project paths
+- Panel resizing refreshes center and bottom anchored components
+- User text is escaped in editor component markup
+
 ## [2.0.0] - 2026-05-16
 
 Project and ZIP data now use **`formatVersion: 2`** (`formatLabel: "2.0.0"`). Older browser saves and ZIPs without `formatVersion: 2` (including `version: "1.1.0"`) are rejected on load/import.

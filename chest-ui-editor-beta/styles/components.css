@@ -703,10 +703,12 @@
 }
 
 .component-container {
-    width: 176px;
+    width: 162px;
     position: absolute;
-    height: 76px;
-    min-height: 76px;
+    height: 100%;
+    min-height: 0;
+    left: 7px;
+    top: 0;
 }
 
 .editor-component.image.custom-image,

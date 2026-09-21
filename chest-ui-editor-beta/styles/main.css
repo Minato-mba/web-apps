@@ -34,11 +34,20 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+input,
+textarea,
+select,
+pre,
+code {
+    user-select: text;
+}
+
 body {
     background-color: var(--mc-bg);
     color: var(--mc-text);
     font-size: var(--mc-font-size-normal);
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     font-family: 'Inter', sans-serif;
 }
@@ -109,6 +118,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
     padding: 16px;
     max-width: 1600px;
     margin: 0 auto;
@@ -176,6 +186,15 @@ button:hover {
 
 button:active {
     transform: translateY(0);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--mc-selection);
+    outline-offset: 2px;
 }
 
 .action-button {
@@ -558,9 +577,11 @@ button:active {
 }
 
 .component-container {
-    width: 176px;
+    width: 162px;
     height: 100%;
     position: absolute;
+    left: 7px;
+    top: 0;
     z-index: 1;
     pointer-events: auto;
 }

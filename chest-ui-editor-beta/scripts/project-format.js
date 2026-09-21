@@ -4,8 +4,8 @@
  * Only projects with matching formatVersion can be saved or loaded.
  */
 const projectFormat = {
-    FORMAT_VERSION: 2,
-    FORMAT_LABEL: '2.0.0',
+    FORMAT_VERSION: 3,
+    FORMAT_LABEL: '3.0.0',
 
     build: function ({ components, uiProject = null, settings = null, uploadedImages = null }) {
         const payload = {
@@ -39,6 +39,9 @@ const projectFormat = {
             y: component.y,
             width: component.width,
             height: component.height,
+            anchor_from: component.anchor_from,
+            anchor_to: component.anchor_to,
+            zIndex: component.zIndex,
             properties: { ...component.properties }
         }));
 
@@ -64,14 +67,13 @@ const projectFormat = {
             };
         }
 
-        if (data.formatVersion !== this.FORMAT_VERSION) {
+        if (![2, this.FORMAT_VERSION].includes(data.formatVersion)) {
             const legacy = data.formatVersion ?? data.version ?? 'none';
             return {
                 ok: false,
                 message:
                     `This project uses an unsupported format (${legacy}). ` +
-                    `Save again or use Import/Export with Chest UI Editor ${this.FORMAT_LABEL} or later. ` +
-                    `Older data (including 1.1.0) cannot be loaded.`
+                    `Use a project exported by Chest UI Editor 2.0.0 or later.`
             };
         }
 
@@ -80,6 +82,69 @@ const projectFormat = {
                 ok: false,
                 message: 'Invalid project file: missing or invalid "components" array.'
             };
+        }
+
+        const validateComponents = (components, location) => {
+            if (!Array.isArray(components)) {
+                return `${location} must be an array.`;
+            }
+            if (components.length > 1000) {
+                return `${location} exceeds the 1000 component safety limit.`;
+            }
+            const ids = new Set();
+            for (let index = 0; index < components.length; index++) {
+                const component = components[index];
+                const path = `${location}[${index}]`;
+                if (!component || typeof component !== 'object' || Array.isArray(component)) {
+                    return `${path} must be an object.`;
+                }
+                if (typeof component.type !== 'string' ||
+                    (typeof componentTypes !== 'undefined' && !componentTypes[component.type])) {
+                    return `${path} has an unsupported component type.`;
+                }
+                if (component.id != null) {
+                    if (!/^[A-Za-z0-9_-]{1,100}$/.test(String(component.id))) {
+                        return `${path}.id contains unsupported characters.`;
+                    }
+                    if (ids.has(component.id)) return `${path}.id is duplicated.`;
+                    ids.add(component.id);
+                }
+                for (const field of ['x', 'y', 'width', 'height']) {
+                    const value = Number(component[field]);
+                    if (!Number.isFinite(value)) return `${path}.${field} must be finite.`;
+                    if ((field === 'width' || field === 'height') && (value <= 0 || value > 4096)) {
+                        return `${path}.${field} must be between 1 and 4096.`;
+                    }
+                    if ((field === 'x' || field === 'y') && Math.abs(value) > 100000) {
+                        return `${path}.${field} is outside the supported range.`;
+                    }
+                }
+                if (component.properties != null &&
+                    (typeof component.properties !== 'object' || Array.isArray(component.properties))) {
+                    return `${path}.properties must be an object.`;
+                }
+                for (const [key, value] of Object.entries(component.properties || {})) {
+                    if ((key.includes('texture') || key === 'picture') && typeof value === 'string' &&
+                        !/^[A-Za-z0-9_./:-]*$/.test(value)) {
+                        return `${path}.properties.${key} is not a safe texture path.`;
+                    }
+                }
+            }
+            return null;
+        };
+
+        let componentError = validateComponents(data.components, 'components');
+        if (componentError) return { ok: false, message: `Invalid project file: ${componentError}` };
+
+        const uis = data.uiProject?.uis || data.uis;
+        if (uis != null) {
+            if (!Array.isArray(uis) || uis.length > 100) {
+                return { ok: false, message: 'Invalid project file: uiProject.uis must contain at most 100 UIs.' };
+            }
+            for (let index = 0; index < uis.length; index++) {
+                componentError = validateComponents(uis[index]?.components, `uiProject.uis[${index}].components`);
+                if (componentError) return { ok: false, message: `Invalid project file: ${componentError}` };
+            }
         }
 
         return { ok: true };
@@ -103,6 +168,8 @@ const projectFormat = {
             return false;
         }
 
+        data = this.migrate(data);
+
         if (data.uploadedImages && typeof imageManager !== 'undefined') {
             imageManager.uploadedImages = data.uploadedImages;
         }
@@ -122,7 +189,8 @@ const projectFormat = {
                 comp.y,
                 comp.width,
                 comp.height,
-                comp.properties
+                comp.properties,
+                comp
             );
 
             if (comp.id) {
@@ -154,9 +222,36 @@ const projectFormat = {
         return true;
     },
 
+    migrate: function (data) {
+        const migrated = JSON.parse(JSON.stringify(data));
+        if (migrated.formatVersion !== 2) return migrated;
+
+        const migrateComponents = components => {
+            (components || []).forEach(component => {
+                component.anchor_from = component.anchor_from || 'top_left';
+                component.anchor_to = component.anchor_to || 'top_left';
+                // v2 added one pixel only during export. Fold it into the real
+                // Bedrock offset so existing packs keep their in-game position.
+                component.x = (Number(component.x) || 0) + 1;
+                component.y = Number(component.y) || 0;
+            });
+        };
+
+        migrateComponents(migrated.components);
+        (migrated.uiProject?.uis || migrated.uis || []).forEach(ui => migrateComponents(ui.components));
+        migrated.formatVersion = this.FORMAT_VERSION;
+        migrated.formatLabel = this.FORMAT_LABEL;
+        migrated.migratedFrom = 2;
+        return migrated;
+    },
+
     persistLocal: function (data) {
         this.assertValid(data);
-        util.saveToLocalStorage('minecraft_chest_ui_project', data);
+        const saved = util.saveToLocalStorage('minecraft_chest_ui_project', data);
+        if (!saved) {
+            throw new Error('The browser could not save this project. Storage may be full or unavailable.');
+        }
+        return true;
     },
 
     saveToBrowser: function () {

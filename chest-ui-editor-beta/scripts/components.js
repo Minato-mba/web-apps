@@ -1,47 +1,3 @@
-const imageManager = {
-    uploadedImages: {},
-
-    generateImageName: function (filename) {
-        const baseName = filename.replace(/\.[^/.]+$/, ''); const sanitizedName = baseName.replace(/[^a-z0-9_]/gi, '_').toLowerCase();
-        const uniqueId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-        return `custom_${sanitizedName}_${uniqueId}`;
-    },
-
-    storeImage: function (file, callback) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const imageName = this.generateImageName(file.name);
-            const imagePath = `user_uploaded:${imageName}`;
-            this.uploadedImages[imagePath] = {
-                data: e.target.result,
-                type: file.type,
-                originalName: file.name
-            };
-            callback(imagePath);
-        };
-        reader.readAsDataURL(file);
-    },
-
-    getImageUrl: function (path) {
-        if (!path) return '';
-
-        if (path.startsWith('user_uploaded:')) {
-            return this.uploadedImages[path]?.data || '';
-        }
-
-        if (path.startsWith('textures/ui/')) {
-            const filename = path.replace('textures/ui/', '');
-            return `https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/textures/ui/${filename}.png`;
-        }
-
-        return `../assets/${path.replace('textures', 'images')}.png`;
-    },
-
-    isUploadedImage: function (path) {
-        return path.startsWith('user_uploaded:');
-    }
-};
-
 function getButtonTextureUrl(texturePath) {
     if (!texturePath) return '';
 
@@ -161,7 +117,7 @@ function getButtonContentHtml(component) {
         const labelScale = Number(properties.label_font_scale_factor) || 1.0;
         controls.push(`<div class="button-embedded-label"
             style="left:calc(50% + ${properties.label_offset_x || 0}px);top:calc(50% + ${properties.label_offset_y || 0}px);color:${labelColor};font-size:${10 * labelScale}px;">
-            ${properties.label_text || ''}
+            ${util.escapeHtml(properties.label_text || '')}
         </div>`);
     }
 
@@ -764,16 +720,16 @@ const componentTypes = {
             return `<div class="editor-component label" 
                         data-id="${component.id}" 
                         data-type="label"
-                        style="left:${component.x}px;top:${component.y}px;color:${color};font-size:${10 * fontScale}px;">
-                        ${component.properties.text}
+                        style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;color:${color};font-size:${10 * fontScale}px;">
+                        ${util.escapeHtml(component.properties.text)}
                     </div>`;
         },
         renderPreview: (component) => {
             const color = util.rgbArrayToHex(component.properties.color);
             const fontScale = Number(component.properties.font_scale_factor) || 1.0;
             return `<div class="preview-component label" 
-                        style="left:${component.x}px;top:${component.y}px;color:${color};font-size:${10 * fontScale}px;">
-                        ${component.properties.text}
+                        style="left:${component.x}px;top:${component.y}px;width:${component.width}px;height:${component.height}px;color:${color};font-size:${10 * fontScale}px;">
+                        ${util.escapeHtml(component.properties.text)}
                     </div>`;
         },
         generateJSON: (component) => {
@@ -783,7 +739,11 @@ const componentTypes = {
                 color: component.properties.color,
                 font_scale_factor: Number(component.properties.font_scale_factor) || 1.0,
                 x: component.x,
-                y: component.x
+                y: component.y,
+                width: component.width,
+                height: component.height,
+                anchor_from: component.anchor_from,
+                anchor_to: component.anchor_to
             };
         }
     },
@@ -867,9 +827,7 @@ const componentTypes = {
             return {
                 close_button_holder: {
                     type: "stack_panel",
-                    anchor_from: "top_left",
-                    anchor_to: "top_left",
-                    offset: [component.x + 1, component.y],
+                    ...jsonUiLayout.getPlacement(component),
                     $close_button_panel_size: [component.width, component.height],
                     controls: [
                         {
@@ -928,7 +886,7 @@ function getNextCollectionIndex(components) {
     return maxIndex + 1;
 }
 
-function createComponent(type, x = 0, y = 0) {
+function createComponent(type, x = 0, y = 0, width = null, height = null, properties = null, layout = null) {
     if (!componentTypes[type]) {
         console.error(`Unknown component type: ${type}`);
         return null;
@@ -940,9 +898,11 @@ function createComponent(type, x = 0, y = 0) {
         type: type,
         x: x,
         y: y,
-        width: componentType.defaultWidth,
-        height: componentType.defaultHeight,
-        properties: { ...componentType.defaultProps }
+        width: width ?? componentType.defaultWidth,
+        height: height ?? componentType.defaultHeight,
+        anchor_from: layout?.anchor_from || layout?.anchorFrom || jsonUiLayout.DEFAULT_ANCHOR,
+        anchor_to: layout?.anchor_to || layout?.anchorTo || jsonUiLayout.DEFAULT_ANCHOR,
+        properties: { ...componentType.defaultProps, ...(properties || {}) }
     };
     const needsIndex = ['container_item', 'container_item_with_picture', 'progress_bar',
         'on_off_item', 'pot', 'container_type'].includes(type);
@@ -952,5 +912,5 @@ function createComponent(type, x = 0, y = 0) {
         component.properties.collection_index = getNextCollectionIndex(currentComponents);
     }
 
-    return component;
+    return jsonUiLayout.normalizeComponent(component);
 }

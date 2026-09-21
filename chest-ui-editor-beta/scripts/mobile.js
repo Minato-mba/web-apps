@@ -1,6 +1,11 @@
 const mobile = {
     selectedComponentType: null,
     selectedComponent: null,
+    isMobileMode: null,
+    currentView: 'editor',
+    isMobileViewport: function () {
+        return window.matchMedia('(max-width: 1024px)').matches;
+    },
     init: function () {
         const showComponentsBtn = document.getElementById('show-components');
         const showEditorBtn = document.getElementById('show-editor');
@@ -20,6 +25,7 @@ const mobile = {
         this.createMobileEditorToolbar();
         this.createPropertiesButton();
         this.setupMobileZoom();
+        this.setupDrawerAccessibility();
 
         showComponentsBtn.addEventListener('click', () => {
             const drawer = document.getElementById('mobile-component-drawer');
@@ -156,15 +162,17 @@ const mobile = {
     getComponentDisplayInfo: function (component) {
         if (component.type === 'label') {
             const text = component.properties.text || '';
-            return text.length > 15 ? `"${text.substring(0, 15)}..."` : `"${text}"`;
+            return text.length > 15
+                ? `"${util.escapeHtml(text.substring(0, 15))}..."`
+                : `"${util.escapeHtml(text)}"`;
         }
         if (component.type === 'tab') {
             return component.properties.show_label && component.properties.label_text
-                ? component.properties.label_text
+                ? util.escapeHtml(component.properties.label_text)
                 : `Tab ${component.properties.toggle_index || 1}`;
         }
         if (component.type === 'button' && component.properties.show_label && component.properties.label_text) {
-            return component.properties.label_text;
+            return util.escapeHtml(component.properties.label_text);
         }
         if (component.properties.collection_index !== undefined) {
             return `Index: ${component.properties.collection_index}`;
@@ -173,6 +181,7 @@ const mobile = {
     },
 
     switchView: function (view) {
+        this.currentView = view;
         const sidebar = document.querySelector('.sidebar');
         const editorArea = document.querySelector('.editor-area');
         const previewArea = document.querySelector('.preview-area');
@@ -226,6 +235,40 @@ const mobile = {
         if (listButton) listButton.classList.remove('active');
     },
 
+    setupDrawerAccessibility: function () {
+        const drawers = document.querySelectorAll(
+            '.mobile-component-drawer, .mobile-templates-drawer, .mobile-properties-drawer, .mobile-components-list-drawer'
+        );
+        drawers.forEach(drawer => {
+            drawer.setAttribute('role', 'dialog');
+            drawer.setAttribute('aria-modal', 'true');
+            const sync = () => {
+                const open = drawer.classList.contains('open');
+                drawer.inert = !open;
+                drawer.setAttribute('aria-hidden', String(!open));
+                if (open) {
+                    requestAnimationFrame(() => {
+                        drawer.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])')?.focus();
+                    });
+                }
+            };
+            new MutationObserver(sync).observe(drawer, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+            sync();
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape' || !this.isMobileViewport()) return;
+            const openDrawer = [...drawers].find(drawer => drawer.classList.contains('open'));
+            if (openDrawer) {
+                event.preventDefault();
+                this.closeAllDrawers();
+            }
+        });
+    },
+
     handleCanvasTap: function (e) {
         if (!this.selectedComponentType) return;
         if (e.target !== e.currentTarget) return;
@@ -234,8 +277,8 @@ const mobile = {
         const rect = canvas.getBoundingClientRect();
         const scaleX = rect.width / canvas.offsetWidth;
         const scaleY = rect.height / canvas.offsetHeight;
-        let x = (e.clientX - rect.left) / scaleX / editor.zoomLevel;
-        let y = (e.clientY - rect.top) / scaleY / editor.zoomLevel;
+        let x = (e.clientX - rect.left) / scaleX;
+        let y = (e.clientY - rect.top) / scaleY;
 
         if (editor.snapToGrid) {
             x = util.snapToGrid(x);
@@ -478,7 +521,7 @@ const mobile = {
         editor.selectComponent = function (component) {
             originalSelectComponent.call(editor, component);
 
-            if (window.innerWidth < 768) {
+            if (mobile.isMobileViewport()) {
                 mobile.selectedComponent = component;
                 if (mobile.propertiesButton) {
                     mobile.propertiesButton.style.display = 'none';
@@ -525,7 +568,7 @@ const mobile = {
         editor.updateComponent = function (component) {
             originalUpdateComponent.call(editor, component);
 
-            if (window.innerWidth < 768 && mobile.selectedComponent?.id === component.id &&
+            if (mobile.isMobileViewport() && mobile.selectedComponent?.id === component.id &&
                 mobile.propertiesContainer?.children.length) {
                 propertiesPanel.setInputValues(mobile.propertiesContainer, component);
             }
@@ -535,7 +578,7 @@ const mobile = {
         editor.updateComponentPosition = function (component) {
             originalUpdateComponentPosition.call(editor, component);
 
-            if (window.innerWidth < 768 && editor.selectedComponent?.id === component.id &&
+            if (mobile.isMobileViewport() && editor.selectedComponent?.id === component.id &&
                 mobile.propertiesContainer?.children.length) {
                 propertiesPanel.setInputValues(mobile.propertiesContainer, component);
             }
@@ -916,7 +959,9 @@ const mobile = {
     },
 
     checkMobileLayout: function () {
-        const isMobile = window.innerWidth < 768;
+        const isMobile = this.isMobileViewport();
+        if (this.isMobileMode === isMobile) return;
+        this.isMobileMode = isMobile;
         const mobileNav = document.querySelector('.mobile-nav');
         const componentDrawer = document.getElementById('mobile-component-drawer');
         const templateDrawer = document.getElementById('mobile-templates-drawer');
@@ -942,8 +987,7 @@ const mobile = {
             if (sidebar && !sidebar.classList.contains('mobile-sidebar-overlay')) {
                 sidebar.style.display = 'none';
             }
-            document.querySelector('.editor-area').style.display = 'block';
-            document.querySelector('.preview-area').style.display = 'none';
+            this.switchView(this.currentView || 'editor');
             document.querySelector('.template-selector-panel').style.display = 'none';
 
             document.getElementById('show-components').classList.remove('active');
